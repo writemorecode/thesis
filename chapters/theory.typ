@@ -37,6 +37,10 @@ vstroke: .5pt + luma(200),
 }
 )
 
+In the worst case, a new bin must be opened for each of the $n$ items.
+This means that placing the $k$:th item will require $k$ bin size checks.
+This gives the algorithm the quadratic time complexity $Omicron (m n)$.
+
 === (BF) Best fit
 Place each item into the bin with the smallest remaining capacity which is at least as large as the size of item.
 If an item does not fit in any open bin, a new bin is opened, and the item is placed in it @garey_graham_ullman_1972.
@@ -68,6 +72,9 @@ vstroke: .5pt + luma(200),
 }
 )
 
+For the worst case, we must check each of the $m$ bins for each of the $n$ items.
+This gives the algorithm the time complexity $Omicron (m n)$. 
+
 === (WF) Worst fit
 A variation of best-fit, where we instead select the bin with the largest remaining capacity @garey_graham_ullman_1972.
 
@@ -98,6 +105,8 @@ vstroke: .5pt + luma(200),
 }
 )
 
+Same time complexity as best fit.
+
 === (NF) Next-fit
 First, open a single bin.
 Let this bin be the current bin.
@@ -125,6 +134,9 @@ vstroke: .5pt + luma(200),
   )
 }
 )
+
+Each item only checks the current bin, opening a new bin if needed.
+This gives the algorithm the time complexity $Theta (n)$.
 
 == Offline bin-packing algorithms
 For the offline case, we can improve the previous online algorithms by sorting the items in decreasing order.

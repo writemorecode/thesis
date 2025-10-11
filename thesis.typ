@@ -1,3 +1,5 @@
+#set text(font: "New Computer Modern")
+
 #set page(numbering: "1")
 
 #let title = [Efficient offline job scheduling in private clouds]
