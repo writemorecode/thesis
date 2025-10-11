@@ -12,6 +12,8 @@
 
 // #pagebreak()
 
+#outline()
+
 #include "chapters/introduction.typ"
 #include "chapters/problem_description.typ"
 #pagebreak()
