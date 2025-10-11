@@ -1,4 +1,4 @@
-== Problem description
+= Problem description
 
 #let ZZnonneg = $ZZ_(>=0)$
 #let ZZpos = $ZZ_(>0)$

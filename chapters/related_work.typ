@@ -1,4 +1,4 @@
-== Related work
+= Related work
 
 In 2010, Speitkamp and Bichler @speitkamp_bichler_2010 described a server consolidation problem.
 The authors presented an LP-based formulation of the problem, and a solution using a heuristic based on LP-relaxation. 

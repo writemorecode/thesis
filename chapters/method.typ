@@ -1,2 +1,2 @@
-== Method
+= Method
 
