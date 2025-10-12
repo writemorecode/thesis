@@ -74,6 +74,9 @@ vstroke: .5pt + luma(200),
 
 For the worst case, we must check each of the $m$ bins for each of the $n$ items.
 This gives the algorithm the time complexity $Omicron (m n)$. 
+The algorithm can be improved by storing the bin capacities in a sorted data structure, such as a binary heap.
+Binary heaps allow us to retrieve the smallest element from a heap of $m$ elements in $Omicron (log m)$ time.
+This gives the algorithm an improved time complexity of $Omicron (n log m)$.
 
 === (WF) Worst fit
 A variation of best-fit, where we instead select the bin with the largest remaining capacity @garey_graham_ullman_1972.
