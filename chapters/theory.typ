@@ -47,9 +47,6 @@ $
   x_(i j) in {0,1}, quad y_j in {0,1} quad forall i,j \
 $
 
-
-== Online bin-packing algorithms
-
 === (FF) First fit
 The _first-fit_ algorithm assigns an item to the bin $U_j$ with sufficient capacity and the smallest index $j$.
 If an item does not fit in any open bin, a new bin is opened, and the item is placed in it @garey_graham_ullman_1972.
@@ -185,6 +182,19 @@ vstroke: .5pt + luma(200),
 Each item only checks the current bin, opening a new bin if needed.
 This gives the algorithm the time complexity $Theta (n)$.
 
-== Offline bin-packing algorithms
 For the offline case, we can improve the previous online algorithms by sorting the items in decreasing order.
-This gives us the FirstFitDecreasing and NextFitDecreasing algorithms @garey_graham_ullman_1972.
+This gives us the First-Fit-Decreasing and Next-Fit-Decreasing algorithms @garey_graham_ullman_1972.
+
+== Algorithmic bounds
+
+Much research has been done on finding tight bounds for approximation algorithms for bin-packing.
+Due to this, we shall only discuss the latest results.
+By _bounds_, we mean the ratio between the number of bins used by the approximation algorithms, and the optimal number of bins possible for the input.
+
+In 2013, Dósa and Sgall @dosa_sgall_2013_ff_bounds showed new bounds for First-Fit: $"FF"(L) <= floor(1.7 "OPT"(L))$.
+This means that if the optimal number of required bins for the input $L$ is $"OPT"(L)$, then the First-Fit algorithm will require $floor(1.7 "OPT"(L))$ bins.
+
+In 2007, Dósa @dosa_2007_ffd_bounds showed new bounds for First-Fit-Decreasing: $"FFD"(L) ≤ 11/9 "OPT"(L) + 6/9$.
+In 2014, Dósa and Gyorgy @dosa_gyorgy_2014_bounds_bf showed that these same bounds also hold for Best-Fit.  
+
+In David Johnson's 1973 Ph.D. thesis @johnson_1973_phd, the bounds $A(L) ≤ 2 "OPT"(L) - 1$ for the Next-Fit and Worst-Fit algorithms were presented.
