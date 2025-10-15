@@ -1,9 +1,53 @@
 #import "@preview/algorithmic:1.0.6"
 #import algorithmic: style-algorithm, algorithm-figure
 
+#let ZZnonneg = $ZZ_(>=0)$
+
 = Theory
 
-Suppose we have bins $U_1,dots.h,U_n$.
+== Bin-packing problem definition
+
+=== One-dimensional bin-packing problem
+
+The book _Computers and Intractability_ @book_computers_intractability gives the following definition of the bin-packing problem.
+Given a finite set $U={u_1,dots.h,u_n}$ of _items_ and a rational _size_ $s(u) in [0,1)$ for each item $u in U$, find a partition of $U$ into disjoint subsets $U_1,dots.h,U_k$ such that the sum of the size of the items in each $U_i$ is no more than $1$ and such that $k$ is as small as possible.
+
+The problem can be formulated as an integer LP problem:
+
+$
+  "minimize" quad sum_(i=1)^k y_i \
+  "subject to" quad \
+  sum_(j=1)^k x_(i j) = 1 quad forall 1 <= i <= n \
+  sum_(i=1)^n s(i) x_(i j) <= c y_j quad forall 1 <= j <= k \
+  x_(i j) in {0,1}, quad y_j in {0,1} quad forall i,j \
+$
+
+Here, $k$ and $n$ are the number of bins and items, respectively.
+The capacity of all bins is $c$.
+The variable $y_j$ is equal to 1 if bin $j$ is used, and $0$ otherwise.
+The variable $x_(i j)$ is equal to 1 if item $i$ is placed in bin $j$, and $0$ otherwise.
+As before, the objective is to minimize the number of bins used.
+The first constraint ensures that each item $i$ is placed in exactly one bin.
+The second constraint ensures that no bin capacity is exceeded by the items placed in it.
+
+=== Multidimensional heterogeneous bin-packing problem
+
+We now consider a more general case, where both items and bins have different sizes and capacities in multiple dimensions.
+Items and bins have $D$ dimensions.
+The size of item $i$ is given by $bold(s)(i) in ZZnonneg^D$.
+The capacity of bin $j$ is given by $bold(c)(j) in ZZnonneg^D$.
+
+The problem can be formulated as an integer LP problem:
+
+$
+  "minimize" quad sum_(i=1)^k y_k \
+  "subject to" quad \
+  sum_(j=1)^k x_(i j) = 1 quad forall 1 <= i <= n \
+  sum_(i=1)^n bold(s)(i) x_(i j) <= bold(c)(i) y_j quad forall 1 <= j <= k \
+  x_(i j) in {0,1}, quad y_j in {0,1} quad forall i,j \
+$
+
+
 == Online bin-packing algorithms
 
 === (FF) First fit
