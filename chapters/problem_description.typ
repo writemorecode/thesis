@@ -199,6 +199,33 @@ The second stage is by far the most difficult.
 Just as there can be an extremely large number of valid placements of objects in bins, there can be an extremely large number of valid allocations for each time slot.
 Here we will need to study heuristics-based methods of pruning the search space.
 
+== Symbol reference table
+
+#figure(
+  table(
+    columns: 4,
+    align: horizon,
+    table.header([*Symbol*], [*Type*], [*Shape*], [*Description*]),
+    [K], [Scalar], [-], [Number of resource types],
+    [J], [Scalar], [-], [Number of job types],
+    [M], [Scalar], [-], [Number of machine types],
+    [$bold(R)$], [Matrix], [(K,J)], [Resource requirement of each job type],
+    [$bold(C)$], [Matrix], [(K,M)], [Resource capacity of each machine type],
+    [$bold(L)$], [Matrix], [(J,T)], [Number of each job type scheduled for each time slot],
+    [$bold(r)_j$], [Vector], [K], [Resource requirement of job type $j$],
+    [$bold(m)_i$], [Vector], [K], [Resource capacity of machine type $i$],
+    [$bold(x)$], [Vector], [M], [Number of each machine type purchased],
+    [$bold(c)^p$], [Vector], [M], [Cost to buy one of each machine type],
+    [$bold(c)^r$], [Vector], [M], [Per time-slot (powered-on) running cost for each machine type],
+    [$bold(z)_t$], [Vector], [M], [Number of each machine type powered-on during time slot $t$],
+    [$S_i$], [Set], [-], [All valid job packing configurations for machine type $i$],
+    [$bold(y)_(i,j)$], [Vector], [J], [A valid job packing configuration for machine type $i$],
+    [$bold(Y)_(i)$], [Matrix], [(J,$abs(S_i)$)], [Matrix with column vectors in $S_i$],
+    [$bold(n)_(i,t)$], [Vector], [$abs(S_i)$], [Number of each machine type $i$ job packing used for time slot $t$],
+  ),
+  caption: [Symbol reference table],
+) <symbol_ref_table>
+
 #pagebreak()
 == Example
 
