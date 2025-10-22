@@ -58,32 +58,32 @@ $
   (bold(x)_(U))_k = max_j (bold(p)_(j))_k
 $
 
-== Lower bound on machine types
-
-Let $S_(t,m)$ be the set of all jobs running on machines of type $m$ during time slot $t$.
-For each resource $k$, the job's demand is $r_(j,k)$ and the machine's capacity is $C_(m,k)$.
-If we are running $N_(t,m)$ machines of type $m$ during time slot $t$, then for each resource $k$, total demand must not exceed total capacity:
-
-$
-  sum_(j in S_(t,m)) r_(j,k) <= N_(t,m) C_(m,k)
-$
-
-Rearranging, we have
-
-$
-  ceil(sum_(j in S_(t,m)) r_(j,k)/C_(m,k)) <= N_(t,m), quad forall k
-$
-
-This must hold for every resource, so
-
-$
-  max_k ceil(sum_(j in S_(t,m)) r_(j,k)/C_(m,k)) <= N_(t,m), quad forall k \
-$
-
-We see that we have found a lower bound on the number of machines of each type needed for each time slot.
-Since we can reuse machines between time slots, we need to own enough machines to handle the highest (lowest) demand over all time slots.
-
-$
-  N_m = max_t N_(t,m)
-$
-This gives us a lower bound $bold(x)_L$ to $bold(x)$.
+// == Lower bound on machine types
+// 
+// Let $S_(t,m)$ be the set of all jobs running on machines of type $m$ during time slot $t$.
+// For each resource $k$, the job's demand is $r_(j,k)$ and the machine's capacity is $C_(m,k)$.
+// If we are running $N_(t,m)$ machines of type $m$ during time slot $t$, then for each resource $k$, total demand must not exceed total capacity:
+// 
+// $
+//   sum_(j in S_(t,m)) r_(j,k) <= N_(t,m) C_(m,k)
+// $
+// 
+// Rearranging, we have
+// 
+// $
+//   ceil(sum_(j in S_(t,m)) r_(j,k)/C_(m,k)) <= N_(t,m), quad forall k
+// $
+// 
+// This must hold for every resource, so
+// 
+// $
+//   max_k ceil(sum_(j in S_(t,m)) r_(j,k)/C_(m,k)) <= N_(t,m), quad forall k \
+// $
+// 
+// We see that we have found a lower bound on the number of machines of each type needed for each time slot.
+// Since we can reuse machines between time slots, we need to own enough machines to handle the highest (lowest) demand over all time slots.
+// 
+// $
+//   N_m = max_t N_(t,m)
+// $
+// This gives us a lower bound $bold(x)_L$ to $bold(x)$.
