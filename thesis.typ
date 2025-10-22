@@ -2,6 +2,23 @@
 
 #set page(numbering: "1")
 
+#set heading(numbering: "1.")
+#show heading.where(level: 1): it => {
+  counter(math.equation).update(0)
+  it
+}
+
+#set math.equation(
+  numbering: it => {
+    let count = counter(heading.where(level: 1)).at(here()).first()
+    if count > 0 {
+      numbering("(1.1)", count, it)
+    } else {
+      numbering("(1)", it)
+    }
+  },
+)
+
 #let title = [Efficient offline job scheduling in private clouds]
 #let author = [Gustav Karlsson]
 
