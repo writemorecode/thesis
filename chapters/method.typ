@@ -1,4 +1,6 @@
 #import "@preview/fletcher:0.5.6" as fletcher: diagram, edge, node
+#import "@preview/algorithmic:1.0.6"
+#import algorithmic: style-algorithm, algorithm-figure
 
 = Method
 
@@ -35,55 +37,66 @@ RQ2: How can we create a cloud job scheduler which is optimized for both schedul
 
 == Upper bound on machine types
 
-Before we begin to search for an optimal machine vector $bold(x)$, we want to find an upper bound $bold(x) <= bold(x)_U$.
-This will restrict the search space.
+Before we begin to search for an optimal machine vector $bold(x)$, we want to restrict the search space by finding an upper bound $bold(x)_U >= bold(x)$.
 
-Any valid upper bound $bold(x_U)$ must be able to run the jobs given by $bold(l)_t$ for all time slots $t$.
+Any valid upper bound must be able to run the jobs given by $bold(l)_t$ for all time slots $t$.
 Since we are searching for an upper bound, we only need to focus on the time slots with the most scheduled jobs.
 We can also ignore all duplicate time slots.
-We can do this by computing the Pareto set of the set of the time slots vectors.
-This gives us a new, possibly smaller set of time slots we will call $P$.
+We can do this by only considering time slots which are not Pareto dominated by some other time slot.
+This gives us a smaller subset of time slots.
+We shall continue here to refer to these time slot vectors as $bold(l)_t$.
 
-$
-  P = "ParetoSet"({bold(l)_1,bold(l)_2,dots.h,bold(l)_t}) = {bold(p)_1,bold(p)_2,dots.h,bold(p)_n}, quad n <= t
-$
+Next, for each time slot vector $bold(l)_i in P$ and for each machine type $j$, we attempt to run FFD (First-Fit-Decreasing) on the jobs in $bold(l)_i$ using only machines of type $j$.
+This gives us an upper bound
 
-Next, for each time slot vector $bold(p)_i in P$, we run FFD (First-Fit-Decreasing) on the jobs in $bold(p)_i$.
-This gives us a machine vector $bold(v)_j$, which is guaranteed to be a valid job-machine allocation.
-By the upper bound on FFD given in the Theory chapter, $bold(v)_j$ will be no more than approximately $22%$ ($11/9$) worse than the theoretical optimum.
+$ u_(i,t)="FFD"(bold(m)_i,bold(l)_t) $
 
-Finally, we get our upper bound $bold(x)_U$ by taking the component-wise maximum across all $bold(p)_k$ vectors.
+on the number of required machines of each type.
+We get each component of the upper bound $bold(x)_U$ by taking the maximum of $u_(i,t)$ across all time slots.
+$ (bold(x)_U)_i = max_t u_(i,t) $
 
-$
-  (bold(x)_(U))_k = max_j (bold(p)_(j))_k
-$
+We can do this because we are searching for an upper bound on the number of each machine type we will need to purchase.
+This upper bound will include machines of different types.
+We are assuming that each job type can run on at least one machine type.
+This means that if some job type cannot run on some machine type, then it will be able to run on some other machine type.
+Since the upper bound will be a valid selection of machines, we can guarantee that it will contain a sufficient number of this machine type.
 
-// == Lower bound on machine types
-// 
-// Let $S_(t,m)$ be the set of all jobs running on machines of type $m$ during time slot $t$.
-// For each resource $k$, the job's demand is $r_(j,k)$ and the machine's capacity is $C_(m,k)$.
-// If we are running $N_(t,m)$ machines of type $m$ during time slot $t$, then for each resource $k$, total demand must not exceed total capacity:
-// 
-// $
-//   sum_(j in S_(t,m)) r_(j,k) <= N_(t,m) C_(m,k)
-// $
-// 
-// Rearranging, we have
-// 
-// $
-//   ceil(sum_(j in S_(t,m)) r_(j,k)/C_(m,k)) <= N_(t,m), quad forall k
-// $
-// 
-// This must hold for every resource, so
-// 
-// $
-//   max_k ceil(sum_(j in S_(t,m)) r_(j,k)/C_(m,k)) <= N_(t,m), quad forall k \
-// $
-// 
-// We see that we have found a lower bound on the number of machines of each type needed for each time slot.
-// Since we can reuse machines between time slots, we need to own enough machines to handle the highest (lowest) demand over all time slots.
-// 
-// $
-//   N_m = max_t N_(t,m)
-// $
-// This gives us a lower bound $bold(x)_L$ to $bold(x)$.
+It is possible that the resource requirements of certain job types exceed the resource capacities of certain machine types.
+Suppose for example that for resource $k$, the demands of job type $j$ exceeds the capacity of machine type $i$.
+In this case, we can skip this job type by setting $bold(l)_(t,j)=0$ where $r_(j,k) > C_(m,k)$.
+Here, we are unscheduling all jobs of type $j$ from time slot $t$, if job type $j$ can not run on machine type $i$.
+
+The algorithm can be described with the following pseudocode.
+
+#block(breakable: false,[
+#show: style-algorithm
+#algorithm-figure("Machine types upper bound",
+  vstroke: .5pt + luma(200),
+  {
+    import algorithmic: *
+    Procedure(
+      "MachinesUpperBound",
+      (),
+      {
+        For($"time slot" t = 1,2,...,T$, {
+          Comment[Let $bold(lambda)_t$ be $bold(l)_t$ with oversized jobs removed]
+          Assign($bold(lambda)_t$, $bold(l)_t$)
+          For($"machine type" m = 1,2,...,M$, {
+            For($"job type" j = 1,2,...,J$, {
+              Comment[Remove oversized job types]
+              If($exists k: r_(j,k) > C_(m,k)$, {
+                Assign($lambda_(t,j)$, $0$)
+              }) 
+              Comment[Pack jobs for time slot $t$ into machines of type $i$]
+              Assign($u_(i,t)$, $max_t "FFD"(bold(m)_i, bold(lambda)_t)$)
+            }) 
+          Comment[Take max number of machines needed across all time slots]
+          Assign($(bold(x)_U)_i$, $max_t u_(i,t)$)
+          })      
+        }) 
+        Return($bold(x)_U$)
+      }
+    )
+  }
+  )
+])
