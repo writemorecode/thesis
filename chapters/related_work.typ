@@ -15,6 +15,11 @@ In 2016, Mosa and Paton @mosa_paton_2016 developed an optimized energy- and SLA-
 
 In 2018, Lei et al. @liu_li_li_2018 presented, analyzed, and benchmarked a randomized approximation algorithm for solving the minimal cost job-server configuration problem.
 
+In 2010, Khuller et al. @khuller_scheduling_energy_partial_shutdown studied job scheduling problems with machine activation costs.
+In this case, a subset of all available machines must be selected for use, and each machine type has a cost for selecting it.
+This machine activation cost shall not be confused with a machine purchase cost.
+Later in 2011, Khuller et al. @khuller_gma presented a generalization of their previous work.
+
 == Bin-packing
 
 In 1972, Gary, Graham, and Ullman analyzed the worst-case performance of heuristics-based methods for bin-packing @garey_worst_mem_alloc.
