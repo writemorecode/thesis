@@ -23,7 +23,7 @@ The scheduler then computes a solution, including the machines to buy, and the j
   edge("-|>"),
   node((1, 1), [
     Problem solution \
-    $bold(x), bold(Y)_i, bold(n)_(i,t)$
+    $bold(x), bold(z)_t, bold(Y)_i, bold(n)_(i,t)$
   ]),
 )
 
@@ -88,7 +88,7 @@ The algorithm can be described with the following pseudocode.
                 Assign($lambda_(t,j)$, $0$)
               }) 
               Comment[Pack jobs for time slot $t$ into machines of type $i$]
-              Assign($u_(i,t)$, $max_t "FFD"(bold(m)_i, bold(lambda)_t)$)
+              Assign($u_(i,t)$, $"FFD"(bold(m)_i, bold(lambda)_t)$)
             }) 
           Comment[Take max number of machines needed across all time slots]
           Assign($(bold(x)_U)_i$, $max_t u_(i,t)$)
@@ -100,3 +100,4 @@ The algorithm can be described with the following pseudocode.
   }
   )
 ])
+
