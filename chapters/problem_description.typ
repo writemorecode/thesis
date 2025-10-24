@@ -50,11 +50,6 @@ The vector element $x_i$ equals the number of machines of type $i$ we choose to 
 The total initial cost of buying our selected machines will then be given by $bold(x)^(T)bold(c^p)$.
 
 To calculate our total running cost, we introduce the variables $z_(t) in ZZnonneg^M$, where $z_(t,m)$ denotes the number of instances of machine type $m$ which are powered on during time slot $t$.
-These new variables may be stored as column vectors of the $(M , T)$ matrix $bold(Z)$.
-
-$
-  bold(Z) = mat(|, |, , |; bold(z)_1, bold(z)_2, dots.c, bold(z)_T; |, |, , |)
-$
 
 Since the number of powered on instances of any machine type can not exceed the number of purchased instances of the given type, we must add the constraints $bold(z)_t<=bold(x) ,forall t$.
 
