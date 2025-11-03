@@ -98,35 +98,25 @@ The algorithm can be described with the following pseudocode.
   })
 ])
 
-== Defining the size of a job
+== Defining the sizes of jobs and machines
 
-In order to be able to use heuristics-based bin-packing algorithm such as First-Fit Descending, we must be able to sort jobs in order of size.
-This in turn requires us to define the size of a job.
+In order to be able to use heuristics-based bin-packing algorithm such as First-Fit Descending, we must be able to order machine types and job types in order of size.
 There are a number of different available approaches.
-We can define the size of a job as the sum or product of its resource demands, as the maximum resource demand, as the Euclidean norm of its resource demand vector, etc.
+We can define the size of a job type or machine type as the sum or product of its resource demands, as the maximum resource demand, as the Euclidean norm of its resource demand vector, etc.
 We shall choose to define the size of a job as the sum of its resource demands.
-The size of job type $j$ is then given by $S(j)$.
+The size of job type $j$ is then given by the function $S(j)$.
+
 $
-  S(j) = sum_(i=1)^K bold(r)_(j,k)
+  S(j) = sum_(k=1)^K bold(r)_(j,k)
 $
+
+Similarly, the size of machine type $i$ is then given by the function $B(i)$.
+
+$
+  B(i) = sum_(k=1)^K bold(C)_(i,k)
+$
+
 For related work on the subject of defining the size of multidimensional jobs/bins for job scheduling/bin packing, see @MOMMESSIN2025106860.
-
-== Defining the size of a machine
-
-In order to be able to efficiently select the machine type when powering on a new machine instance, we should order the mmachine types in non-increasing order of size.
-As discussed previously, this requires us to define the size, or volume, of a machine.
-First, we defint the volume of a machine type as the product of its capacities for all resources.
-Next, we define the size $V(i)$ of machine type $i$ as the ratio to its volume to its running cost per time slot.
-
-$
-  V(i) = 1 / c^r_i product_(k=1)^K bold(C)_(i,k)
-$
-
-This definition of size gives us a good ordering of machine types.
-If two machine types have the same volume, then the machine type with the lowest running cost per time slot will be considered the largest machine.
-If two machine types have the running cost per time slot, then the machine type with the largest volume will be considered the largest machine.
-This ensures that the machine types with the largest volume and lowest running cost will be selected first.
-This ordering ensures that the machine types with the highest resource capacities will be run the largest jobs.
 
 == A first solution algorithm
 
