@@ -134,7 +134,7 @@ At first glance, the problem of searching for both an optimal machine fleet to b
 However, using the relation between the machine vector $bold(x)$ and the vector $bold(z)_t$ of powered-on machines at time $t$:
 
 $
-  bold(x)_i = max_t (bold(z)_t)_i
+  bold(x)_i = max_t z_(t,i)
 $ <eqn_x_z_vectors>
 
 we can essentially remove the variable $bold(x)$ from the problem, and work only with $bold(z)_t$.
