@@ -1,6 +1,6 @@
 #import "@preview/fletcher:0.5.6" as fletcher: diagram, edge, node
 #import "@preview/algorithmic:1.0.6"
-#import algorithmic: style-algorithm, algorithm-figure
+#import algorithmic: algorithm-figure, style-algorithm
 
 = Method
 
@@ -46,7 +46,7 @@ We can do this by only considering time slots which are not Pareto dominated by 
 This gives us a smaller subset of time slots.
 We shall continue here to refer to these time slot vectors as $bold(l)_t$.
 
-Next, for each time slot vector $bold(l)_i in P$ and for each machine type $j$, we attempt to run FFD (First-Fit-Decreasing) on the jobs in $bold(l)_i$ using only machines of type $j$.
+Next, for each time slot vector $bold(l)_i$ and for each machine type $j$, we attempt to run FFD (First-Fit-Decreasing) on the jobs in $bold(l)_i$ using only machines of type $j$.
 This gives us an upper bound
 
 $ u_(i,t)="FFD"(bold(m)_i,bold(l)_t) $
@@ -68,11 +68,9 @@ Here, we are unscheduling all jobs of type $j$ from time slot $t$, if job type $
 
 The algorithm can be described with the following pseudocode.
 
-#block(breakable: false,[
-#show: style-algorithm
-#algorithm-figure("Machine types upper bound",
-  vstroke: .5pt + luma(200),
-  {
+#block(breakable: false, [
+  #show: style-algorithm
+  #algorithm-figure("Machine types upper bound", vstroke: .5pt + luma(200), {
     import algorithmic: *
     Procedure(
       "MachinesUpperBound",
@@ -86,18 +84,92 @@ The algorithm can be described with the following pseudocode.
               Comment[Remove oversized job types]
               If($exists k: r_(j,k) > C_(m,k)$, {
                 Assign($lambda_(t,j)$, $0$)
-              }) 
+              })
               Comment[Pack jobs for time slot $t$ into machines of type $i$]
               Assign($u_(i,t)$, $"FFD"(bold(m)_i, bold(lambda)_t)$)
-            }) 
-          Comment[Take max number of machines needed across all time slots]
-          Assign($(bold(x)_U)_i$, $max_t u_(i,t)$)
-          })      
-        }) 
+            })
+            Comment[Take max number of machines needed across all time slots]
+            Assign($(bold(x)_U)_i$, $max_t u_(i,t)$)
+          })
+        })
         Return($bold(x)_U$)
-      }
+      },
     )
-  }
-  )
+  })
 ])
+
+== Defining the size of a job
+
+In order to be able to use heuristics-based bin-packing algorithm such as First-Fit Descending, we must be able to sort jobs in order of size.
+This in turn requires us to define the size of a job.
+There are a number of different available approaches.
+We can define the size of a job as the sum or product of its resource demands, as the maximum resource demand, as the Euclidean norm of its resource demand vector, etc.
+We shall choose to define the size of a job as the sum of its resource demands.
+The size of job type $j$ is then given by $S(j)$.
+$
+  S(j) = sum_(i=1)^K bold(r)_(j,k)
+$
+For related work on the subject of defining the size of multidimensional jobs/bins for job scheduling/bin packing, see @MOMMESSIN2025106860.
+
+== Defining the size of a machine
+
+In order to be able to efficiently select the machine type when powering on a new machine instance, we should order the mmachine types in non-increasing order of size.
+As discussed previously, this requires us to define the size, or volume, of a machine.
+First, we defint the volume of a machine type as the product of its capacities for all resources.
+Next, we define the size $V(i)$ of machine type $i$ as the ratio to its volume to its running cost per time slot.
+
+$
+  V(i) = 1 / c^r_i product_(k=1)^K bold(C)_(i,k)
+$
+
+This definition of size gives us a good ordering of machine types.
+If two machine types have the same volume, then the machine type with the lowest running cost per time slot will be considered the largest machine.
+If two machine types have the running cost per time slot, then the machine type with the largest volume will be considered the largest machine.
+This ensures that the machine types with the largest volume and lowest running cost will be selected first.
+This ordering ensures that the machine types with the highest resource capacities will be run the largest jobs.
+
+== A first solution algorithm
+
+At first glance, the problem of searching for both an optimal machine fleet to buy, and an optimal packing of jobs to these machines may seem quite difficult.
+However, using the relation between the machine vector $bold(x)$ and the vector $bold(z)_t$ of powered-on machines at time $t$:
+
+$
+  bold(x)_i = max_t (bold(z)_t)_i
+$ <eqn_x_z_vectors>
+
+we can essentially remove the variable $bold(x)$ from the problem, and work only with $bold(z)_t$.
+This simplifies the problem greatly.
+An initial basic solution algorithm proceeds as following.
+
+First, we compute an upper bound $bold(x_U)$ on the machine vector $bold(x)$.
+Next, we select $bold(x_U)$ as our initial machine vector.
+We then pack the jobs into the machines given by the initial machine vector.
+Here we use the FFD algorithm, sorting jobs and machines as discussed previously.
+This gives us an initial solution $(bold(z), Y, bold(n))$, and an initial cost $c$.
+Here, $bold(z)$ is the number of powered-on machine instances of each type for all time slots, $bold(Y)$ are the job packing configurations selected by the packing algorithm, and $bold(n)$ are the number of each job packing configuration used for each machine type and time slot.
+Next, we enter a loop of some fixed number of iterations.
+
+At the start of each iteration, we select the best neighbor solution to the current solution.
+For this algorithm, this means attempting to move one or more jobs from one machine instance to another.
+We want to move jobs from machines with higher unused capacity, to machines with lower unused capacity.
+In other words, we want to move jobs from machines with lower resource utilization to machines with higher utilization.
+The FFD algorithm will always yield a valid allocation of jobs to machines.
+By moving jobs between machines, we can improve these allocations.
+More advanced versions of this solution algorithm could involve other operations, such as swapping two jobs between machines.
+We execute some fixed number of these operations, and select the neighboring solution with the lowest cost.
+If no such neighboring solution could be found, or if its cost was greater than the previous cost, then we stop the algorithm and return the current valid solution and cost since no improved solution could be found.
+Otherwise, we let this improved solution be $(bold(hat(z)), hat(Y), bold(hat(n)))$, and let $hat(c)$ be its cost.
+
+Next, we compute the new machine vector $bold(hat(x))$, using @eqn_x_z_vectors.
+If the new machine vector is greater than the upper bound, i.e. $bold(hat(x)) > bold(x_U)$, then we stop the algorithm and return the current valid solution and cost.
+Otherwise, if the new machine vector is not equal to the old, i.e. $bold(hat(x)) != bold(x)$, then we will attempt to re-pack the jobs into the machines given by $bold(hat(x))$.
+Let $(bold(hat(z)), hat(Y), bold(hat(n)))$ be this job-packing configuration, and let $hat(c)$ be its cost.
+
+In any case, we will now compare the costs of the previous and neighboring solutions.
+If $hat(c)$ is less than $c$, then let $c$ be the lowest cost and let $(bold(z), Y, bold(n))$ be the lowest-cost solution.
+
+Finally, if the maximum number of iterations has been reached, we stop the algorithm and return the best cost and solution found, $(c, (bold(z), Y, bold(n)))$.
+
+This rather primitive algorithm may be enhanced using methods such as Simulated Annealing, Tabu search.
+Since these methods can accept some inferior solutions, they can avoid those local minimums reached by only selecting superior solutions.
 
