@@ -202,3 +202,97 @@ In 2007, Dósa @dosa_2007_ffd_bounds showed new bounds for First-Fit-Decreasing:
 In 2014, Dósa and Gyorgy @dosa_gyorgy_2014_bounds_bf showed that these same bounds also hold for Best-Fit.
 
 In David Johnson's 1973 Ph.D. thesis @johnson_1973_phd, the bounds $A(L) ≤ 2 "OPT"(L) - 1$ for the Next-Fit and Worst-Fit algorithms were presented.
+
+== Size measures for items and bins
+
+=== Size measures
+
+In order to be able to use heuristics-based bin-packing algorithm such as First-Fit Descending, we must be able to order machine types and job types in order of size.
+In this section, we shall take a more abstract approach and refer to jobs and machines as items and bins, respectively.
+Mommessin et al. @MOMMESSIN2025106860 has evaluated and classified a number of different algorithms for vector bin packing with homogeneous bins.
+These algorithms may be classified as either item-centric or bin-centric.
+Item-centric algorithms pack items into bins one item at a time.
+Bin-centric algorithms pack items into a single current bin until it is full, before opening a new current bin.
+
+The size measures for the item-centric algorithms can be divided into three different classes.
+First, there is the dominant resource measure, given by maximum resource demand or capacity for an item or bin, respectively.
+This measure, among others, was introduced in @Maruyama_Chang_Tang_1977.
+With this measure, the size of an item or bin $bold(u)$ is given by:
+$
+  S_("MAX")(bold(u)) = max_k u_k.
+$
+
+For the last two measures, there is a weight parameter $w_k$ for each dimension $k$.
+Second, there is the weighted sum measure @Maruyama_Chang_Tang_1977.
+With this measure, the size of an item or bin $bold(u)$ is given by:
+$
+  S_("SUM")(bold(u)) = sum_(k=1)^K w_k u_k
+$ <eqn_l1_sum_size_measure>
+
+Third, there is the weighted sum of squares measure @Maruyama_Chang_Tang_1977.
+With this measure, the size of an item or bin $bold(u)$ is given by:
+$
+  S_("SQSUM")(bold(u)) = sum_(k=1)^K w_k u_k^2
+$
+
+For the bin-centric algorithms, we can use the remaining capacity of the current open bin to define other size measures.
+Let this capacity vector be $bold(q)$.
+
+The first size measure is a normalized weighted dot product between an item $bold(u)$ and the remaining capacity of the current open bin $bold(q)$.
+With this measure, the size of an item $bold(u)$ is given by:
+
+$
+  S_("DP1")(bold(u)) = 1 / (norm(bold(u)) norm(bold(q))) sum_(k=1)^K w_k u_k q_k.
+$
+For this measure, the size of the item will be determined by how well it fits into the remaining capacity of the current open bin.
+
+//We can define a different dot product-based size measure, introduced in @MOMMESSIN2025106860, by using a different form of normalization.
+//$
+//  S_("DP2")(bold(u)) = sum_(k=1)^K w_k u_k/D_k q_k/R_k
+//$
+//
+//Let $I$ and $B$ be the set of all items and bins, respectively.
+//Here, $D_k$ is the total size of each item in dimension $k$. $R_k$ is the total remaining capacity in dimension $k$ across all bins, opened or unopened.
+//The value $D_k$ is computed once and remains constant, but $R_k$ is re-computed after each item placement decision is made.
+//This makes this size measure more adaptive than other measures.
+
+Finally, we can define a size measure from the negative weighted sum of squared Euclidean distance between an item vector $bold(u)$ and the remaining capacity $bold(q)$ of the current open bin.
+This measure was introduced by @Panigrahy2011HeuristicsFV.
+With this measure, the size of an item is given by:
+$
+  S_("L2")(bold(u)) = -sum_(k=1)^K w_k (u_k - q_k)^2.
+$
+
+=== Weights for size measures
+
+In Mommessin et al. @MOMMESSIN2025106860, the authors discuss different options for the weights $w_k$ used for the previously discussed item/bin size measures.
+These weights are based on the total size (demand) and capacity of items and bins, respectively.
+For the simplest case, we can set $w_k=1$ for all dimensions $k$.
+This gives each dimension/resource equal weight.
+Next, we shall discuss more advanced weights.
+
+Let $I$ and $B$ be the set of all items and bins, respectively.
+Previously, we have divided items and bins (jobs and machines) into different types.
+However, for bin-packing algorithms the items and bins will be stored in a list with possible duplicates.
+Therefore, in this case it makes more sense to consider lists rather than sets.
+
+Let $d_k$ be the average size in dimension $k$ of all items, and let $b_k$ be the average capacity in dimension $k$ of all activated bins:
+
+$
+  d_k = 1/abs(I) sum_(i in I) r_(i,k), quad b_k = 1/abs(B) sum_(b in B) q_(b,k).
+$
+
+Here, $q_(b,k)$ is the remaining (residual) capacity in dimension $k$ of bin $b$.
+Let $I^* subset.eq I$ be the set of all unallocated items, and define $d^*_k$ as the average size in dimension $k$ of all unallocated items:
+
+$
+d^*_k = 1/abs(I^*) sum_(i in I^*) r_(i,k).
+$
+
+Depending on whether the packing algorithm we are using is item-centric or bin-centric, we shall use different weights.
+For item-based algorithms such as FFD, we shall want to use weights based on the average size of all items in each dimension, such as $w_k=d_k$ @caprara_lower_2001.
+We can also choose to update these weights after each time we place an item in a bin.
+In this case, we will want to use weights $w_k=d^*_k$ where we only consider the items which have not yet been placed in some bin.
+
+Similarly, if we are using bin-centric algorithms such as Next Fit Decreasing, we shall want to use weights based on bin capacities, such as $w_k=b_k$.
+These weights shall then also be updated after each time an item is placed in a bin.

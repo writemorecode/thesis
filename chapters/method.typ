@@ -98,26 +98,6 @@ The algorithm can be described with the following pseudocode.
   })
 ])
 
-== Defining the sizes of jobs and machines
-
-In order to be able to use heuristics-based bin-packing algorithm such as First-Fit Descending, we must be able to order machine types and job types in order of size.
-There are a number of different available approaches.
-We can define the size of a job type or machine type as the sum or product of its resource demands, as the maximum resource demand, as the Euclidean norm of its resource demand vector, etc.
-We shall choose to define the size of a job as the sum of its resource demands.
-The size of job type $j$ is then given by the function $S(j)$.
-
-$
-  S(j) = sum_(k=1)^K bold(r)_(j,k)
-$
-
-Similarly, the size of machine type $i$ is then given by the function $B(i)$.
-
-$
-  B(i) = sum_(k=1)^K bold(C)_(i,k)
-$
-
-For related work on the subject of defining the size of multidimensional jobs/bins for job scheduling/bin packing, see @MOMMESSIN2025106860.
-
 == A first solution algorithm
 
 At first glance, the problem of searching for both an optimal machine fleet to buy, and an optimal packing of jobs to these machines may seem quite difficult.
@@ -131,15 +111,36 @@ we can essentially remove the variable $bold(x)$ from the problem, and work only
 This simplifies the problem greatly.
 An initial basic solution algorithm proceeds as following.
 
+We sort items and bins using the $S_("SUM")(bold(u))$ size measure (see @eqn_l1_sum_size_measure) with weights $w_k=d_k$ for all items, and $w_k=b_k$ for all bins. 
+
+// TODO:
+// add discussion about keeping state of previous packing configurations
+// add discussion about pruning search space by never moving job to an "empty" machine
+// discuss how a state is represented
+// discuss how a move between states is represented
+//
+
 First, we compute an upper bound $bold(x_U)$ on the machine vector $bold(x)$.
 Next, we select $bold(x_U)$ as our initial machine vector.
 We then pack the jobs into the machines given by the initial machine vector.
 Here we use the FFD algorithm, sorting jobs and machines as discussed previously.
-This gives us an initial solution $(bold(z), Y, bold(n))$, and an initial cost $c$.
-Here, $bold(z)$ is the number of powered-on machine instances of each type for all time slots, $bold(Y)$ are the job packing configurations selected by the packing algorithm, and $bold(n)$ are the number of each job packing configuration used for each machine type and time slot.
+This gives us an initial cost $c_0$, and an initial solution $X_0$ in the form of the pair:
+$
+  X_0 = ({bold(z)_t}_t, {bold(Y)_(i,t)}_(i,t)).
+$
+Here, ${bold(z)_t}_t$ is the set of the vectors $bold(z)_t$ representing the number of powered-on machine instances of each type for each time slot $t$.
+The second element of the solution pair, ${bold(Y)_(i,t)}_(i,t)$ is the set of tuples $(bold(y)_(i,j),n_(i,j))$, where the vector $bold(y)_(i,j)$ is a job-packing configuration for machine type $i$, and $n_(i j)$ is the number of machine instances of type $i$ running the configuration $bold(y)_(i,j)$.
+
+$
+  bold(Y)_(i,t) = {dots.h, (bold(y)_(i,j), n_j), dots.h}
+$
+
+We will store previously seen solutions $X_i$ in the set $S$, which will be initialized with the initial solution $X_0$.
+
 Next, we enter a loop of some fixed number of iterations.
 
-At the start of each iteration, we select the best neighbor solution to the current solution.
+At the start of each iteration, let the current best solution be $X$.
+We begin by selecting the best neighbor solution to the current solution.
 For this algorithm, this means attempting to move one or more jobs from one machine instance to another.
 We want to move jobs from machines with higher unused capacity, to machines with lower unused capacity.
 In other words, we want to move jobs from machines with lower resource utilization to machines with higher utilization.
@@ -148,17 +149,23 @@ By moving jobs between machines, we can improve these allocations.
 More advanced versions of this solution algorithm could involve other operations, such as swapping two jobs between machines.
 We execute some fixed number of these operations, and select the neighboring solution with the lowest cost.
 If no such neighboring solution could be found, or if its cost was greater than the previous cost, then we stop the algorithm and return the current valid solution and cost since no improved solution could be found.
-Otherwise, we let this improved solution be $(bold(hat(z)), hat(Y), bold(hat(n)))$, and let $hat(c)$ be its cost.
+Otherwise, we let this improved solution be 
+
+$
+  hat(X) = ({bold(hat(z))_t}_t, {bold(hat(Y))_(i,t)}_(i,t))
+$
+
+and let $hat(c)$ be its cost.
+If this neighbor solution $hat(X)$ has been seen previously (i.e. $hat(X) in S$), then we stop the algorithm.
 
 Next, we compute the new machine vector $bold(hat(x))$, using @eqn_x_z_vectors.
-If the new machine vector is greater than the upper bound, i.e. $bold(hat(x)) > bold(x_U)$, then we stop the algorithm and return the current valid solution and cost.
+If the new machine vector is greater than the upper bound, i.e. $bold(hat(x)) > bold(x_U)$, then we stop the algorithm and return the current valid solution $X$ and cost $c$.
 Otherwise, if the new machine vector is not equal to the old, i.e. $bold(hat(x)) != bold(x)$, then we will attempt to re-pack the jobs into the machines given by $bold(hat(x))$.
-Let $(bold(hat(z)), hat(Y), bold(hat(n)))$ be this job-packing configuration, and let $hat(c)$ be its cost.
-
+Let $bold(hat(X))$ be this job-packing configuration, and let $hat(c)$ be its cost.
 In any case, we will now compare the costs of the previous and neighboring solutions.
-If $hat(c)$ is less than $c$, then let $c$ be the lowest cost and let $(bold(z), Y, bold(n))$ be the lowest-cost solution.
-
-Finally, if the maximum number of iterations has been reached, we stop the algorithm and return the best cost and solution found, $(c, (bold(z), Y, bold(n)))$.
+If $hat(c)<c$, then set $c$ to $hat(c)$ and let $X$ be the lowest-cost solution.
+Next, we insert this solution $X$ into the set $S$ of previously seen solutions: $S arrow.l S union {X}$.
+Finally, if the maximum number of iterations has been reached, we stop the algorithm and return the best cost and solution found, $(c, X)$.
 
 This rather primitive algorithm may be enhanced using methods such as Simulated Annealing, Tabu search.
 Since these methods can accept some inferior solutions, they can avoid those local minimums reached by only selecting superior solutions.

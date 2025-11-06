@@ -33,6 +33,10 @@ With precedence constraints, certain jobs may need to be scheduled before others
 
 In 2004, Chekuri and Khanna studied approximation algorithms for multidimensional versions of classic packing problems, including the bin-packing problem @chekuri_multidim_packing.
 
+// Mommessin, Erlebach, Sahkhlevich (2025) 'Classification and evaluation of the algorithms for vector bin packing': studied VBP (vector bin packing problem), with heterogeneous bins.
+// missing? study of vector bin packing problem with heterogeneous bins
+
+
 == Research gap
 
 Previous work in this area have focused on solving job scheduling problems where the collection of available machines were given as an input.
