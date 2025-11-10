@@ -100,6 +100,8 @@ The algorithm can be described with the following pseudocode.
 
 == A first solution algorithm
 
+=== Introduction
+
 At first glance, the problem of searching for both an optimal machine fleet to buy, and an optimal packing of jobs to these machines may seem quite difficult.
 However, using the relation between the machine vector $bold(x)$ and the vector $bold(z)_t$ of powered-on machines at time $t$:
 
@@ -109,16 +111,95 @@ $ <eqn_x_z_vectors>
 
 we can essentially remove the variable $bold(x)$ from the problem, and work only with $bold(z)_t$.
 This simplifies the problem greatly.
+
+We can divide this algorithm into two main stages: packing and re-packing.
+We will use the FFD algorithm to pack jobs into machines.
+FFD is guaranteed to yield a valid packing.
+We can improve this packing by moving jobs from machines with lower utilization to machines with higher utilization.
+If all jobs running on some machines can be moved to another machine, then the now-empty machine can be shut down for the time slot.
+
+=== Job re-packing
+
+Let $B = {bold(b)_1,bold(b)_2,dots.h,bold(b)_N}$ be the set of capacities of each bin, with $bold(b)_k in ZZ_(>= 0)^K$.
+Let $I = {I_1,I_2,dots.h,I_N}$ be the set of sets of items in each bin.
+The set $I_j$ contains the items in bin $j$.
+
+For each bin $bold(b)_i$, we define the _bin utilization_ for resource $k$ as:
+
+$
+  U_(i,k) = cases(
+    l_(i,k)/b_(i,k) quad "if" b_(i,k)>0,
+    -infinity quad "else".
+  )
+$
+
+With this definition, we can define the total utilization for bin $bold(b)_i$ as:
+
+$
+  U_i = max_k U_(i,k).
+$
+
+We define the current load $bold(L)_j$ of bin $j$ as the sum of all items $bold(b)_i$ in bin $I_j$:
+$
+  bold(L)_j = sum_(bold(s) in I_j) bold(s).
+$
+
+
+#block(breakable: false, [
+  #show: style-algorithm
+  #algorithm-figure("Job re-packing algorithm", vstroke: .5pt + luma(200), {
+    import algorithmic: *
+    Procedure(
+      "REPACK_JOBS",
+      (),
+      {
+        Comment[Sort bins by non-increasing utilization]
+        Assign($B$, $"SortByUtilization"(B)$)
+
+        Comment[Initialize indexes]
+        Assign($i$, $1$)
+        Assign($j$, $abs(B)$)
+
+        Comment[Build binary max-heap from each bin]
+        For($I_k in I$, {
+          Assign($I_k$, $"BuildHeap"(I_k)$)
+        })
+
+        While($i < j$, {
+          Comment[Find largest item $lambda$ in bin $i$ which fits in bin $j$]
+          For($lambda in I_i$,{
+            Comment[Check if item fits in bin $j$]
+            If($lambda + bold(L)_j <= bold(b)_j$, {
+                Comment[Remove item from old bin]
+                Assign($Lambda$, $"HeapPop"(I_i)$)
+                // Assign($I_i$, $I_i without {lambda} $)
+                Comment[Add item to new bin]
+                Assign($I_j$, $"HeapPush"(I_j, Lambda)$)
+                Comment[Update load of new bin]
+                Assign($bold(L)_j$, $bold(L)_j + lambda$)
+            })
+          })
+          Comment[Move to next bin if current bin was emptied]
+          IfElseChain($I_i = emptyset $, {
+            Assign($i$, $i+1$)
+          },{
+            Comment[Some items in bin $i$ could not be moved to bin $j$]
+            Assign($j$, $j-1$)
+          })
+          // Assign($i$, $i+1$)
+          // Assign($j$, $j-1$)
+        }) 
+
+      },
+    )
+  })
+])
+
+
+=== Algorithm description
+
 An initial basic solution algorithm proceeds as following.
 
-We sort items and bins using the $S_("SUM")(bold(u))$ size measure (see @eqn_l1_sum_size_measure) with weights $w_k=d_k$ for all items, and $w_k=b_k$ for all bins. 
-
-// TODO:
-// add discussion about keeping state of previous packing configurations
-// add discussion about pruning search space by never moving job to an "empty" machine
-// discuss how a state is represented
-// discuss how a move between states is represented
-//
 
 First, we compute an upper bound $bold(x_U)$ on the machine vector $bold(x)$.
 Next, we select $bold(x_U)$ as our initial machine vector.
@@ -147,7 +228,8 @@ In other words, we want to move jobs from machines with lower resource utilizati
 The FFD algorithm will always yield a valid allocation of jobs to machines.
 By moving jobs between machines, we can improve these allocations.
 More advanced versions of this solution algorithm could involve other operations, such as swapping two jobs between machines.
-We execute some fixed number of these operations, and select the neighboring solution with the lowest cost.
+
+
 If no such neighboring solution could be found, or if its cost was greater than the previous cost, then we stop the algorithm and return the current valid solution and cost since no improved solution could be found.
 Otherwise, we let this improved solution be 
 
@@ -166,6 +248,60 @@ In any case, we will now compare the costs of the previous and neighboring solut
 If $hat(c)<c$, then set $c$ to $hat(c)$ and let $X$ be the lowest-cost solution.
 Next, we insert this solution $X$ into the set $S$ of previously seen solutions: $S arrow.l S union {X}$.
 Finally, if the maximum number of iterations has been reached, we stop the algorithm and return the best cost and solution found, $(c, X)$.
+
+#block(breakable: false, [
+  #show: style-algorithm
+  #algorithm-figure("Scheduler algorithm", vstroke: .5pt + luma(200), {
+    import algorithmic: *
+    Procedure(
+      "Scheduler",
+      (),
+      {
+        Comment[Using upper bound as initial machine vector]
+        Assign($bold(x)$, "MACHINESUPPERBOUND()")
+
+        Comment[Packing jobs into initial machine vector]
+        Assign($X$, $"PACKJOBS"(bold(x))$)
+
+        Comment[Initial cost]
+        Assign($c$, "COST(X)")
+
+        Comment[Initializing set of seen solutions with the initial solution]
+        Assign($S$, ${X}$)
+
+        While("RUNNING", {
+
+          Comment[Set of neighboring solutions]
+          Assign($N$, $"REPACKJOBS"(X)$)
+
+          For($hat(X) in N$, {
+            Comment[If current neighbor solution is unseen]
+            If($hat(X) in.not S$, {
+              Comment[Calculate neighbor solution cost]
+              Assign($hat(c)$, $"COST"(hat(X))$)
+              If($hat(c) < c$, {
+                Comment[Update solution with new best solution]
+                Assign($c$, $hat(c)$)
+                Assign($X$, $hat(X)$)
+                Assign($S$, $S union {X}$)
+              })
+
+            })
+          })
+          Comment[If max iterations reached]
+          If($"STOP()"$, {
+            Comment[Stop]
+            Return[$(c, X)$]
+          })
+        })
+        Return[$(c, X)$]
+      },
+    )
+  })
+])
+
+
+
 
 This rather primitive algorithm may be enhanced using methods such as Simulated Annealing, Tabu search.
 Since these methods can accept some inferior solutions, they can avoid those local minimums reached by only selecting superior solutions.
