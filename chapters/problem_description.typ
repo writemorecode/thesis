@@ -204,6 +204,7 @@ Here we will need to study heuristics-based methods of pruning the search space.
     [K], [Scalar], [-], [Number of resource types],
     [J], [Scalar], [-], [Number of job types],
     [M], [Scalar], [-], [Number of machine types],
+    [T], [Scalar], [-], [Number of time slots],
     [$bold(R)$], [Matrix], [(K,J)], [Resource requirement of each job type],
     [$bold(C)$], [Matrix], [(K,M)], [Resource capacity of each machine type],
     [$bold(L)$], [Matrix], [(J,T)], [Number of each job type scheduled for each time slot],
