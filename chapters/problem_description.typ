@@ -227,12 +227,12 @@ Here we will need to study heuristics-based methods of pruning the search space.
 We will now show a small example of the problem.
 
 $
-  J=3, M=2, K=2, T=2 \
+  J=2, M=2, K=3, T=3 \
   R = mat(2, 1; 1, 1; 0, 1) quad C = mat(3, 1; 2, 3; 1, 0) quad L = mat(1, 2, 0; 1, 0, 1) \
   bold(c^p) = mat(5, 6) quad bold(c^r) = mat(1, 1/2)
 $
 
-This problem instance has three job types, two machine types, two resource types, and two time slots.
+This problem instance has two job types, two machine types, three resource types, and three time slots.
 We now present a solution to the problem.
 This solution is not guaranteed to be optimal.
 
@@ -250,11 +250,20 @@ Let us now interpret this solution.
 
 We shall buy $2$ instances of machine type $1$, and $0$ instances of machine type $2$.
 
-For time slot $1$, the first machine will run $1$ type $1$ job and the second machine will run $1$ type $2$ job.
+For time slot $1$, one machine instance will run $1$ type $1$ job and the other machine instance will run $1$ type $2$ job.
 
-For time slot $2$, both machines will each run $1$ type $1$ job.
+For time slot $2$, both machine instances will each run $1$ type $1$ job.
 
-For time slot $3$, the first machine will run $1$ type $2$ job. The second machine will be powered off.
+For time slot $3$, one machine instance will run $1$ type $2$ job. The other machine will be powered off.
+
+The solution can also be represented by this table.
+
+#let example_solution_data = csv("../example_job_schedule_solution.csv")
+
+#table(
+  columns: 6,
+  ..example_solution_data.flatten()
+)
 
 The matrices $bold(Y)_1$, $bold(Y)_2$ shown here do not contain all possible job packings for each respective machine type.
 We only show the job packings which we use for this specific solution.

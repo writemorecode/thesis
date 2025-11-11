@@ -1,0 +1,7 @@
+Time slot,Instance #,Instance type,State,Job type 1 #,Job type 2 #
+1,1,1,ON,1,0
+1,2,1,ON,0,1
+2,1,1,ON,1,0
+2,2,1,ON,1,0
+3,1,1,ON,0,1
+3,2,1,OFF,0,0
