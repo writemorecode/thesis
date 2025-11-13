@@ -73,7 +73,7 @@ The algorithm can be described with the following pseudocode.
   #algorithm-figure("Machine types upper bound", vstroke: .5pt + luma(200), {
     import algorithmic: *
     Procedure(
-      "MachinesUpperBound",
+      "MachineTypesUpperBound",
       (),
       {
         For($"time slot" t = 1,2,...,T$, {
@@ -86,7 +86,7 @@ The algorithm can be described with the following pseudocode.
                 Assign($lambda_(t,j)$, $0$)
               })
               Comment[Pack jobs for time slot $t$ into machines of type $i$]
-              Assign($u_(i,t)$, $"FFD"(bold(m)_i, bold(lambda)_t)$)
+              Assign($u_(i,t)$, $"SingleMachineTypeFFD"(bold(m)_i, bold(lambda)_t)$)
             })
             Comment[Take max number of machines needed across all time slots]
             Assign($(bold(x)_U)_i$, $max_t u_(i,t)$)
@@ -120,29 +120,62 @@ If all jobs running on some machines can be moved to another machine, then the n
 
 === Job re-packing
 
-Let $B = {bold(b)_1,bold(b)_2,dots.h,bold(b)_N}$ be the set of capacities of each bin, with $bold(b)_k in ZZ_(>= 0)^K$.
+We will now describe how the job re-packing algorithm works.
+We begin with a few definitions.
+Let $N$ be the number of bins.
+Let $B = {(a_1,bold(b)_1),(a_2,bold(b)_2),dots.h,(a_N,bold(b)_N)}$ be the set of pairs of types and capacities of each bin, with $bold(b)_k in ZZ_(>= 0)^K$ and $1<=a_k<=M, forall k$.
 Let $I = {I_1,I_2,dots.h,I_N}$ be the set of sets of items in each bin.
 The set $I_j$ contains the items in bin $j$.
 
-For each bin $bold(b)_i$, we define the _bin utilization_ for resource $k$ as:
+We define the load $bold(l)_j$ of bin $j$ as the sum of all items in bin $I_j$:
+$
+  bold(l)_j = sum_(bold(s) in I_j) bold(s).
+$
+For all bins, the load of the bin cannot exceed its capacity:
+
+$
+  bold(l)_j <= bold(b)_j, quad forall 1<=j<=N.
+$
+
+For each bin $i$, we define the _bin utilization_ for dimension $k$ as the load-to-capacity ratio for dimension $k$:
 
 $
   U_(i,k) = cases(
-    l_(i,k)/b_(i,k) quad "if" b_(i,k)>0,
+    l_(i,k) \/ b_(i,k) quad "if" b_(i,k)>0,
     -infinity quad "else".
   )
 $
 
-With this definition, we can define the total utilization for bin $bold(b)_i$ as:
+In the case where some bin $bold(b)_i$ has zero capacity in some dimension $k$, we define the bin's utilization for the dimension to be negative infinity.
+
+With this definition, we can define the total utilization for bin $bold(b)_i$ as the maximum bin utilization across all dimensions:
 
 $
   U_i = max_k U_(i,k).
 $
 
-We define the current load $bold(L)_j$ of bin $j$ as the sum of all items $bold(b)_i$ in bin $I_j$:
-$
-  bold(L)_j = sum_(bold(s) in I_j) bold(s).
-$
+The goal of the job-repacking algorithm is reduce item fragmentation across all bins.
+We can achieve this by moving items from bins with lower utilization, to bins with higher utilization.
+This is easier to do if we first sort the bins by their utilization.
+
+We shall begin the algorithm by sorting the bins, first in non-decreasing order of their bin utilization and then in non-increasing order of per-time slot running cost.
+The second sort condition ensures that in the case where two bins have different capacities and running costs, but equal bin utilization, the bin with the highest running cost is first selected for re-packing.
+If all of the jobs from this more expensive bin were to be moved, the cost savings would be larger than if the items from a less expensive bin were moved.
+
+We initialize two index variables $i=0$ and $j=abs(B)$.
+The $i$ index pointer will start at the beginning of the bin list, at the bin with the lowest utilization.
+The $j$ index pointer will start at the end of the bin list, at the bin with the highest utilization.
+The $i$ index pointer is then moved forward to the first non-empty bin.
+
+Then, we sort the items in each bin in non-increasing order.
+The reason for this is that we want to move the largest items first.
+This makes better use of the free space in the receiving bins.
+Here, we use ordinary element-wise comparison of vectors.
+It may be worth investigating using other measures of item size here.
+
+Next, we shall attempt to move items from bin $i$ to bin $j$.
+If none of the items from bin $i$ can be moved to bin $j$, then the $j$ index is decremented (moved one step to the right).
+Otherwise, items from bin $i$ are moved, in non-increasing order of size, to bin $j$.
 
 
 #block(breakable: false, [
@@ -150,8 +183,8 @@ $
   #algorithm-figure("Job re-packing algorithm", vstroke: .5pt + luma(200), {
     import algorithmic: *
     Procedure(
-      "REPACK_JOBS",
-      (),
+      "RepackJobs",
+      ($B$, $I$, $z$),
       {
         Comment[Sort bins by non-increasing utilization]
         Assign($B$, $"SortByUtilization"(B)$)
@@ -160,36 +193,42 @@ $
         Assign($i$, $1$)
         Assign($j$, $abs(B)$)
 
-        Comment[Build binary max-heap from each bin]
+        Comment[Sort items of each bin in non-increasing size order]
         For($I_k in I$, {
-          Assign($I_k$, $"BuildHeap"(I_k)$)
+          Assign($I_k$, $"Sort"(I_k)$)
         })
 
         While($i < j$, {
           Comment[Find largest item $lambda$ in bin $i$ which fits in bin $j$]
-          For($lambda in I_i$,{
+          For($1<=k<=abs(I_i)$,{
+            Comment[Let $lambda$ be item $k$ of bin $i$]
+            Assign($lambda$, $I_(i)[k]$)
             Comment[Check if item fits in bin $j$]
-            If($lambda + bold(L)_j <= bold(b)_j$, {
-                Comment[Remove item from old bin]
-                Assign($Lambda$, $"HeapPop"(I_i)$)
-                // Assign($I_i$, $I_i without {lambda} $)
+            If($lambda + bold(l)_j <= bold(b)_j$, {
+                Comment[Remove largest (first) item from old bin]
+                Assign($lambda$, $"ListPopFront"(I_i)$)
                 Comment[Add item to new bin]
-                Assign($I_j$, $"HeapPush"(I_j, Lambda)$)
+                Assign($I_j$, $"ListPush"(I_j, lambda)$)
+                Comment[Re-sort new bin]
+                Assign($I_j$, $"Sort"(I_j)$)
                 Comment[Update load of new bin]
-                Assign($bold(L)_j$, $bold(L)_j + lambda$)
+                Assign($bold(l)_j$, $bold(l)_j + lambda$)
             })
           })
           Comment[Move to next bin if current bin was emptied]
           IfElseChain($I_i = emptyset $, {
             Assign($i$, $i+1$)
+
+            Comment[Decrement number of running instances]
+            Comment[Bin $i$ has bin type $a_i$]
+            Assign($z_(a_i)$,$z_(a_i) - 1$)
           },{
             Comment[Some items in bin $i$ could not be moved to bin $j$]
             Assign($j$, $j-1$)
           })
-          // Assign($i$, $i+1$)
-          // Assign($j$, $j-1$)
         }) 
-
+        Comment[Returned repacked items]
+        Return[$(z,I)$]
       },
     )
   })
@@ -203,11 +242,13 @@ An initial basic solution algorithm proceeds as following.
 
 First, we compute an upper bound $bold(x_U)$ on the machine vector $bold(x)$.
 Next, we select $bold(x_U)$ as our initial machine vector.
-We then pack the jobs into the machines given by the initial machine vector.
+We compute the cost $c_p$ of selecting these machines.
+Next, for each time slot $t$, we pack the jobs given by $bold(l)_t$ into the machines given by the initial machine vector.
 Here we use the FFD algorithm, sorting jobs and machines as discussed previously.
-This gives us an initial cost $c_0$, and an initial solution $X_0$ in the form of the pair:
+This gives us an initial running cost $c_r^t$  and an initial solution $X_t$ for time slot $t$ in the form of the pair:
 $
-  X_0 = ({bold(z)_t}_t, {bold(Y)_(i,t)}_(i,t)).
+//  X_0 = ({bold(z)_t}_t, {bold(Y)_(i,t)}_(i,t)).
+  X_t = (bold(z)_t, {bold(Y)_(i,t)}_(i)).
 $
 Here, ${bold(z)_t}_t$ is the set of the vectors $bold(z)_t$ representing the number of powered-on machine instances of each type for each time slot $t$.
 The second element of the solution pair, ${bold(Y)_(i,t)}_(i,t)$ is the set of tuples $(bold(y)_(i,j),n_(i,j))$, where the vector $bold(y)_(i,j)$ is a job-packing configuration for machine type $i$, and $n_(i j)$ is the number of machine instances of type $i$ running the configuration $bold(y)_(i,j)$.
@@ -258,43 +299,47 @@ Finally, if the maximum number of iterations has been reached, we stop the algor
       (),
       {
         Comment[Using upper bound as initial machine vector]
-        Assign($bold(x)$, "MACHINESUPPERBOUND()")
+        Assign($bold(x)$, "MachineTypesUpperBound()")
 
-        Comment[Packing jobs into initial machine vector]
-        Assign($X$, $"PACKJOBS"(bold(x))$)
+        For($1<=t<=T$, {
+          Comment[Packing jobs for time slot $t$ into initial machines]
+          Assign($(bold(z)_t, {bold(Y)_(i,t)}_(i))$, $"FFD"(bold(x), bold(l)_t)$)
+          Comment[Initial solution]
+          Assign($X_t$, $(bold(z)_t, {bold(Y)_(i,t)}_(i))$)
+        })
+        Assign($X$, ${X_t}_t$)
 
         Comment[Initial cost]
-        Assign($c$, "COST(X)")
+        Assign($c$, $"SolutionCost"({bold(z)}_t)$)
 
-        Comment[Initializing set of seen solutions with the initial solution]
+        Comment[Set of seen solutions]
         Assign($S$, ${X}$)
 
-        While("RUNNING", {
+        Comment[Start loop]
+        While("true", {
 
-          Comment[Set of neighboring solutions]
-          Assign($N$, $"REPACKJOBS"(X)$)
+          For($1<=t<=T$, {
+            Comment[Re-pack jobs for time slot $t$]
+            Assign($(hat(bold(z))_t, {hat(bold(Y))_(i,t)}_(i))$, $"RepackJobs"(X_t)$)
+            Comment[Neighbor solution]
+            Assign($hat(X)_t$, $(hat(bold(z))_t, {hat(bold(Y))_(i,t)}_(i))$)
+          })
+          Assign($hat(X)$, ${hat(X)_t}_t$)
 
-          For($hat(X) in N$, {
-            Comment[If current neighbor solution is unseen]
-            If($hat(X) in.not S$, {
-              Comment[Calculate neighbor solution cost]
-              Assign($hat(c)$, $"COST"(hat(X))$)
-              If($hat(c) < c$, {
-                Comment[Update solution with new best solution]
-                Assign($c$, $hat(c)$)
-                Assign($X$, $hat(X)$)
-                Assign($S$, $S union {X}$)
-              })
-
+          Comment[Check if neighbor solution seen before]
+          IfElseChain($hat(X) in S$, {
+            Return[$(c,X)$]},
+          {
+            Comment[Calculate neighbor solution cost]
+            Assign($hat(c)$, $"SolutionCost"({hat(bold(z))}_t)$)
+            If($hat(c) < c$, {
+              Comment[Update solution with new best solution]
+              Assign($c$, $hat(c)$)
+              Assign($X$, $hat(X)$)
+              Assign($S$, $S union {hat(X)}$)
             })
           })
-          Comment[If max iterations reached]
-          If($"STOP()"$, {
-            Comment[Stop]
-            Return[$(c, X)$]
-          })
         })
-        Return[$(c, X)$]
       },
     )
   })
