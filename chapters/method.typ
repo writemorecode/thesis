@@ -177,6 +177,15 @@ Next, we shall attempt to move items from bin $i$ to bin $j$.
 If none of the items from bin $i$ can be moved to bin $j$, then the $j$ index is decremented (moved one step to the right).
 Otherwise, items from bin $i$ are moved, in non-increasing order of size, to bin $j$.
 
+The process of moving an item from bin $i$ to bin $j$ involves four steps.
+First, remove the item from the list of items in bin $i$.
+Second, add the item to the list of items in bin $j$.
+Third, re-sort the items in bin $j$.
+Finally, add the item to the bin load of bin $j$.
+We do not need to subtract the item from the load of bin $i$, since items will never be moved back to a previous bin.
+Items are only moved to bins with higher utilization than its origin bin.
+
+
 
 #block(breakable: false, [
   #show: style-algorithm
@@ -299,47 +308,69 @@ Finally, if the maximum number of iterations has been reached, we stop the algor
       (),
       {
         Comment[Using upper bound as initial machine vector]
-        Assign($bold(x)$, "MachineTypesUpperBound()")
+        Assign($bold(x)_U$, $"MachineTypesUpperBound"(C, R, {bold(l)_t}_t)$)
+        Assign($bold(x)$, $bold(x)_U$)
 
+        Comment[Initial packing for each time slot]
         For($1<=t<=T$, {
-          Comment[Packing jobs for time slot $t$ into initial machines]
           Assign($(bold(z)_t, {bold(Y)_(i,t)}_(i))$, $"FFD"(bold(x), bold(l)_t)$)
-          Comment[Initial solution]
           Assign($X_t$, $(bold(z)_t, {bold(Y)_(i,t)}_(i))$)
         })
         Assign($X$, ${X_t}_t$)
 
-        Comment[Initial cost]
+        Comment[Initial cost and seen solution]
         Assign($c$, $"SolutionCost"({bold(z)}_t)$)
-
-        Comment[Set of seen solutions]
         Assign($S$, ${X}$)
+        Assign($i$, $0$)
 
-        Comment[Start loop]
-        While("true", {
-
+        Comment[Iterative improvement loop]
+        While($i < N_max$, {
+          Comment[Generate neighboring solution via re-packing]
           For($1<=t<=T$, {
-            Comment[Re-pack jobs for time slot $t$]
             Assign($(hat(bold(z))_t, {hat(bold(Y))_(i,t)}_(i))$, $"RepackJobs"(X_t)$)
-            Comment[Neighbor solution]
             Assign($hat(X)_t$, $(hat(bold(z))_t, {hat(bold(Y))_(i,t)}_(i))$)
           })
           Assign($hat(X)$, ${hat(X)_t}_t$)
 
-          Comment[Check if neighbor solution seen before]
-          IfElseChain($hat(X) in S$, {
-            Return[$(c,X)$]},
-          {
-            Comment[Calculate neighbor solution cost]
-            Assign($hat(c)$, $"SolutionCost"({hat(bold(z))}_t)$)
-            If($hat(c) < c$, {
-              Comment[Update solution with new best solution]
-              Assign($c$, $hat(c)$)
-              Assign($X$, $hat(X)$)
-              Assign($S$, $S union {hat(X)}$)
-            })
+          Comment[Stop if configuration repeats]
+          If($hat(X) in S$, {
+            Return[$(c,X)$]
           })
+
+          Comment[Compute neighbor cost and implied machine vector]
+          Assign($hat(c)$, $"SolutionCost"({hat(bold(z))}_t)$)
+          Assign($hat(bold(x))$, $"MaxOverTime"({hat(bold(z))_t}_t)$)
+
+          Comment[Abort if neighbor violates upper bound]
+          If($hat(bold(x)) > bold(x)_U$, {
+            Return[$(c,X)$]
+          })
+
+          Comment[Re-pack when fewer machines suffice]
+          If($hat(bold(x)) != bold(x)$, {
+            For($1<=t<=T$, {
+              Assign($(hat(bold(z))_t, {hat(bold(Y))_(i,t)}_(i))$, $"FFD"(hat(bold(x)), bold(l)_t)$)
+              Assign($hat(X)_t$, $(hat(bold(z))_t, {hat(bold(Y))_(i,t)}_(i))$)
+            })
+            Assign($hat(X)$, ${hat(X)_t}_t$)
+            Assign($hat(c)$, $"SolutionCost"({hat(bold(z))}_t)$)
+          })
+
+          Comment[Accept improved neighbor; otherwise stop]
+          IfElseChain($hat(c) < c$, {
+            Assign($c$, $hat(c)$)
+            Assign($X$, $hat(X)$)
+            Assign($bold(x)$, $hat(bold(x))$)
+            Assign($S$, $S union {X}$)
+          }, {
+            Return[$(c,X)$]
+          })
+
+          Assign($i$, $i + 1$)
         })
+
+        Comment[Return best-found solution if max iterations reached]
+        Return[$(c,X)$]
       },
     )
   })
@@ -350,4 +381,3 @@ Finally, if the maximum number of iterations has been reached, we stop the algor
 
 This rather primitive algorithm may be enhanced using methods such as Simulated Annealing, Tabu search.
 Since these methods can accept some inferior solutions, they can avoid those local minimums reached by only selecting superior solutions.
-
