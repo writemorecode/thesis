@@ -46,7 +46,7 @@ We can do this by only considering time slots which are not Pareto dominated by 
 This gives us a smaller subset of time slots.
 We shall continue here to refer to these time slot vectors as $bold(l)_t$.
 
-Next, for each time slot vector $bold(l)_i$ and for each machine type $j$, we attempt to run FFD (First-Fit-Decreasing) on the jobs in $bold(l)_i$ using only machines of type $j$.
+Next, for each time slot vector $bold(l)_t$ and for each machine type $i$, we attempt to run FFD (First-Fit-Decreasing) on the jobs in $bold(l)_t$ using only machines of type $i$.
 This gives us an upper bound
 
 $ u_(i,t)="FFD"(bold(m)_i,bold(l)_t) $
@@ -74,19 +74,19 @@ The algorithm can be described with the following pseudocode.
     import algorithmic: *
     Procedure(
       "MachineTypesUpperBound",
-      (),
+      ($C$, $R$, $L$),
       {
         For($"time slot" t = 1,2,...,T$, {
           Comment[Let $bold(lambda)_t$ be $bold(l)_t$ with oversized jobs removed]
           Assign($bold(lambda)_t$, $bold(l)_t$)
-          For($"machine type" m = 1,2,...,M$, {
-            For($"job type" j = 1,2,...,J$, {
+          For($1<=m<=M$, {
+            For($1<=j<=J$, {
               Comment[Remove oversized job types]
               If($exists k: r_(j,k) > C_(m,k)$, {
                 Assign($lambda_(t,j)$, $0$)
               })
               Comment[Pack jobs for time slot $t$ into machines of type $i$]
-              Assign($u_(i,t)$, $"SingleMachineTypeFFD"(bold(m)_i, bold(lambda)_t)$)
+              Assign($u_(i,t)$, $"FFD"(bold(m)_i, bold(lambda)_t)$)
             })
             Comment[Take max number of machines needed across all time slots]
             Assign($(bold(x)_U)_i$, $max_t u_(i,t)$)
@@ -114,7 +114,7 @@ This simplifies the problem greatly.
 
 We can divide this algorithm into two main stages: packing and re-packing.
 We will use the FFD algorithm to pack jobs into machines.
-FFD is guaranteed to yield a valid packing.
+FFD is guaranteed to yield a valid packing given a sufficiently large set of machines.
 We can improve this packing by moving jobs from machines with lower utilization to machines with higher utilization.
 If all jobs running on some machines can be moved to another machine, then the now-empty machine can be shut down for the time slot.
 
@@ -122,8 +122,8 @@ If all jobs running on some machines can be moved to another machine, then the n
 
 We will now describe how the job re-packing algorithm works.
 We begin with a few definitions.
-Let $N$ be the number of bins.
-Let $B = {(a_1,bold(b)_1),(a_2,bold(b)_2),dots.h,(a_N,bold(b)_N)}$ be the set of pairs of types and capacities of each bin, with $bold(b)_k in ZZ_(>= 0)^K$ and $1<=a_k<=M, forall k$.
+Let $N=sum_i x_i$ be the number of bins.
+Let $B = {(a_1,bold(b)_1),(a_2,bold(b)_2),dots.h,(a_N,bold(b)_N)}$ be the set of pairs of types $a_k$ and capacities $bold(b)_k$ of each bin, with $bold(b)_k in ZZ_(>= 0)^K$ and $1<=a_k<=M, forall k$.
 Let $I = {I_1,I_2,dots.h,I_N}$ be the set of sets of items in each bin.
 The set $I_j$ contains the items in bin $j$.
 
@@ -195,49 +195,49 @@ Items are only moved to bins with higher utilization than its origin bin.
       "RepackJobs",
       ($B$, $I$, $z$),
       {
-        Comment[Sort bins by non-increasing utilization]
-        Assign($B$, $"SortByUtilization"(B)$)
+        LineComment(Assign($B$, $"SortByUtilization"(I)$), "Sort bins by non-decreasing utilization")
 
-        Comment[Initialize indexes]
-        Assign($i$, $1$)
+        LineComment(Assign($i$, $1$), "Initialize indexes")
         Assign($j$, $abs(B)$)
 
         Comment[Sort items of each bin in non-increasing size order]
-        For($I_k in I$, {
+        For($1<=k<=K$, {
           Assign($I_k$, $"Sort"(I_k)$)
         })
 
         While($i < j$, {
           Comment[Find largest item $lambda$ in bin $i$ which fits in bin $j$]
-          For($1<=k<=abs(I_i)$,{
-            Comment[Let $lambda$ be item $k$ of bin $i$]
-            Assign($lambda$, $I_(i)[k]$)
+          For($1<=k<=abs(I_i)$, {
+            LineComment(Assign($lambda$, $I_(i)[k]$), $"Let "lambda "be item" k "of bin" j$)
             Comment[Check if item fits in bin $j$]
             If($lambda + bold(l)_j <= bold(b)_j$, {
-                Comment[Remove largest (first) item from old bin]
-                Assign($lambda$, $"ListPopFront"(I_i)$)
-                Comment[Add item to new bin]
-                Assign($I_j$, $"ListPush"(I_j, lambda)$)
-                Comment[Re-sort new bin]
-                Assign($I_j$, $"Sort"(I_j)$)
-                Comment[Update load of new bin]
-                Assign($bold(l)_j$, $bold(l)_j + lambda$)
+              LineComment(Assign($lambda$, $"ListPopFront"(I_i)$), "Remove largest (first) item from old bin")
+              LineComment(Assign($I_j$, $"ListPush"(I_j, lambda)$), "Add item to new bin")
+              LineComment(Assign($I_j$, $"Sort"(I_j)$), "Re-sort new bin")
+              LineComment(Assign($bold(l)_j$, $bold(l)_j + lambda$), "Update load of new bin")
             })
           })
           Comment[Move to next bin if current bin was emptied]
-          IfElseChain($I_i = emptyset $, {
-            Assign($i$, $i+1$)
+          IfElseChain(
+            $I_i = emptyset$,
+            {
+              LineComment(Assign($i$, $i+1$), "Increment source bin index")
+              LineComment(Assign($j$, $abs(B)$), "Reset destination bin index")
+              LineComment(Assign($k$, $a_i$), $"Bin i has bin type" k$)
+              LineComment(Assign($z_k$, $z_k - 1$), "Decrement number of running instances")
+            },
+            {
+              Comment[Some items in bin $i$ did not fit in bin $j$]
+              LineComment(Assign($j$, $j-1$), "Move to next destination bin")
+            },
+          )
 
-            Comment[Decrement number of running instances]
-            Comment[Bin $i$ has bin type $a_i$]
-            Assign($z_(a_i)$,$z_(a_i) - 1$)
-          },{
-            Comment[Some items in bin $i$ could not be moved to bin $j$]
-            Assign($j$, $j-1$)
+          Comment[Re-sort all bins]
+          For($1<=k<=K$, {
+            Assign($I_k$, $"Sort"(I_k)$)
           })
-        }) 
-        Comment[Returned repacked items]
-        Return[$(z,I)$]
+        })
+        LineComment(Return[$(z,I)$], "Returned re-packed items")
       },
     )
   })
@@ -256,14 +256,14 @@ Next, for each time slot $t$, we pack the jobs given by $bold(l)_t$ into the mac
 Here we use the FFD algorithm, sorting jobs and machines as discussed previously.
 This gives us an initial running cost $c_r^t$  and an initial solution $X_t$ for time slot $t$ in the form of the pair:
 $
-//  X_0 = ({bold(z)_t}_t, {bold(Y)_(i,t)}_(i,t)).
-  X_t = (bold(z)_t, {bold(Y)_(i,t)}_(i)).
+  //  X_0 = ({bold(z)_t}_t, {bold(Y)_(i,t)}_(i,t)).
+  X_t = (bold(z)_t, {bold(Y)_(i,tau)}_(i,tau=t)).
 $
-Here, ${bold(z)_t}_t$ is the set of the vectors $bold(z)_t$ representing the number of powered-on machine instances of each type for each time slot $t$.
-The second element of the solution pair, ${bold(Y)_(i,t)}_(i,t)$ is the set of tuples $(bold(y)_(i,j),n_(i,j))$, where the vector $bold(y)_(i,j)$ is a job-packing configuration for machine type $i$, and $n_(i j)$ is the number of machine instances of type $i$ running the configuration $bold(y)_(i,j)$.
+Here, $bold(z)_t$ is the vector representing the number of powered-on machine instances for time slot $t$.
+The second element of the solution pair, ${bold(Y)_(i,tau)}_(i,tau=t)$ is the set of tuples $(bold(y)_(i,j),n_(i,j))$, where the vector $bold(y)_(i,j)$ is a job-packing configuration for machine type $i$, and $n_(i,j)$ is the number of machine instances of type $i$ running the configuration $bold(y)_(i,j)$:
 
 $
-  bold(Y)_(i,t) = {dots.h, (bold(y)_(i,j), n_j), dots.h}
+  bold(Y)_(i,t) = {dots.h, (bold(y)_(i,j), n_(i,j)), dots.h}.
 $
 
 We will store previously seen solutions $X_i$ in the set $S$, which will be initialized with the initial solution $X_0$.
@@ -281,10 +281,10 @@ More advanced versions of this solution algorithm could involve other operations
 
 
 If no such neighboring solution could be found, or if its cost was greater than the previous cost, then we stop the algorithm and return the current valid solution and cost since no improved solution could be found.
-Otherwise, we let this improved solution be 
+Otherwise, we let this improved solution be
 
 $
-  hat(X) = ({bold(hat(z))_t}_t, {bold(hat(Y))_(i,t)}_(i,t))
+  hat(X) = ({bold(hat(z))_t}_t, {bold(hat(Y))_(i,tau)}_(i,tau=t))
 $
 
 and let $hat(c)$ be its cost.
@@ -305,10 +305,10 @@ Finally, if the maximum number of iterations has been reached, we stop the algor
     import algorithmic: *
     Procedure(
       "Scheduler",
-      (),
+      ($C$, $R$, $L$),
       {
-        Comment[Using upper bound as initial machine vector]
-        Assign($bold(x)_U$, $"MachineTypesUpperBound"(C, R, {bold(l)_t}_t)$)
+        // Comment[Using upper bound as initial machine vector]
+        LineComment(Assign($bold(x)_U$, $"MachineTypesUpperBound"(C, R, L)$), "Compute upper bound")
         Assign($bold(x)$, $bold(x)_U$)
 
         Comment[Initial packing for each time slot]
@@ -316,12 +316,12 @@ Finally, if the maximum number of iterations has been reached, we stop the algor
           Assign($(bold(z)_t, {bold(Y)_(i,t)}_(i))$, $"FFD"(bold(x), bold(l)_t)$)
           Assign($X_t$, $(bold(z)_t, {bold(Y)_(i,t)}_(i))$)
         })
-        Assign($X$, ${X_t}_t$)
+        LineComment(Assign($X$, ${X_t}_t$), "Collect solutions from all time slots")
 
-        Comment[Initial cost and seen solution]
-        Assign($c$, $"SolutionCost"({bold(z)}_t)$)
-        Assign($S$, ${X}$)
-        Assign($i$, $0$)
+        // Comment[Initial cost and seen solution]
+        LineComment(Assign($c$, $"SolutionCost"({bold(z)}_t)$), "Compute cost of initial solution")
+        LineComment(Assign($S$, ${X}$), "Initialize set of seen solutions with initial solution")
+        LineComment(Assign($i$, $0$), "Initialize loop iteration variable")
 
         Comment[Iterative improvement loop]
         While($i < N_max$, {
@@ -337,9 +337,8 @@ Finally, if the maximum number of iterations has been reached, we stop the algor
             Return[$(c,X)$]
           })
 
-          Comment[Compute neighbor cost and implied machine vector]
-          Assign($hat(c)$, $"SolutionCost"({hat(bold(z))}_t)$)
-          Assign($hat(bold(x))$, $"MaxOverTime"({hat(bold(z))_t}_t)$)
+          LineComment(Assign($hat(c)$, $"SolutionCost"({hat(bold(z))}_t)$), "Compute cost of neighbor solution")
+          LineComment(Assign($hat(bold(x))$, $"MaxOverTime"({hat(bold(z))_t}_t)$), "Compute new machine vector")
 
           Comment[Abort if neighbor violates upper bound]
           If($hat(bold(x)) > bold(x)_U$, {
@@ -357,20 +356,26 @@ Finally, if the maximum number of iterations has been reached, we stop the algor
           })
 
           Comment[Accept improved neighbor; otherwise stop]
-          IfElseChain($hat(c) < c$, {
-            Assign($c$, $hat(c)$)
-            Assign($X$, $hat(X)$)
-            Assign($bold(x)$, $hat(bold(x))$)
-            Assign($S$, $S union {X}$)
-          }, {
-            Return[$(c,X)$]
-          })
+          IfElseChain(
+            $hat(c) < c$,
+            {
+              LineComment(Assign($c$, $hat(c)$), "Set neighbor cost to current cost")
+              LineComment(Assign($X$, $hat(X)$), "Set neighbor solution to current solution")
+              LineComment(Assign($bold(x)$, $hat(bold(x))$), "Set neighbor machines to current machines")
+              LineComment(Assign($S$, $S union {X}$), "Mark current solution as seen")
+            },
+            {
+              LineComment(Return[$(c,X), "")$], "Return current solution if neighbor not improved")
+            },
+          )
 
           Assign($i$, $i + 1$)
         })
 
-        Comment[Return best-found solution if max iterations reached]
-        Return[$(c,X)$]
+        // Comment[]
+        // Return[$(c,X)$]
+
+        LineComment(Return($(c,X)$), "Return best-found solution if max iterations reached")
       },
     )
   })
