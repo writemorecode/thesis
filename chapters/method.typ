@@ -76,14 +76,19 @@ The algorithm can be described with the following pseudocode.
       "MachineTypesUpperBound",
       ($C$, $R$, $L$),
       {
-        For($"time slot" t = 1,2,...,T$, {
+        Comment[Iterate over each time slot]
+        For($1<=t<=T$, {
           Comment[Let $bold(lambda)_t$ be $bold(l)_t$ with oversized jobs removed]
           Assign($bold(lambda)_t$, $bold(l)_t$)
+          Comment[Iterate over each machine type]
           For($1<=m<=M$, {
+            Comment[Iterate over each job type]
             For($1<=j<=J$, {
-              Comment[Remove oversized job types]
-              If($exists k: r_(j,k) > C_(m,k)$, {
-                Assign($lambda_(t,j)$, $0$)
+              Comment[Remove job types which do not fit on current machine type]
+              For($1<=k<=K$, {
+                If($r_(j,k) > C_(m,k)$, {
+                  Assign($lambda_(t,j)$, $0$)
+                })
               })
               Comment[Pack jobs for time slot $t$ into machines of type $i$]
               Assign($u_(i,t)$, $"FFD"(bold(m)_i, bold(lambda)_t)$)
@@ -142,11 +147,13 @@ For each bin $i$, we define the _bin utilization_ for dimension $k$ as the load-
 $
   U_(i,k) = cases(
     l_(i,k) \/ b_(i,k) quad "if" b_(i,k)>0,
-    -infinity quad "else".
+    0 quad "else".
   )
 $
 
-In the case where some bin $bold(b)_i$ has zero capacity in some dimension $k$, we define the bin's utilization for the dimension to be negative infinity.
+Since we are re-packing a valid packing of items to bins, we know that no bins are over-packed.
+This means that for each bin and for each dimension, the load does not exceed the capacity.
+In other words, we have $U_(i,k) <= 1$ for all bins $i$ and dimensions $k$.
 
 With this definition, we can define the total utilization for bin $bold(b)_i$ as the maximum bin utilization across all dimensions:
 
@@ -163,9 +170,9 @@ The second sort condition ensures that in the case where two bins have different
 If all of the jobs from this more expensive bin were to be moved, the cost savings would be larger than if the items from a less expensive bin were moved.
 
 We initialize two index variables $i=0$ and $j=abs(B)$.
-The $i$ index pointer will start at the beginning of the bin list, at the bin with the lowest utilization.
-The $j$ index pointer will start at the end of the bin list, at the bin with the highest utilization.
-The $i$ index pointer is then moved forward to the first non-empty bin.
+The $i$ index variable will start at the beginning of the bin list.
+The $j$ index variable will start at the end of the bin list.
+The $i$ index variable is then moved forward to the first non-empty bin.
 
 Then, we sort the items in each bin in non-increasing order.
 The reason for this is that we want to move the largest items first.
@@ -174,18 +181,40 @@ Here, we use ordinary element-wise comparison of vectors.
 It may be worth investigating using other measures of item size here.
 
 Next, we shall attempt to move items from bin $i$ to bin $j$.
+Here, we shall refer to bin $i$ and $j$ as the source and destination bins, respectively.
 If none of the items from bin $i$ can be moved to bin $j$, then the $j$ index is decremented (moved one step to the right).
 Otherwise, items from bin $i$ are moved, in non-increasing order of size, to bin $j$.
 
-The process of moving an item from bin $i$ to bin $j$ involves four steps.
+The process of moving an item from bin $i$ to bin $j$ involves five steps.
 First, remove the item from the list of items in bin $i$.
 Second, add the item to the list of items in bin $j$.
 Third, re-sort the items in bin $j$.
-Finally, add the item to the bin load of bin $j$.
-We do not need to subtract the item from the load of bin $i$, since items will never be moved back to a previous bin.
+Fourth, add the item to the bin load of bin $j$.
+Finally, remove the item from the bin load of bin $i$.
 Items are only moved to bins with higher utilization than its origin bin.
 
+Suppose now that all items from the source bin have been moved to other destination bins.
+This means that the source bin is now empty.
+In this case, we move to a new source bin by incrementing the source bin index (moving one step to the left).
+We also reset the destination bin index $j$ to the end of the bin list, by setting $j <- abs(B)$.
+Now, we will describe the most important step of this algorithm.
+We were able to re-pack the items for this time slot in such a way that the source bin was emptied of all items.
+Let $k$ be the bin type of the source bin, and let $z_k$ be the number of bins of type $k$ required to pack all items of this time slot.
+Since the source bin was emptied, we will need one fewer bin of type $k$ to pack the items of this time slot.
+This means setting $z_k <- z_k - 1$.
 
+It is by this method that we reduce the number of required bins for each type.
+We begin by computing a rough upper bound on the number of each bin type required to pack all items.
+We then attempt to re-pack these items in a better way, aiming to reduce item fragmentation by moving items to bins with higher utilization.
+If one more bins are emptied by this re-packing process, then we can remove these bins from the current bin configuration.
+This in turn yields a smaller valid bin configuration.
+We can then continue this packing-repacking process until we reach an optimal (or near-optimal) bin configuration.
+
+Suppose now that the source bin is not empty, and that none of the remaining items from the source bin can be moved to the destination bin.
+In this case, we want to attempt to find a new destination bin.
+We also reset the destination bin index $j$ to the end of the bin list, by setting $j <- abs(B)$.
+
+In any case, we re-sort the list of bins in non-decreasing order of utilization.
 
 #block(breakable: false, [
   #show: style-algorithm
@@ -201,20 +230,27 @@ Items are only moved to bins with higher utilization than its origin bin.
         Assign($j$, $abs(B)$)
 
         Comment[Sort items of each bin in non-increasing size order]
-        For($1<=k<=K$, {
+        For($1<=k<=abs(B)$, {
           Assign($I_k$, $"Sort"(I_k)$)
         })
 
         While($i < j$, {
-          Comment[Find largest item $lambda$ in bin $i$ which fits in bin $j$]
+          Comment[Find largest item $bold(lambda)$ in bin $i$ which fits in bin $j$]
           For($1<=k<=abs(I_i)$, {
-            LineComment(Assign($lambda$, $I_(i)[k]$), $"Let "lambda "be item" k "of bin" j$)
+            LineComment(Assign($bold(lambda)$, $I_(i)[k]$), $"Let" bold(lambda) "be item" k "of bin" j$)
             Comment[Check if item fits in bin $j$]
-            If($lambda + bold(l)_j <= bold(b)_j$, {
-              LineComment(Assign($lambda$, $"ListPopFront"(I_i)$), "Remove largest (first) item from old bin")
-              LineComment(Assign($I_j$, $"ListPush"(I_j, lambda)$), "Add item to new bin")
-              LineComment(Assign($I_j$, $"Sort"(I_j)$), "Re-sort new bin")
-              LineComment(Assign($bold(l)_j$, $bold(l)_j + lambda$), "Update load of new bin")
+            If($bold(lambda) + bold(l)_j <= bold(b)_j$, {
+              LineComment(
+                Assign($bold(lambda)$, $"ListRemoveItem"(I_i, bold(lambda))$),
+                $"Remove item" bold(lambda) "from source bin"$,
+              )
+              LineComment(
+                Assign($I_j$, $"ListPush"(I_j, bold(lambda))$),
+                $"Add item" bold(lambda) "to destination bin"$,
+              )
+              LineComment(Assign($I_j$, $"Sort"(I_j)$), "Re-sort destination bin")
+              LineComment(Assign($bold(l)_j$, $bold(l)_j + bold(lambda)$), "Update load of destination bin")
+              LineComment(Assign($bold(l)_i$, $bold(l)_i - bold(lambda)$), "Update load of source bin")
             })
           })
           Comment[Move to next bin if current bin was emptied]
@@ -232,8 +268,8 @@ Items are only moved to bins with higher utilization than its origin bin.
             },
           )
 
-          Comment[Re-sort all bins]
-          For($1<=k<=K$, {
+          Comment[Re-sort all non-source bins]
+          For($i + 1<=k<=abs(B)$, {
             Assign($I_k$, $"Sort"(I_k)$)
           })
         })
@@ -372,17 +408,9 @@ Finally, if the maximum number of iterations has been reached, we stop the algor
           Assign($i$, $i + 1$)
         })
 
-        // Comment[]
-        // Return[$(c,X)$]
-
         LineComment(Return($(c,X)$), "Return best-found solution if max iterations reached")
       },
     )
   })
 ])
 
-
-
-
-This rather primitive algorithm may be enhanced using methods such as Simulated Annealing, Tabu search.
-Since these methods can accept some inferior solutions, they can avoid those local minimums reached by only selecting superior solutions.
