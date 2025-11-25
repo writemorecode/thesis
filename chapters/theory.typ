@@ -49,7 +49,7 @@ $
 
 == Online bin-packing algorithms
 
-=== (FF) First fit
+=== (FF) First fit <ff_algorithm>
 The _first-fit_ algorithm assigns an item to the bin $U_j$ with sufficient capacity and the smallest index $j$.
 If an item does not fit in any open bin, a new bin is opened, and the item is placed in it @garey_graham_ullman_1972.
 
@@ -286,7 +286,7 @@ Here, $q_(b,k)$ is the remaining (residual) capacity in dimension $k$ of bin $b$
 Let $I^* subset.eq I$ be the set of all unallocated items, and define $d^*_k$ as the average size in dimension $k$ of all unallocated items:
 
 $
-d^*_k = 1/abs(I^*) sum_(i in I^*) r_(i,k).
+  d^*_k = 1/abs(I^*) sum_(i in I^*) r_(i,k).
 $
 
 Depending on whether the packing algorithm we are using is item-centric or bin-centric, we shall use different weights.

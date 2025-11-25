@@ -128,6 +128,9 @@ $
   bold(gamma)_i = min {j | C_s e_j >= bold(r)_i , 1<=j<=M}, quad 1<=i<=J.
 $
 
+Finally, let MHBCFF (Multidimensional Heterogeneous Bins and Costs) be the version of the first-fit algorithm which uses this new bin selection method.
+Similarly, let MHBCFFD be the first-fit descending algorithm which uses MHBCFF.
+
 == A first solution algorithm
 
 === Introduction
