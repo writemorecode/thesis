@@ -60,7 +60,8 @@ $
   bold(gamma)_i = min {j | C_s e_j >= bold(r)_i , 1<=j<=M}, quad 1<=i<=J.
 $
 
-We shall refer to this version of the first-fit algorithm as FFD in the rest of the report.
+We shall refer to this version of the first-fit decreasing algorithm as FFD in the rest of the report.
+We can also use this bin selection method for the best-fit decreasing (BFD) algorithm.
 
 == Upper bound on machine types
 
@@ -129,7 +130,6 @@ The algorithm can be described with the following pseudocode.
     )
   })
 ])
-
 
 == A first solution algorithm
 
@@ -308,7 +308,7 @@ In any case, we re-sort the list of bins in non-decreasing order of utilization.
 ])
 
 
-=== Algorithm description
+=== Algorithm description <first_alg>
 
 An initial basic solution algorithm proceeds as following.
 
@@ -441,4 +441,63 @@ Finally, if the maximum number of iterations has been reached, we stop the algor
     )
   })
 ])
+
+== Alternate initial solution method <alt_initial_soln>
+
+The previously described algorithm uses the upper-bound machine vector $bold(x)_U$ as its initial solution.
+This is a valid choice, but often very far from optimal.
+The goal is to minimize the total cost of ownership for all machines.
+This means we should minimize the number of machines owned.
+We can find a better initial solution by using a new version of FFD.
+This new FFD version uses a different method for selecting the bin type to open for an item.
+For a given item type, from the set of bin types with sufficient capacity, we select the bin type with the lowest marginal cost.
+Here, we define the marginal cost of each bin type as the cost to add one more bin of the type to the current bin configuration.
+If there exists at least one purchased unused bin of some bin type, then the marginal cost will be equal to the per-slot opening cost.
+Otherwise, if there are no unused bins of the type remaining, then the marginal cost will be equal to the sum of the bin type's purchase and running costs.
+For an item type, the cost-optimal bin type is then given by the bin type with the lowest marginal cost.
+The running costs and purchase costs, respectively, are used as tie-breakers.
+It is a good idea to use choose to order bin types by their per-slot cost, rather than their purchase cost.
+This is especially true for problem instances with larger numbers of time slots.
+The purchase costs are a one-time cost, but the per-slot costs represent the most of the total cost.
+
+We can define a new version of the previously described algorithm, which uses this method for computing an initial solution.
+
+== A "recreate-and-ruin" algorithm <rnr_alg>
+
+The problem with the first job scheduler algorithm was that it was unable to move away from the neighborhood defined by the initial solution.
+It was able to find a local minimum solution in this neighborhood, but was unable to move to other neighborhoods further away to find better solutions.
+We need a new algorithm which can take large steps between neighborhood and explore larger regions of the search space.
+One idea for how to do this is to destroy, or "ruin" a feasible solution, and then somehow fix, or "recreate" the ruined solution in a different way in order to find a new feasible and possibly superior solution.
+This method is known as "recreate and ruin" and has previously been used successfully for problems such as vehicle routing @shaw_maher_lns_vrp and bin packing @gardeyn2022goal @EKICI20231007.
+
+The algorithm proceeds as following.
+We begin by computing an initial solution using FFD with the previously discussed "marginal cost"-based method for new bin selection.
+Initialize the best cost as the cost of the initial solution.
+Next, we enter a loop of a fixed number of $N$ iterations.
+Let the current iteration be $i$.
+Let $p=1-i/N$.
+We begin each iteration by re-packing the items in each bin, in the same way as in the previous algorithm.
+Let the best cost be the minimum of the current best cost and the cost of the re-packed solution.
+Next, we enter the "ruin" phase of the algorithm.
+We order the bins in ascending order of their utilization (i.e. load to capacity ratio).
+We select the first $ceil(p)$ of bins from this sorted list.
+These bins are removed from the current solution, and the items packed in these bins are marked as unpacked.
+Next, we move to the "recreate" phase of the algorithm.
+Here, it is important that we do not create and recreate solutions in the same way.
+Therefore, we use the best-fit decreasing (BFD) algorithm for recreating ruined solutions.
+
+What the "ruin and recreate" algorithm attempts to do is reduce costs by removing the most expensive bins with the lowest utilization.
+The algorithm will attempt to place the items in these bins in a better location, which can either be a in an existing open bin, or in a new bin.
+
+Finally, we compare the cost of the current best solution and the recreated solution.
+One important difference between this new algorithm and the previous is that we now accept some inferior solutions, since they may lead to superior solutions.
+If the current cost is greater than the cost of the recreated solution, then the new recreated solution is accepted unconditionally.
+Otherwise, the new recreated solution is accepted with probability $p$.
+Recall the definition of $p$ as $p=1-i/N$.
+For $i$ near $0$, $p$ will be near $1$.
+As $i$ goes from $0$ to $N$, $p$ decreases linearly to $0$.
+This allows the algorithm to accept take large steps early on, but then take smaller and smaller steps as it proceeds.
+
+
+
 
