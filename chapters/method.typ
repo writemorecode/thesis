@@ -35,6 +35,33 @@ With this research, we aim to answer the following research questions:
 RQ1: How can we create a cloud job scheduler which is efficient with respect to energy consumption? \
 RQ2: How can we create a cloud job scheduler which is optimized for both scheduling quality and execution time?
 
+== Adapting first-fit to heterogeneous bins with costs
+
+The first-fit algorithm described in @ff_algorithm is intended for the case of homogeneous bins with no costs.
+This algorithm does not take bin type opening costs into account when opening a new bin.
+This can lead to the algorithm selecting a more expensive bin type, when other less expensive bin types are available.
+We can solve this problem by sorting the machine capacity vector $bold(m)_i$ of the machine capacity matrix $bold(C)$, in non-decreasing order of the opening costs $c^r_i$ of the machine types.
+This can be achieved by multiplying the $bold(C)$ matrix with permutation matrix $bold(P)$, forming the new matrix $bold(C_s)=bold(C P)$.
+
+$
+  bold(C) = mat(|, |, , |; bold(m)_1, bold(m)_2, dots.c, bold(m)_M; |, |, , |), quad
+  bold(P) = mat(|, |, , |; bold(e)_(alpha_1), bold(e)_(alpha_2), dots.c, bold(e)_(alpha_M); |, |, , |), quad
+  bold(I) = mat(|, |, , |; bold(e)_(1), bold(e)_(2), dots.c, bold(e)_(M); |, |, , |) \
+  bold(c^r) = mat(c^r_1, c^r_2, dots.c, c^r_M), quad
+  c^r_(alpha_1) <= c^r_(alpha_2) <= dots.c <= c^r_(alpha_M) quad
+  1<=alpha_k<=M, quad 1<=k<=M \
+  bold(e)_1 = mat(1, 0, 0, dots.c, 0)^T, bold(e)_2 = mat(0, 1, 0, dots.c, 0)^T, ..., bold(e)_M = mat(0, 0, 0, dots.c, 1)^T.
+$
+
+Now, we can define the cost-optimal bin type $bold(gamma)_i$ for each item type $i$ as:
+
+$
+  bold(gamma) = mat(gamma_1, gamma_2, dots.c, gamma_J), quad
+  bold(gamma)_i = min {j | C_s e_j >= bold(r)_i , 1<=j<=M}, quad 1<=i<=J.
+$
+
+We shall refer to this version of the first-fit algorithm as FFD in the rest of the report.
+
 == Upper bound on machine types
 
 Before we begin to search for an optimal machine vector $bold(x)$, we want to restrict the search space by finding an upper bound $bold(x)_U >= bold(x)$.
@@ -103,33 +130,6 @@ The algorithm can be described with the following pseudocode.
   })
 ])
 
-== Adapting first-fit to heterogeneous bins with costs
-
-The first-fit algorithm described in @ff_algorithm is intended for the case of homogeneous bins with no costs.
-This algorithm does not take bin type opening costs into account when opening a new bin.
-This can lead to the algorithm selecting a more expensive bin type, when other less expensive bin types are available.
-We can solve this problem by sorting the machine capacity vector $bold(m)_i$ of the machine capacity matrix $bold(C)$, in non-decreasing order of the opening costs $c^r_i$ of the machine types.
-This can be achieved by multiplying the $bold(C)$ matrix with permutation matrix $bold(P)$, forming the new matrix $bold(C_s)=bold(C P)$.
-
-$
-  bold(C) = mat(|, |, , |; bold(m)_1, bold(m)_2, dots.c, bold(m)_M; |, |, , |), quad
-  bold(P) = mat(|, |, , |; bold(e)_(alpha_1), bold(e)_(alpha_2), dots.c, bold(e)_(alpha_M); |, |, , |), quad
-  bold(I) = mat(|, |, , |; bold(e)_(1), bold(e)_(2), dots.c, bold(e)_(M); |, |, , |) \
-  bold(c^r) = mat(c^r_1, c^r_2, dots.c, c^r_M), quad
-  c^r_(alpha_1) <= c^r_(alpha_2) <= dots.c <= c^r_(alpha_M) quad
-  1<=alpha_k<=M, quad 1<=k<=M \
-  bold(e)_1 = mat(1, 0, 0, dots.c, 0)^T, bold(e)_2 = mat(0, 1, 0, dots.c, 0)^T, ..., bold(e)_M = mat(0, 0, 0, dots.c, 1)^T.
-$
-
-Now, we can define the cost-optimal bin type $bold(gamma)_i$ for each item type $i$ as:
-
-$
-  bold(gamma) = mat(gamma_1, gamma_2, dots.c, gamma_J), quad
-  bold(gamma)_i = min {j | C_s e_j >= bold(r)_i , 1<=j<=M}, quad 1<=i<=J.
-$
-
-Finally, let MHBCFF (Multidimensional Heterogeneous Bins and Costs) be the version of the first-fit algorithm which uses this new bin selection method.
-Similarly, let MHBCFFD be the first-fit descending algorithm which uses MHBCFF.
 
 == A first solution algorithm
 
@@ -377,8 +377,8 @@ Finally, if the maximum number of iterations has been reached, we stop the algor
 
         Comment[Initial packing for each time slot]
         For($1<=t<=T$, {
-          Assign($(bold(z)_t, {bold(Y)_(i,t)}_(i))$, $"FFD"(bold(x), bold(l)_t)$)
-          Assign($X_t$, $(bold(z)_t, {bold(Y)_(i,t)}_(i))$)
+          Assign($(bold(z)_t, {bold(Y)_(i,tau)}_(i,tau=t))$, $"MHBCFFD"(bold(x), bold(l)_t)$)
+          Assign($X_t$, $(bold(z)_t, {bold(Y)_(i,tau)}_(i,tau=t))$)
         })
         LineComment(Assign($X$, ${X_t}_t$), "Collect solutions from all time slots")
 
