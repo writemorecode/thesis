@@ -296,3 +296,19 @@ In this case, we will want to use weights $w_k=d^*_k$ where we only consider the
 
 Similarly, if we are using bin-centric algorithms such as Next Fit Decreasing, we shall want to use weights based on bin capacities, such as $w_k=b_k$.
 These weights shall then also be updated after each time an item is placed in a bin.
+
+=== Alternative method for item & bin size normalization
+
+We can normalize the sizes of items and bins by, for each resource dimension $k$, dividing each item type $bold(r)_i$ and machine type $bold(m)_j$ by a scale $M_k$.
+Here, we define $M_k$ as the maximum resource demand or capacity across all item and machine types.
+
+$
+  M_k = max_(i,j) {bold(r)_i, bold(m)_j}.
+$
+
+With this definition, we can define the normalized item and bin type vectors as
+
+$ hat(bold(r))_i=(r_(i,1) \/ M_1,dots.h,r_(i,K) \/ M_K) $
+and
+$ hat(bold(m))_j=(m_(j,1) \/ M_1,dots.h,m_(j,K) \/ M_K) $
+respectively.

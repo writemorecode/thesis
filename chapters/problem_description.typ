@@ -1,4 +1,4 @@
-= Problem description
+= Problem description <problem_description_section>
 
 #let ZZnonneg = $ZZ_(>=0)$
 #let ZZpos = $ZZ_(>0)$
@@ -25,12 +25,22 @@ $
 
 There are $M$ different kinds of machines available to buy.
 The initial purchase cost of each machine type is given by the vector $bold(c^p) in ZZnonneg^M$.
-A machine instance of type $i$ costs $c_i^r$ to buy.
+A machine instance of type $i$ costs $c_i^p$ to buy.
 We will not be considering constraints on the maximum number of instances of a given machine type.
 For each time slot, a machine instance can either be running or powered off.
 The per time-slot running cost of each machine type is given by the vector $bold(c^r) in ZZnonneg^M$.
 A running machine instance of type $i$ has a running cost of $c_i^r$ per time slot.
 We will be assuming a constant running cost for running instances, regardless of the jobs running on the instances.
+
+The purchase and running costs of the machines types are a function of their respective capacity vectors.
+The purchase and running cost vectors are given by:
+
+$
+  bold(c^p) = bold(C)^T bold(alpha), quad bold(c^r) = gamma bold(c^p), quad bold(alpha) in [0,1)^K, quad gamma in (0,1)
+$
+
+where $bold(alpha)$ is a vector where the element $alpha_k$ represents the weight of resource $k$.
+
 We will not allow a single job to be split across multiple machines.
 Machines incur no running cost while powered off.
 Each machine type has a different hardware configuration, e.g. CPU, memory, disk, GPU, etc.

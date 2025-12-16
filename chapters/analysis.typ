@@ -2,7 +2,9 @@
 
 == Algorithm discussion
 
-As demonstrated by the results of the algorithm in @results_section, the current algorithm can perform poorly for certain problem instances.
+=== Naive local search algorithm
+
+As demonstrated by the results of the first described algorithm in @results_section, this algorithm can perform poorly for certain problem instances.
 Specifically, we saw that the chose buy machines of only a single type, despite the fact that this machine type was the most expensive of all.
 The reason for this was the rudimentary algorithms for selecting a new bin type and packing jobs into open bins.
 
@@ -34,3 +36,17 @@ In this case, the memory resource of the machine will be well-utilized, but the 
 Because of this, the CPU resource of the machine will be stranded.
 A solution to this problem is to find a better machine for the job, with high memory resource but only medium-high CPU resources.
 By placing the job on this other machine, its CPU resources will not be wasted.
+
+=== Improved local search algorithm
+
+By modifying the naive local search algorithm discussed above, we get a much improved algorithm which is able to correctly pack items into bins of different types.
+However, this is still only a local search algorithm, with no ability to search for solutions outside of the initial solution neighborhood.
+
+=== Global search algorithm
+
+This algorithm has the capacity to search for solutions in multiple neighborhoods.
+However, the algorithm is unable to outperform the simple first-fit decreasing algorithm.
+In fact, the algorithm is rarely able to find any other solution superior to the initial solution computed with FFD.
+It is possible that the algorithm can be improved using more intelligent methods for moving between adjacent neighborhoods.
+However, the complexity of the algorithm must match its performance.
+Increased algorithmic complexity must yield superior performance.

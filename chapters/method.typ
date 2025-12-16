@@ -2,6 +2,8 @@
 #import "@preview/algorithmic:1.0.6"
 #import algorithmic: algorithm-figure, style-algorithm
 
+#let ZZnonneg = $ZZ_(>=0)$
+
 = Method
 
 == Solution flowchart
@@ -35,7 +37,11 @@ With this research, we aim to answer the following research questions:
 RQ1: How can we create a cloud job scheduler which is efficient with respect to energy consumption? \
 RQ2: How can we create a cloud job scheduler which is optimized for both scheduling quality and execution time?
 
-== Adapting first-fit to heterogeneous bins with costs
+== Algorithms
+
+=== Adapting first-fit to heterogeneous bins with costs
+
+// TODO: update with "marginal-cost" stuff
 
 The first-fit algorithm described in @ff_algorithm is intended for the case of homogeneous bins with no costs.
 This algorithm does not take bin type opening costs into account when opening a new bin.
@@ -63,7 +69,7 @@ $
 We shall refer to this version of the first-fit decreasing algorithm as FFD in the rest of the report.
 We can also use this bin selection method for the best-fit decreasing (BFD) algorithm.
 
-== Upper bound on machine types
+=== Upper bound on machine types
 
 Before we begin to search for an optimal machine vector $bold(x)$, we want to restrict the search space by finding an upper bound $bold(x)_U >= bold(x)$.
 
@@ -131,9 +137,9 @@ The algorithm can be described with the following pseudocode.
   })
 ])
 
-== A first solution algorithm
+=== A first solution algorithm
 
-=== Introduction
+==== Introduction
 
 At first glance, the problem of searching for both an optimal machine fleet to buy, and an optimal packing of jobs to these machines may seem quite difficult.
 However, using the relation between the machine vector $bold(x)$ and the vector $bold(z)_t$ of powered-on machines at time $t$:
@@ -151,7 +157,7 @@ FFD is guaranteed to yield a valid packing given a sufficiently large set of mac
 We can improve this packing by moving jobs from machines with lower utilization to machines with higher utilization.
 If all jobs running on some machines can be moved to another machine, then the now-empty machine can be shut down for the time slot.
 
-=== Job re-packing
+==== Job re-packing
 
 We will now describe how the job re-packing algorithm works.
 We begin with a few definitions.
@@ -308,7 +314,7 @@ In any case, we re-sort the list of bins in non-decreasing order of utilization.
 ])
 
 
-=== Algorithm description <first_alg>
+==== Algorithm description <first_alg>
 
 An initial basic solution algorithm proceeds as following.
 
@@ -442,7 +448,7 @@ Finally, if the maximum number of iterations has been reached, we stop the algor
   })
 ])
 
-== Alternate initial solution method <alt_initial_soln>
+==== Alternate initial solution method <alt_initial_soln>
 
 The previously described algorithm uses the upper-bound machine vector $bold(x)_U$ as its initial solution.
 This is a valid choice, but often very far from optimal.
@@ -462,42 +468,259 @@ The purchase costs are a one-time cost, but the per-slot costs represent the mos
 
 We can define a new version of the previously described algorithm, which uses this method for computing an initial solution.
 
-== A "recreate-and-ruin" algorithm <rnr_alg>
+=== A global search algorithm <rnr_alg>
 
 The problem with the first job scheduler algorithm was that it was unable to move away from the neighborhood defined by the initial solution.
 It was able to find a local minimum solution in this neighborhood, but was unable to move to other neighborhoods further away to find better solutions.
 We need a new algorithm which can take large steps between neighborhood and explore larger regions of the search space.
 One idea for how to do this is to destroy, or "ruin" a feasible solution, and then somehow fix, or "recreate" the ruined solution in a different way in order to find a new feasible and possibly superior solution.
+What the "ruin and recreate" algorithm attempts to do is reduce costs by removing the most expensive bins with the lowest utilization.
 This method is known as "recreate and ruin" and has previously been used successfully for problems such as vehicle routing @shaw_maher_lns_vrp and bin packing @gardeyn2022goal @EKICI20231007.
 
 The algorithm proceeds as following.
-We begin by computing an initial solution using FFD with the previously discussed "marginal cost"-based method for new bin selection.
+We begin by computing an initial solution $x_0$ using FFD with the previously discussed "marginal cost"-based method for new bin selection.
+Initialize the best solution $x_"best"$ as the initial solution $x_0$.
 Initialize the best cost as the cost of the initial solution.
 Next, we enter a loop of a fixed number of $N$ iterations.
 Let the current iteration be $i$.
-Let $p=1-i/N$.
-We begin each iteration by re-packing the items in each bin, in the same way as in the previous algorithm.
-Let the best cost be the minimum of the current best cost and the cost of the re-packed solution.
-Next, we enter the "ruin" phase of the algorithm.
-We order the bins in ascending order of their utilization (i.e. load to capacity ratio).
-We select the first $ceil(p)$ of bins from this sorted list.
+The main loop consists of two phases.
+The first phase is a global search phase, which aims to move from the current neighborhood to an adjacent neighborhood.
+We refer to this neighborhood transition as a "shaking" operation.
+We order the bins in ascending order of their utilization.
+As previously defined, the utilization bin is its maximum load to capacity ratio across all resource dimensions.
+Let $alpha = min (abs(B), ceil(p abs(B)))$.
+Here, $B$ is the set of all bins, and $p$, $0<=p<=1$, is a configurable parameter controlling the maximum percentage of bins which should be "ruined" in each iteration.
+Let $beta$ be a random variable sampled from the uniform distribution on $[0, alpha]$.
+We select the first $beta$ bins from this sorted list.
 These bins are removed from the current solution, and the items packed in these bins are marked as unpacked.
 Next, we move to the "recreate" phase of the algorithm.
 Here, it is important that we do not create and recreate solutions in the same way.
-Therefore, we use the best-fit decreasing (BFD) algorithm for recreating ruined solutions.
+Therefore, we use the best-fit decreasing (BFD) algorithm for recreating ruined solutions, rather than the first-fit decreasing (FFD) algorithm.
+Let $x'$ be the solution given by the shake operation.
 
-What the "ruin and recreate" algorithm attempts to do is reduce costs by removing the most expensive bins with the lowest utilization.
+After the global search phase, we enter the local improvement phase.
+In this phase, we aim to find an optimal or near-optimal solution in the neighborhood entered in the previous phase.
+Here, we use the previously described job repack algorithm.
+Let $x''$ be the solution given by the local search operation.
+
 The algorithm will attempt to place the items in these bins in a better location, which can either be a in an existing open bin, or in a new bin.
+Finally, we set the best solution $x_"best"$ to the best of $x_"best"$ and the current solution $x''$.
 
-Finally, we compare the cost of the current best solution and the recreated solution.
-One important difference between this new algorithm and the previous is that we now accept some inferior solutions, since they may lead to superior solutions.
-If the current cost is greater than the cost of the recreated solution, then the new recreated solution is accepted unconditionally.
-Otherwise, the new recreated solution is accepted with probability $p$.
-Recall the definition of $p$ as $p=1-i/N$.
-For $i$ near $0$, $p$ will be near $1$.
-As $i$ goes from $0$ to $N$, $p$ decreases linearly to $0$.
-This allows the algorithm to accept take large steps early on, but then take smaller and smaller steps as it proceeds.
+#block(breakable: false, [
+  #show: style-algorithm
+  #algorithm-figure("Global search algorithm", vstroke: .5pt + luma(200), {
+    import algorithmic: *
+    Procedure(
+      "GlobalSearch",
+      ($bold(C)$, $bold(R)$, $bold(L)$, $bold(c^p)$, $bold(c^r)$),
+      {
+        LineComment(
+          Assign($x_0$, $"InitialSolution"(bold(C),bold(R),bold(L),bold(c^p),bold(c^r))$),
+          $"Compute initial solution "x_0$,
+        )
+        LineComment(Assign($x_"best"$, $x_0$), $"Initialize current best solution "x_"best"$)
+        LineComment(Assign($x$, $x_"best"$), $"Initialize current solution "x$)
+        Assign($i$, $0$)
+        While($i < N$, {
+          LineComment(Assign($x'$, $"Shake"(x)$), "Run global search phase")
+          LineComment(Assign($x''$, $"LocalSearch"(x')$), "Run local search phase")
+          If($"Cost"(x'')<="Cost"(x_"best")$, {
+            LineComment(Assign($x_"best"$, $x''$), "Update best solution")
+          })
+        })
+        Return($x_"best"$)
+      },
+    )
+  })])
+
+== Experimental methodology
+
+=== Problem instance generation
+
+In order to evaluate these algorithms, we use randomly generated problem instances.
+Each problem instance is generated as follows.
+
+Each machine type resource capacity value $C_(i,k)$ is initialized according to a configurable positive base resource capacity parameter $c_0$.
+Each job type resource demand value $R_(j,k)$ is initialized according to a configurable positive base resource demand parameter $d_0$.
+Next, some variation is introduced to each element $C_(i,k)$ and $R_(j,k)$ with multiplicative jitter values sampled uniformly from the configurable ranges $[c_"min",c_"max"]$ and $[d_"min",d_"max"]$, respectively.
+
+$
+  C_(i,k) arrow.l ceil(c_0 U([c_"min", c_"max"])), quad
+  R_(i,j) arrow.l ceil(d_0 U([d_"min", d_"max"])), quad forall i,j,k.
+$
+
+In order to generate more realistic problem instances, we want to avoid having nearly uniform machine types, job types, and time slots.
+Instead, we want a fraction of all machine types, job types, and time slots to have a greater number of certain resource capacities, resource demands, and job types, respectively.
+For example, certain machine types may be optimized, or specialized, for certain kinds of workloads.
+These special machine types will have a larger amount of a certain resource type, such as memory, disk, etc.
+This will make these machine types better suited to running job types with above average demands for these resource types.
+This is also true for job time slots.
+Above average numbers of certain job types may be scheduled to run during certain time slots.
+
+Each machine type, job type, and time slot may be assigned a primary resource or job type.
+The number of them which are assigned a primary resource is controlled by a configurable parameter $rho in [0,1]$.
+This means that, for example, given $M$ different machine types, $ceil(rho M)$ machine types will be assigned a primary resource.
+
+The primary resources of a machine type, job type, or time slot are computed using the $"CHOOSEPRIMARYRESOURCES"$ function, described below.
+The function takes as arguments the number $n$ of primary resources to compute, the number of resources $K$,
+the fraction $rho$ of resources to assign a primary resource to, and a probability vector $bold(q) in (0,1)^K$.
+For each of the machine types, job types, or time slots assigned a primary resource, the resource index $k$ will be chosen with probability $q_k$, for $1<=k<=K$.
+By setting each element $q_k$ of $bold(q)$ to $1\/K$, each primary resource index $k$ will be chosen with equal probability.
+The values $q_k$ can instead be adjusted to increase or decrease the probability of resource $k$ being assigned to primary resources.
+This will be used later in order to make the machine types have similar primary resources as the job types.
+This means that, for example, if there are many job types with memory as a primary resource, then there should also be many machine types with memory as a primary resource.
+
+#block(
+  breakable: false,
+  [
+    #show: style-algorithm
+    #algorithm-figure(
+      "Choose primary resources",
+      vstroke: .5pt + luma(200),
+      {
+        import algorithmic: *
+        Procedure(
+          "ChoosePrimaryResources",
+          (
+            $"count" n$,
+            $"resource count" K$,
+            $"specialization fraction" rho$,
+            $"probability vector" bold(q)$,
+            $"RNG" G$,
+          ),
+          {
+            Assign($s$, $ceil(n rho)$)
+            Comment[Sample set $S$ of size $s$ from set ${1,dots.h,n}$ without replacement, with RNG G]
+            Assign($S$, $"UniformWithoutReplacement"({1,dots.h,n}, s ; G)$)
+            Comment[Let $bold(p)$ be $n$-dimensional vector initialized to value $-1$]
+            Assign($bold(p)$, $mat(-1, dots.h, -1)$)
+            For($i in S$, {
+              Comment[Sample $p_i$ from set ${1,dots.h,K}$ with probabilities ${q_1,dots.h,q_K}$, with RNG G]
+              Assign($p_i$, $"Categorical"({1,dots.h,K}, bold(q) ; G)$)
+            })
+            Return($bold(p)$)
+          },
+        )
+      },
+    )],
+)
+
+Now that we have described how the primary resources are computed, we move on to describing how they are used in practice.
+Let $u ~ "UniformInteger"([u_"min", u_"max"])$.
+For each machine type $i$, if the machine type has been assigned primary resource $k^*$, then we set $C_(i,k^*) arrow.l u dot max(1, ceil(C_(i,k^*)))$, where.
+For each job type $j$, if the job type has been assigned primary resource $k^*$, then we set $R_(j,k^*) arrow.l u dot max(1, ceil(R_(j,k^*)))$.
+Note that $u$ is re-sampled for each element $C_(i,k)$ and $R_(j,k)$.
+Here, it is the configurable range $[u_"min", u_"max"]$ which controls how much primary resource values shall be increased.
+
+Next, we want to use the vector $p^"machine"$ returned by the $"CHOOSEPRIMARYRESOURCES"$ function for
+computing a probability vector $bold(q)^"job"$ to use for computing the primary resources for the job types matrix $bold(R)$.
+To do this, we begin by letting the vector $bold(u)$ be the $K$-dimensional uniform probability vector $bold(1)\/K$.
+Next, we compute a histogram vector $bold(h)$ of the elements of $p^"machine"$.
+The $bold(h)$ vector will have dimension $k$, and each element $h_k$ will be equal to the number of machine types which were assigned resource $k$ as a primary resource.
+If no primary resources were assigned, then we set $bold(h)$ equal to $bold(u)$.
+Finally, we can compute the probability vector $q^"job"$ as a weighted vector sum between the normalized histogram vector $bold(h)$ and the vector $bold(u)$.
+
+$
+  bold(q)^"job" = eta bold(h)/norm(bold(h)) + (1-eta) 1/K bold(1)
+$
+
+Here, $eta in (0,1)$ is a configurable correlation parameter.
+For larger values of $eta$, $bold(q)^"job"$ will be more similar to the histogram vector $bold(h)$, and vice versa.
+In other words, larger values of $eta$ increase the correlation between the primary resources of the machine and job types.
+This means that, for example, if many job types were assigned CPU as a primary resource, then $eta$ will control how many machine types are assigned CPU as a primary resource.
+With the vector $bold(q)^"job"$ computed, we can now compute the primary resources for the machine types.
+
+The next step is to compute the machine capacity matrix $bold(C)$.
+This is handled by the function $"GENERATECAPACITIES"$.
+
+#block(
+  breakable: false,
+  [
+    #show: style-algorithm
+    #algorithm-figure(
+      "Generate capacities and requirements",
+      vstroke: .5pt + luma(200),
+      {
+        import algorithmic: *
+        Procedure(
+          "GenerateCapacitiesAndRequirements",
+          (
+            $K$,
+            $M$,
+            $J$,
+            $c_0$,
+            $d_0$,
+            $bold(p)^"machine"$,
+            $bold(p)^"job"$,
+            $"hyperparameters"$,
+            $"RNG" G$,
+          ),
+          {
+            Comment[Initialize $bold(C)$ with base capacity]
+            Assign($C_(i,k)$, $ceil(c_0 dot U(c_"min", c_"max"))$)
+            Comment[Initialize $bold(R)$ with base demand]
+            Assign($R_(j,k)$, $ceil(d_0 dot U(d_"min", d_"max"))$)
+
+            Comment[Amplify assigned primary resources for machine types]
+            For($1<=i<=M$, {
+              If($p^"machine"_i >= 0$, {
+                Assign($k^*$, $p^"machine"_i$)
+                Assign($u$, $"UniformInteger"([u_"min", u_"max"])$)
+                Assign($C_(i,k^*)$, $u dot C_(i,k^*)$)
+              })
+            })
+
+            Comment[Amplify assigned primary resources for job types]
+            For($1<=j<=J$, {
+              If($p^"job"_j >= 0$, {
+                Assign($k^*$, $p^"job"_j$)
+                Assign($u$, $"UniformInteger"([u_"min", u_"max"])$)
+                Assign($R_(j,k^*)$, $u dot R_(j,k^*)$)
+              })
+            })
+
+            LineComment(Assign($C_(i,k)$, $max(1, C_(i,k))$), $"Ensure all capacity values" >=1$)
+            LineComment(Assign($R_(j,k)$, $max(1, R_(j,k))$), $"Ensure all demand values" >=1$)
+
+            Comment[Ensure all job types can be packed]
+            For($1<=j<=J$, {
+              Comment[If no machine type can store job type $j$]
+              If($exists.not i: bold(m)_i >= bold(r)_j$, {
+                LineComment(Assign($pi$, $p^"job"_j$), $"Let" pi "be primary resource of job type j"$)
+
+                IfElseChain(
+                  $pi!=-1$,
+                  {
+                    LineComment(Assign($A$, ${i|p^"machine"_i=pi}$), $"Compute machine types with primary resource" pi$)
+                    LineComment(
+                      Assign($t$, $"Uniform"(A)$),
+                      $"Select random machine type with primary resource" pi$,
+                    )
+                  },
+                  {
+                    Assign($t$, $arg max_m sum_k C_(m,k)$)
+                  },
+                )
+                Assign($bold(m)_t$, $bold(m)_t + bold(r)_j$)
+              })
+            })
 
 
+            Return($bold(C), bold(R)$)
+          },
+        )
+      },
+    )],
+)
 
+
+/*
+#block(breakable: false, [
+  #show: style-algorithm
+  #algorithm-figure("", vstroke: .5pt + luma(200), {
+    import algorithmic: *
+    Procedure("", ($x$), {
+    })
+  })]))
+*/
 
