@@ -717,7 +717,84 @@ This is handled by the function $"GENERATECAPACITIESANDREQUIREMENTS"$.
     )],
 )
 
+With the description of the generation of the machine capacity matrix $bold(C)$ and job demand matrix $bold(R)$ completed, we now move on to description of the job time slot matrix $bold(L)$.
+The $bold(L)$ matrix generation is handled by the $"GENERATEJOBCOUNTS"$ function.
+The function works as follows.
 
+For each time slot, the job count matrix generation aims to select job types which have been assigned some primary resource.
+Previously, the primary resource capacities of the machine types were selected with respect to the primary resource demands of the job types.
+If some subset of the job types were each assigned some primary resource demand, then the machine types must be assigned matching resource capacities.
+For example, memory-intensive job types are best assigned to memory-optimized machine types.
+In this function, for a subset of all time slots, we select a primary resource $k^*$, where $0<=k^*<K$.
+For each time slot in this subset, we can increase the number of jobs which also have primary resource $k^*$.
+
+For each time slot $t$, the total time slot load value $N_t$ is assigned a base load value, which is $lambda_0$ in this case.
+Next, some jitter is applied to $N_t$ by multiplying it by a jitter value $u$ sampled uniformly from a configurable interval $[lambda_"min", lambda_"max")$, after which $N_t$ is clamped to an integer $>=1$.
+After this, we uniformly sample a $J$-dimensional job type weight vector $bold(w)$ from the interval $[0.5,1)$.
+This vector will later be used to decide the number of each job type to select for time slot $t$.
+Next, we compute a set $M$ of each job type $j$ assigned the same primary resource $k^*>0$ as time slot $t$.
+For each of these matching job types, we sample a positive integer $v$ from the configurable interval $[v_"min", v_"max"]$.
+Then, the weight vector element $w_j$ is multiplied by $v$.
+
+Once we have completed this step for all time slots, we let $bold(pi)$ be the normalized $bold(w)$ vector.
+Finally, we compute the job count vector $bold(l)_t$ for time slot $t$.
+This is done by sampling the vector from multinomial distribution.
+Here, $bold(l)_t$ is the total number of jobs scheduled for time slot $t$, across all job types.
+The vector $bold(pi)$ is the probability vector controlling the probability of selecting each job type.
+
+#block(breakable: false, [
+  #show: style-algorithm
+  #algorithm-figure("Generate job counts", vstroke: .5pt + luma(200), {
+    import algorithmic: *
+    Procedure(
+      "GenerateJobCounts",
+      (
+        $K$,
+        $J$,
+        $T$,
+        $lambda_0$,
+        $(lambda_"min",lambda_"max")$,
+        $rho^"slot"$,
+        $eta$,
+        $(v_"min", v_"max")$,
+        $bold(p)^"job"$,
+        $G$,
+      ),
+      {
+        LineComment(Assign($bold(h)$, $"Histogram"(bold(p)^"job")$), "Compute histogram of job type primary resources")
+        LineComment(Assign($bold(u)$, $bold(1)\/K$), $"Let "bold(u)" be uniform "K"-dim probability vector"$)
+        LineComment(
+          Assign($bold(q)^"slot"$, $eta bold(h)\/norm(bold(h))+(1-eta)bold(u)$),
+          "Compute time slot primary job type probabilities",
+        )
+        Comment[Compute primary job types for time slots]
+        Assign($p^"slot"$, $"COMPUTEPRIMARYRESOURCES"(T,K,rho^"slot", bold(q)^"slot",G)$)
+        Assign($L_(j,t)$, $0$)
+        For($1<=t<=T$, {
+          LineComment(Assign($u$, $"Uniform"([lambda_"min", lambda_"max");G)$), "Sample jitter value")
+          LineComment(Assign($N_t$, $max(1, ceil(lambda_0 u))$), "Multiply base load by jitter, clip")
+
+          LineComment(Assign($bold(w)$, $"UniformVector"([0.5, 1), J ; G)$), "Sample job type weight vector")
+
+          If($p^"slot"_t>=0$, {
+            LineComment(Assign($k^*$, $p^"slot"_t$), $"Let" k^* "be primary job type for slot "t$)
+            Comment[Compute set $M$ of job types with same primary resource as time slot $t$]
+            Assign($M$, ${j | p^"job"_j = p^"slot"_t}$)
+            If($M != emptyset$, {
+              Comment[Sample a job type focus multiplier]
+              Assign($v$, $"UniformInteger"([v_"min",v_"max"])$)
+              For($i in M$, {
+                Assign($w_i$, $w_i v$)
+              })
+            })
+          })
+          LineComment(Assign($bold(pi)$, $bold(w)\/norm(bold(w))$), "Normalize weight vector")
+          Comment[Sample job types for slot $t$ from multinomial distribution]
+          LineComment(Assign($L_(dot,t)$, $"Multinomial"(N_t, bold(pi))$), "")
+        })
+      },
+    )
+  })])
 
 
 /*
