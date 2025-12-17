@@ -631,7 +631,7 @@ This means that, for example, if many job types were assigned CPU as a primary r
 With the vector $bold(q)^"job"$ computed, we can now compute the primary resources for the machine types.
 
 The next step is to compute the machine capacity matrix $bold(C)$.
-This is handled by the function $"GENERATECAPACITIES"$.
+This is handled by the function $"GENERATECAPACITIESANDREQUIREMENTS"$.
 
 #block(
   breakable: false,
@@ -656,26 +656,28 @@ This is handled by the function $"GENERATECAPACITIES"$.
             $"RNG" G$,
           ),
           {
-            Comment[Initialize $bold(C)$ with base capacity]
+            Comment[Initialize $bold(C)$ with base capacity and variance]
             Assign($C_(i,k)$, $ceil(c_0 dot U(c_"min", c_"max"))$)
-            Comment[Initialize $bold(R)$ with base demand]
+            Comment[Initialize $bold(R)$ with base demand and variation]
             Assign($R_(j,k)$, $ceil(d_0 dot U(d_"min", d_"max"))$)
 
             Comment[Amplify assigned primary resources for machine types]
             For($1<=i<=M$, {
+              Comment[Check if machine type $i$ was assigned a primary resource]
               If($p^"machine"_i >= 0$, {
-                Assign($k^*$, $p^"machine"_i$)
+                LineComment(Assign($k^*$, $p^"machine"_i$), $"Let" k^* "be primary resource of machine type "i$)
                 Assign($u$, $"UniformInteger"([u_"min", u_"max"])$)
-                Assign($C_(i,k^*)$, $u dot C_(i,k^*)$)
+                LineComment(Assign($C_(i,k^*)$, $u dot C_(i,k^*)$), "Scale the capacity of primary resource")
               })
             })
 
             Comment[Amplify assigned primary resources for job types]
             For($1<=j<=J$, {
+              Comment[Check if job type $j$ was assigned a primary resource]
               If($p^"job"_j >= 0$, {
-                Assign($k^*$, $p^"job"_j$)
+                LineComment(Assign($k^*$, $p^"job"_j$), $"Let" k^* "be primary resource of job type "j$)
                 Assign($u$, $"UniformInteger"([u_"min", u_"max"])$)
-                Assign($R_(j,k^*)$, $u dot R_(j,k^*)$)
+                LineComment(Assign($R_(j,k^*)$, $u dot R_(j,k^*)$), "Scale the demand of primary resource")
               })
             })
 
@@ -689,7 +691,7 @@ This is handled by the function $"GENERATECAPACITIES"$.
                 LineComment(Assign($pi$, $p^"job"_j$), $"Let" pi "be primary resource of job type j"$)
 
                 IfElseChain(
-                  $pi!=-1$,
+                  $pi>=0$,
                   {
                     LineComment(Assign($A$, ${i|p^"machine"_i=pi}$), $"Compute machine types with primary resource" pi$)
                     LineComment(
@@ -698,13 +700,15 @@ This is handled by the function $"GENERATECAPACITIES"$.
                     )
                   },
                   {
-                    Assign($t$, $arg max_m sum_k C_(m,k)$)
+                    LineComment(
+                      Assign($t$, $arg max_m sum_k C_(m,k)$),
+                      "Fallback to machine type with max capacity sum",
+                    )
                   },
                 )
-                Assign($bold(m)_t$, $bold(m)_t + bold(r)_j$)
+                LineComment(Assign($bold(m)_t$, $bold(r)_j - bold(m)_t$), "Add deficit capacity to target machine type")
               })
             })
-
 
             Return($bold(C), bold(R)$)
           },
@@ -712,6 +716,8 @@ This is handled by the function $"GENERATECAPACITIES"$.
       },
     )],
 )
+
+
 
 
 /*
