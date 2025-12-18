@@ -894,4 +894,38 @@ $
   ) quad
 $
 
+=== Dataset generation
 
+With the description of the method for generating a single problem instance completed, we now move on to describing how a dataset of multiple problem instances is generated.
+
+Each generated problem instance samples its dimensions $K$, $J$, $M$, and $T$ uniformly from configurable intervals $[K_"min", K_"max"]$, $[J_"min", J_"max"]$, $[M_"min", M_"max"]$, and $[T_"min", T_"max"]$.
+
+#block(breakable: false, [
+  #show: style-algorithm
+  #algorithm-figure("Generate dataset", vstroke: .5pt + luma(200), {
+    import algorithmic: *
+    Procedure(
+      "GENERATEDATASET",
+      (
+        $N$,
+        $[K_"min", K_"max"]$,
+        $[J_"min", J_"max"]$,
+        $[M_"min", M_"max"]$,
+        $[T_"min", T_"max"]$,
+        $"hyperparameters"$,
+        $G$,
+      ),
+      {
+        Assign($S$, $emptyset$)
+        For($1<=i<=N$, {
+          Assign($K$, $"UniformInteger"([K_"min", K_"max"] ; G)$)
+          Assign($J$, $"UniformInteger"([J_"min", J_"max"] ; G)$)
+          Assign($M$, $"UniformInteger"([M_"min", M_"max"] ; G)$)
+          Assign($T$, $"UniformInteger"([T_"min", T_"max"] ; G)$)
+          Assign($(C,R,L,T,bold(c)^p, bold(c)^r)$, $"GenerateRandomInstance"(K, J, M, T, G)$)
+          Assign($S$, $S union {(C,R,L,T,bold(c)^p, bold(c)^r)}$)
+        })
+        Return($S$)
+      },
+    )
+  })])
