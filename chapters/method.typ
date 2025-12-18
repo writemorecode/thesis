@@ -738,9 +738,9 @@ Then, the weight vector element $w_j$ is multiplied by $v$.
 
 Once we have completed this step for all time slots, we let $bold(pi)$ be the normalized $bold(w)$ vector.
 Finally, we compute the job count vector $bold(l)_t$ for time slot $t$.
-This is done by sampling the vector from multinomial distribution.
-Here, $bold(l)_t$ is the total number of jobs scheduled for time slot $t$, across all job types.
-The vector $bold(pi)$ is the probability vector controlling the probability of selecting each job type.
+This is done by sampling the vector from the $"Multinomial"(N,bold(p))$ distribution.
+Here, the $N$ parameter is $N_t$, the total number of jobs scheduled for time slot $t$, across all job types.
+The vector $bold(pi)$ is the $bold(p)$ parameter, the probability of selecting each job type.
 
 #block(breakable: false, [
   #show: style-algorithm
@@ -789,21 +789,109 @@ The vector $bold(pi)$ is the probability vector controlling the probability of s
             })
           })
           LineComment(Assign($bold(pi)$, $bold(w)\/norm(bold(w))$), "Normalize weight vector")
-          Comment[Sample job types for slot $t$ from multinomial distribution]
+          Comment[Sample job type count vector for slot $t$ from multinomial distribution]
           LineComment(Assign($L_(dot,t)$, $"Multinomial"(N_t, bold(pi))$), "")
         })
       },
     )
   })])
 
+Lastly, we will again describe the algorithm used for computing the machine type purchase and running cost vectors $bold(c^p)$ and $bold(c^r)$.
+This is handled by the $"COMPUTECOSTS"$ function.
 
-/*
 #block(breakable: false, [
   #show: style-algorithm
-  #algorithm-figure("", vstroke: .5pt + luma(200), {
+  #algorithm-figure("Compute costs", vstroke: .5pt + luma(200), {
     import algorithmic: *
-    Procedure("", ($x$), {
+    Procedure("COMPUTECOSTS", ($C$, $"resource weights" bold(alpha)$, $"running cost fraction" gamma$, $"RNG" G$), {
+      Assign($bold(c^p)$, $C^T bold(alpha)$)
+      Assign($bold(c^r)$, $gamma bold(c^p)$)
+      Return($bold(c^p), bold(c^r)$)
     })
-  })]))
-*/
+  })])
+
+Finally, we can describe the full algorithm for generating a single problem instance.
+This is handled by the $"GENERATERANDOMINSTANCE"$ function.
+
+#block(breakable: false, [
+  #show: style-algorithm
+  #algorithm-figure("Generate random instance", vstroke: .5pt + luma(200), {
+    import algorithmic: *
+    Procedure(
+      "GENERATERANDOMINSTANCE",
+      ($K$, $J$, $M$, $T$, "hyperparameters", $G$),
+      {
+        Assign($bold(u)$, $bold(1)\/K$)
+        Assign($bold(p)^"job"$, $"ChoosePrimaryResources"(J,K,rho^"job",bold(u),G)$)
+        Assign($bold(h)$, $"Histogram"(bold(p)^"job")$)
+        Assign($bold(q)^"machine"$, $zeta bold(h)\/norm(bold(h)) + (1-zeta) u$)
+        Assign($bold(p)^"machine"$, $"ChoosePrimaryResources"(M,K,rho^"machine",bold(q)^"machine",G)$)
+        Assign(
+          $(C,R)$,
+          $"GenerateCapacitiesAndRequirements"(
+            K,
+            M,
+            J,
+            c_0,
+            d_0,
+            bold(p)^"machine",
+            bold(p)^"job",
+            G
+          )$,
+        )
+
+        Assign(
+          $L$,
+          $"GenerateJobCounts"(
+            K,
+            J,
+            T,
+            lambda_0,
+            (lambda_"min",lambda_"max"),
+            rho^"slot",
+            eta,
+            (v_"min", v_"max"),
+            bold(p)^"job",
+            G,
+          )$,
+        )
+
+        Assign($(bold(c^p),bold(c^r))$, $"ComputeCosts"(C, bold(alpha), gamma)$)
+        Return($C, R, L, bold(c^p), bold(c^r)$)
+      },
+    )
+  })])
+
+We will now show two $bold(C)$ and $bold(R)$ matrices generated with the same seed value, with and without the primary resource logic.
+The two matrices below were generated using the primary resource logic.
+The primary resource values are in bold.
+
+$
+  C=mat(
+    25, bold(42), 17, 22;
+    19, 25, bold(85), bold(49);
+    19, 21, 28, 21;
+  ),
+  R=mat(
+    6, 9, 7, bold(26), 7;
+    9, 9, bold(27), 7, 9;
+    9, bold(28), 9, 10, bold(20);
+  )
+$
+
+The two matrices here below were generated from the same seed value, but without the primary resource logic.
+
+$
+  C=mat(
+    25, 21, 17, 22;
+    19, 25, 21, 16;
+    19, 21, 21, 21;
+  ),
+  R=mat(
+    6, 9, 7, 9, 7;
+    9, 9, 7, 7, 9;
+    9, 9, 9, 10, 7;
+  ) quad
+$
+
 
