@@ -43,6 +43,8 @@
 #pagebreak()
 #include "chapters/method.typ"
 #pagebreak()
+#include "chapters/experimental_method.typ"
+#pagebreak()
 #include "chapters/results.typ"
 #pagebreak()
 #include "chapters/analysis.typ"
