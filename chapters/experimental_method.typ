@@ -8,6 +8,28 @@
 In order to evaluate these algorithms, we use randomly generated problem instances.
 Each problem instance is generated as follows.
 
+The generation of problem instances is controlled by a set of configurable parameters.
+The table below describes each of these parameters.
+
+#block(breakable: false, [
+  #table(
+    columns: 2,
+    [*Parameter*], [*Purpose*],
+    [$c_0$], [Base machine capacity value],
+    [$d_0$], [Base job demand value],
+    [$lambda_0$], [Base job type count value],
+    [$[c_"min",c_"max"]$], [Random machine capacity jitter interval],
+    [$[d_"min",d_"max"]$], [Random job demand jitter interval],
+    [$[lambda_"min",lambda_"max"]$], [Random job type count jitter interval],
+    [$[u_"min",u_"max"]$], [Primary resource amplification interval],
+    [$rho$], [Resource specialization fraction],
+    [$eta$], [Machine-job primary resource correlation factor],
+    [$$], [],
+    [$$], [],
+    [$$], [],
+  )
+])
+
 Each machine type resource capacity value $C_(i,k)$ is initialized according to a configurable positive base resource capacity parameter $c_0$.
 Each job type resource demand value $R_(j,k)$ is initialized according to a configurable positive base resource demand parameter $d_0$.
 Next, some variation is introduced to each element $C_(i,k)$ and $R_(j,k)$ with multiplicative jitter values sampled uniformly from the configurable ranges $[c_"min",c_"max"]$ and $[d_"min",d_"max"]$, respectively.
