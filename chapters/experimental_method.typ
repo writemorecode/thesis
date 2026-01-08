@@ -13,20 +13,20 @@ The table below describes each of these parameters.
 
 #block(breakable: false, [
   #table(
-    columns: 2,
-    [*Parameter*], [*Purpose*],
-    [$c_0$], [Base machine capacity value],
-    [$d_0$], [Base job demand value],
-    [$lambda_0$], [Base job type count value],
-    [$[c_"min",c_"max"]$], [Random machine capacity jitter interval],
-    [$[d_"min",d_"max"]$], [Random job demand jitter interval],
-    [$[lambda_"min",lambda_"max"]$], [Random job type count jitter interval],
-    [$[u_"min",u_"max"]$], [Primary resource amplification interval],
-    [$rho$], [Resource specialization fraction],
-    [$eta$], [Machine-job primary resource correlation factor],
-    [$$], [],
-    [$$], [],
-    [$$], [],
+    columns: 3,
+    [*Parameter*], [*Purpose*], [*Default value*],
+    [$c_0$], [Base machine capacity value], [$20$],
+    [$d_0$], [Base job demand value], [$8$],
+    [$lambda_0$], [Base job type count value], [$12$],
+    [$[c_"min",c_"max"]$], [Random machine capacity jitter interval], [$(0.8,1.3)$],
+    [$[d_"min",d_"max"]$], [Random job demand jitter interval], [$(0.8,1.3)$],
+    [$[lambda_"min",lambda_"max"]$], [Random job type count jitter interval], [$(0.6,1.4)$],
+    [$[u_"min",u_"max"]$], [Primary resource amplification interval], [$(2,4)$],
+    [$[v_"min",v_"max"]$], [Job type count amplification interval], [$(5,8)$],
+    [$rho^"machine"$], [Machine resource specialization ratio], [$?$],
+    [$rho^"job"$], [Job resource specialization ratio], [$?$],
+    [$rho^"slot"$], [Time slot specialization ratio], [$0.6$],
+    [$eta$], [Machine-job primary resource correlation factor], [$?$],
   )
 ])
 
@@ -51,7 +51,7 @@ Each machine type, job type, and time slot may be assigned a primary resource or
 The number of them which are assigned a primary resource is controlled by a configurable parameter $rho in [0,1]$.
 This means that, for example, given $M$ different machine types, $ceil(rho M)$ machine types will be assigned a primary resource.
 
-The primary resources of a machine type, job type, or time slot are computed using the $"CHOOSEPRIMARYRESOURCES"$ function, described below.
+The primary resources of a machine type, job type, or time slot are computed using the $sans("ChoosePrimaryResources")$ function, described below.
 The function takes as arguments the number $n$ of primary resources to compute, the number of resources $K$,
 the fraction $rho$ of resources to assign a primary resource to, and a probability vector $bold(q) in (0,1)^K$.
 For each of the machine types, job types, or time slots assigned a primary resource, the resource index $k$ will be chosen with probability $q_k$, for $1<=k<=K$.
@@ -96,19 +96,19 @@ This means that, for example, if there are many job types with memory as a prima
 )
 
 Now that we have described how the primary resources are computed, we move on to describing how they are used in practice.
-Let $u ~ "UniformInteger"([u_"min", u_"max"])$.
-For each machine type $i$, if the machine type has been assigned primary resource $k^*$, then we set $C_(i,k^*) arrow.l u dot max(1, ceil(C_(i,k^*)))$, where.
-For each job type $j$, if the job type has been assigned primary resource $k^*$, then we set $R_(j,k^*) arrow.l u dot max(1, ceil(R_(j,k^*)))$.
+Let $u ~ sans("UniformInteger")([u_"min", u_"max"])$.
+For each machine type $i$, if the machine type has been assigned primary resource $k^*$, then we set $C_(i,k^*)$ to $u dot max(1, ceil(C_(i,k^*)))$.
+For each job type $j$, if the job type has been assigned primary resource $k^*$, then we set $R_(j,k^*)$ to $u dot max(1, ceil(R_(j,k^*)))$.
 Note that $u$ is re-sampled for each element $C_(i,k)$ and $R_(j,k)$.
-Here, it is the configurable range $[u_"min", u_"max"]$ which controls how much primary resource values shall be increased.
+Here, it is the configurable interval $[u_"min", u_"max"]$ which controls how much primary resource values shall be increased.
 
-Next, we want to use the vector $p^"machine"$ returned by the $"CHOOSEPRIMARYRESOURCES"$ function for
+Next, we want to use the vector $bold(p)^"machine"$ returned by the $sans("ChoosePrimaryResources")$ function for
 computing a probability vector $bold(q)^"job"$ to use for computing the primary resources for the job types matrix $bold(R)$.
-To do this, we begin by letting the vector $bold(u)$ be the $K$-dimensional uniform probability vector $bold(1)\/K$.
-Next, we compute a histogram vector $bold(h)$ of the elements of $p^"machine"$.
-The $bold(h)$ vector will have dimension $k$, and each element $h_k$ will be equal to the number of machine types which were assigned resource $k$ as a primary resource.
+To do this, we begin by letting the vector $bold(u)$ be the $K$-dimensional uniform probability vector $bold(1)\/K$, where $bold(1)$ is the all-ones vector.
+Next, we compute a histogram vector $bold(h)$ of the elements of $bold(p)^"machine"$.
+The histogram vector $bold(h)$ will have dimension $k$, and each element $h_k$ will be equal to the number of machine types which were assigned resource $k$ as a primary resource.
 If no primary resources were assigned, then we set $bold(h)$ equal to $bold(u)$.
-Finally, we can compute the probability vector $q^"job"$ as a weighted vector sum between the normalized histogram vector $bold(h)$ and the vector $bold(u)$.
+Finally, we can compute the probability vector $bold(q)^"job"$ as a weighted vector sum between the normalized histogram vector $bold(h)$ and the vector $bold(u)$.
 
 $
   bold(q)^"job" = eta bold(h)/norm(bold(h)) + (1-eta) 1/K bold(1)
@@ -121,7 +121,7 @@ This means that, for example, if many job types were assigned CPU as a primary r
 With the vector $bold(q)^"job"$ computed, we can now compute the primary resources for the machine types.
 
 The next step is to compute the machine capacity matrix $bold(C)$.
-This is handled by the function $"GENERATECAPACITIESANDREQUIREMENTS"$.
+This is handled by the function $sans("GenerateCapacitiesAndRequirements")$.
 
 #block(
   breakable: false,
@@ -130,6 +130,7 @@ This is handled by the function $"GENERATECAPACITIESANDREQUIREMENTS"$.
     #algorithm-figure(
       "Generate capacities and requirements",
       vstroke: .5pt + luma(200),
+      inset: 0.3em,
       {
         import algorithmic: *
         Procedure(
@@ -146,17 +147,22 @@ This is handled by the function $"GENERATECAPACITIESANDREQUIREMENTS"$.
             $"RNG" G$,
           ),
           {
-            Comment[Initialize $bold(C)$ with base capacity and variance]
-            Assign($C_(i,k)$, $ceil(c_0 dot U(c_"min", c_"max"))$)
-            Comment[Initialize $bold(R)$ with base demand and variation]
-            Assign($R_(j,k)$, $ceil(d_0 dot U(d_"min", d_"max"))$)
+            LineComment(
+              Assign($C_(i,k)$, $ceil(c_0 dot U(c_"min", c_"max"))$),
+              $"Initialize" bold(C) "with base capacity and jitter"$,
+            )
+
+            LineComment(
+              Assign($R_(j,k)$, $ceil(d_0 dot U(d_"min", d_"max"))$),
+              $"Initialize" bold(R) "with base demand and jitter"$,
+            )
 
             Comment[Amplify assigned primary resources for machine types]
             For($1<=i<=M$, {
               Comment[Check if machine type $i$ was assigned a primary resource]
               If($p^"machine"_i >= 0$, {
                 LineComment(Assign($k^*$, $p^"machine"_i$), $"Let" k^* "be primary resource of machine type "i$)
-                Assign($u$, $"UniformInteger"([u_"min", u_"max"])$)
+                LineComment(Assign($u$, $"UniformInteger"([u_"min", u_"max"])$), "Sample random amplification factor")
                 LineComment(Assign($C_(i,k^*)$, $u dot C_(i,k^*)$), "Scale the capacity of primary resource")
               })
             })
@@ -166,7 +172,7 @@ This is handled by the function $"GENERATECAPACITIESANDREQUIREMENTS"$.
               Comment[Check if job type $j$ was assigned a primary resource]
               If($p^"job"_j >= 0$, {
                 LineComment(Assign($k^*$, $p^"job"_j$), $"Let" k^* "be primary resource of job type "j$)
-                Assign($u$, $"UniformInteger"([u_"min", u_"max"])$)
+                LineComment(Assign($u$, $"UniformInteger"([u_"min", u_"max"])$), "Sample random amplification factor")
                 LineComment(Assign($R_(j,k^*)$, $u dot R_(j,k^*)$), "Scale the demand of primary resource")
               })
             })
@@ -176,27 +182,28 @@ This is handled by the function $"GENERATECAPACITIESANDREQUIREMENTS"$.
 
             Comment[Ensure all job types can be packed]
             For($1<=j<=J$, {
-              Comment[If no machine type can store job type $j$]
+              Comment[Check if no machine type can store job type $j$]
               If($exists.not i: bold(m)_i >= bold(r)_j$, {
-                LineComment(Assign($pi$, $p^"job"_j$), $"Let" pi "be primary resource of job type j"$)
-
+                LineComment(
+                  Assign($A$, ${i|p^"machine"_i=p^"job"_j}$),
+                  $"Compute machine types with primary resource" pi$,
+                )
                 IfElseChain(
-                  $pi>=0$,
+                  $p^"job"_j>=0 "and" A != emptyset$,
                   {
-                    LineComment(Assign($A$, ${i|p^"machine"_i=pi}$), $"Compute machine types with primary resource" pi$)
                     LineComment(
-                      Assign($t$, $"Uniform"(A)$),
-                      $"Select random machine type with primary resource" pi$,
+                      Assign($i$, $"Uniform"(A)$),
+                      $"Sample machine type with primary resource" pi$,
                     )
                   },
                   {
                     LineComment(
-                      Assign($t$, $arg max_m sum_k C_(m,k)$),
+                      Assign($i$, $arg max_m sum_k C_(m,k)$),
                       "Fallback to machine type with max capacity sum",
                     )
                   },
                 )
-                LineComment(Assign($bold(m)_t$, $bold(r)_j - bold(m)_t$), "Add deficit capacity to target machine type")
+                LineComment(Assign($bold(m)_i$, $bold(r)_j - bold(m)_i$), "Add deficit capacity to target machine type")
               })
             })
 
@@ -208,7 +215,7 @@ This is handled by the function $"GENERATECAPACITIESANDREQUIREMENTS"$.
 )
 
 With the description of the generation of the machine capacity matrix $bold(C)$ and job demand matrix $bold(R)$ completed, we now move on to description of the job time slot matrix $bold(L)$.
-The $bold(L)$ matrix generation is handled by the $"GENERATEJOBCOUNTS"$ function.
+The $bold(L)$ matrix generation is handled by the $sans("GenerateJobCounts")$ function.
 The function works as follows.
 
 For each time slot, the job count matrix generation aims to select job types which have been assigned some primary resource.
@@ -216,21 +223,20 @@ Previously, the primary resource capacities of the machine types were selected w
 If some subset of the job types were each assigned some primary resource demand, then the machine types must be assigned matching resource capacities.
 For example, memory-intensive job types are best assigned to memory-optimized machine types.
 In this function, for a subset of all time slots, we select a primary resource $k^*$, where $0<=k^*<K$.
-For each time slot in this subset, we can increase the number of jobs which also have primary resource $k^*$.
+For each time slot in this subset, we increase the number of jobs which also have primary resource $k^*$.
 
-For each time slot $t$, the total time slot load value $N_t$ is assigned a base load value, which is $lambda_0$ in this case.
+For each time slot $t$, $N_t$ is the total time slot job count, across all job types.
+$N_t$ is initialized with a base load value $lambda_0$.
 Next, some jitter is applied to $N_t$ by multiplying it by a jitter value $u$ sampled uniformly from a configurable interval $[lambda_"min", lambda_"max")$, after which $N_t$ is clamped to an integer $>=1$.
 After this, we uniformly sample a $J$-dimensional job type weight vector $bold(w)$ from the interval $[0.5,1)$.
 This vector will later be used to decide the number of each job type to select for time slot $t$.
-Next, we compute a set $M$ of each job type $j$ assigned the same primary resource $k^*>0$ as time slot $t$.
+Next, we compute a set $M$ of each job type $j$ assigned the same primary resource $k^*$ as time slot $t$.
 For each of these matching job types, we sample a positive integer $v$ from the configurable interval $[v_"min", v_"max"]$.
 Then, the weight vector element $w_j$ is multiplied by $v$.
 
 Once we have completed this step for all time slots, we let $bold(pi)$ be the normalized $bold(w)$ vector.
 Finally, we compute the job count vector $bold(l)_t$ for time slot $t$.
-This is done by sampling the vector from the $"Multinomial"(N,bold(p))$ distribution.
-Here, the $N$ parameter is $N_t$, the total number of jobs scheduled for time slot $t$, across all job types.
-The vector $bold(pi)$ is the $bold(p)$ parameter, the probability of selecting each job type.
+This is done by sampling the vector from the $sans("Multinomial")(N_t,bold(pi))$ distribution.
 
 #block(breakable: false, [
   #show: style-algorithm
