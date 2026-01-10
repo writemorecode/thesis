@@ -12,14 +12,14 @@ The third dataset ("machine heavy") was generated with a greater number of machi
 
 The table below presents the parameters used to generate each dataset.
 
-#let all_datasets_csv_file = csv("../all_datasets.csv")
+#let all_datasets_csv_file = csv("../data/all_datasets.csv")
 #table(
   columns: 9,
   [*$"Name"$*], [*$K_min$*], [*$K_max$*], [*$J_min$*], [*$J_max$*], [*$M_min$*], [*$M_max$*], [*$T_min$*], [*$T_max$*],
   ..all_datasets_csv_file.flatten(),
 )
 
-== Evaluation
+== Evaluation method
 
 We want to determine which algorithm performs best on each of the three datasets.
 Let $N$ be the number of problem instances (fixed to 100 in this case).
@@ -31,7 +31,6 @@ $
 $
 
 be the ratio of costs for algorithms $A$ and $B$ on problem instance $i$.
-//We are not interested in those problem instances where both algorithms perform equally well.
 Because raw ratios are asymmetric.
 To see why this is the case, consider the case of two different algorithms $A$ and $B$, and two problem instances.
 On the first problem instance, algorithm $A$ performs twice as well as algorithm $B$.
@@ -67,9 +66,45 @@ $
 
 Next, we compute a 95% confidence interval for the value of $l_(A,B,i)$.
 Let the upper and lower bounds of this confidence interval be $[L_(A,B), U_(A,B)]$.
-
 If this confidence interval does not contain the value $1$, i.e. $1 in.not [L_(A,B), U_(A,B)]$ , then it is statistically likely that algorithm $A$ outperforms algorithm $B$ on each problem instance of the dataset.
 For example, suppose the confidence interval $[L_(A,B), U_(A,B)] = [0.895, 0.982]$.
 In this case, we can conclude with some degree of confidence that $mu_(A,B)$ is slightly less than $1$.
 This would then mean that, with some degree of confidence, algorithm $A$ has a lower average cost than algorithm $B$ across each problem instance of the dataset.
 
+== Data
+
+For each of the three datasets, we present a summary table of the evaluation results for each scheduler algorithm.
+
+== Balanced dataset
+
+#let summary_data_balanced_dataset = csv("../data/eval_summary_balanced.csv")
+#block(breakable: false, [
+  #table(
+    columns: 6,
+    [*Scheduler*], [*Average cost*], [*Min cost*], [*Max cost*], [*Average runtime (sec)*], [*Average machine count*],
+    ..summary_data_balanced_dataset.flatten(),
+  )
+])
+
+
+== Job-heavy dataset
+
+#let summary_data_balanced_dataset = csv("../data/eval_summary_job_heavy.csv")
+#block(breakable: false, [
+  #table(
+    columns: 6,
+    [*Scheduler*], [*Average cost*], [*Min cost*], [*Max cost*], [*Average runtime (sec)*], [*Average machine count*],
+    ..summary_data_balanced_dataset.flatten(),
+  )
+])
+
+== Machine-heavy dataset
+
+#let summary_data_balanced_dataset = csv("../data/eval_summary_machine_heavy.csv")
+#block(breakable: false, [
+  #table(
+    columns: 6,
+    [*Scheduler*], [*Average cost*], [*Min cost*], [*Max cost*], [*Average runtime (sec)*], [*Average machine count*],
+    ..summary_data_balanced_dataset.flatten(),
+  )
+])
