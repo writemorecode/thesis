@@ -21,18 +21,55 @@ The table below presents the parameters used to generate each dataset.
 
 == Evaluation
 
-For each problem instance, we collect the best total cost value.
-For each pair of algorithms $A$ and $B$ and problem instance $i$, we compare the logarithmic cost ratios
+We want to determine which algorithm performs best on each of the three datasets.
+Let $N$ be the number of problem instances (fixed to 100 in this case).
+Let $c_(A,i)$ be the cost of algorithm $A$ for problem instance $i$, for $1<=i<=N$.
+Let
 
-$ log(r_i)=log(c_A)-log(c_B) $.
+$
+  r_(A,B,i) = c_(A,i) / c_(B,i)
+$
 
-We then compute the mean value of $log(r_i)$ across all problem instances in the dataset.
-The results are compared in the table below.
+be the ratio of costs for algorithms $A$ and $B$ on problem instance $i$.
+//We are not interested in those problem instances where both algorithms perform equally well.
+Because raw ratios are asymmetric.
+To see why this is the case, consider the case of two different algorithms $A$ and $B$, and two problem instances.
+On the first problem instance, algorithm $A$ performs twice as well as algorithm $B$.
+On the second problem instance, algorithm $B$ performs twice as well as algorithm $A$.
+This gives us the following cost ratios:
 
-#table(
-  columns: 3,
-  [*Algorithm A*], [*Algorithm B*], [*Log ratio*],
-  [Ruin-and-recreate], [FFD], [-0.000809],
-  [Ruin-and-recreate], [Local scheduler], [-0.000809],
-  [FFD], [Local scheduler], [0.0],
-)
+$
+  r_(A,B,1) = (0.5 c_(B,1)) / c_(B,1) = 0.5, quad r_(A,B,2) = (c_(B,2)) / (0.5 c_(B,2)) = 2
+$
+
+Together, we compute the raw mean cost ratio value $mu_(A,B)$.
+
+$
+  mu_(A, B) = (0.5 + 2) / 2 = 1.25
+$
+
+This results is unexpected, since each of the two algorithm outperformed the other algorithm equally much on one of the two problem instances.
+Therefore, none of the algorithm outperformed the other, and we would expect to have $mu_(A,B) = 1$.
+If we instead use logarithmic mean ratios, then we get the expected value of:
+
+$
+  mu_(A,B) = (log(2) + log(0.5))/2 = 0
+$
+
+Therefore, we choose to compute the logarithmic ratios $l_(A,B,i) = log(r_(A,B,i))$.
+
+
+Next, we compute the mean value $mu_(A,B)$ of $l_(A,B,i)$ across all problem instances $i$.
+
+$
+  mu_(A,B) = 1/N sum_(i=1)^N l_(A,B,i)
+$
+
+Next, we compute a 95% confidence interval for the value of $l_(A,B,i)$.
+Let the upper and lower bounds of this confidence interval be $[L_(A,B), U_(A,B)]$.
+
+If this confidence interval does not contain the value $1$, i.e. $1 in.not [L_(A,B), U_(A,B)]$ , then it is statistically likely that algorithm $A$ outperforms algorithm $B$ on each problem instance of the dataset.
+For example, suppose the confidence interval $[L_(A,B), U_(A,B)] = [0.895, 0.982]$.
+In this case, we can conclude with some degree of confidence that $mu_(A,B)$ is slightly less than $1$.
+This would then mean that, with some degree of confidence, algorithm $A$ has a lower average cost than algorithm $B$ across each problem instance of the dataset.
+
