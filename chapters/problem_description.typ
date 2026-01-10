@@ -269,7 +269,7 @@ For time slot $3$, one machine instance will run $1$ type $2$ job. The other mac
 
 The solution can also be represented by this table.
 
-#let example_solution_data = csv("../example_job_schedule_solution.csv")
+#let example_solution_data = csv("../data/example_job_schedule_solution.csv")
 
 #table(
   columns: 6,
