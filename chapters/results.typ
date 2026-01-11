@@ -130,6 +130,19 @@ For each of the three datasets, we present a summary table of the evaluation res
   )
 ])
 
+#let ci_data_job_heavy = csv("../data/eval_log_ratio_job_heavy.csv")
+#block(breakable: false, [
+  #figure(
+    table(
+      columns: 9,
+      [*Alg. A*], [*Alg. B*], [*Mean*], [*Median*], [*Std. dev.*], [*Min*], [*Max*], [*CI low*], [*CI high*],
+      ..ci_data_job_heavy.flatten(),
+    ),
+    caption: [Confidence interval for mean algorithm cost ratios for job-heavy dataset.],
+  )
+
+])
+
 #block(breakable: false, [
   #figure(
     image(
@@ -154,6 +167,19 @@ For each of the three datasets, we present a summary table of the evaluation res
     ),
     caption: [Summary of evaluation results for machine-heavy dataset.],
   )
+])
+
+#let ci_data_machine_heavy = csv("../data/eval_log_ratio_machine_heavy.csv")
+#block(breakable: false, [
+  #figure(
+    table(
+      columns: 9,
+      [*Alg. A*], [*Alg. B*], [*Mean*], [*Median*], [*Std. dev.*], [*Min*], [*Max*], [*CI low*], [*CI high*],
+      ..ci_data_machine_heavy.flatten(),
+    ),
+    caption: [Confidence interval for mean algorithm cost ratios for machine-heavy dataset.],
+  )
+
 ])
 
 #block(breakable: false, [
