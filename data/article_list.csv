@@ -1,0 +1,16 @@
+ID,Source,Title,Authors,Year
+1,Web search,NUMA-Aware Virtual Machine Placement: New MMMK Model and Column Generation-Based Decomposition Approach,"Sun, X.; Cao, X.; Zhai, Q.; Tan, H.; Hu, J.; Zhu, L.; Su, L.; Zhou, W.; Gao, F.; Guan, X.",2025
+2,Web search,Genetic Algorithm for the Variable Sized Vector Bin-Packing Problem with the Limited Number of Bins,"Borisovsky, P.; Fedotova, E.",2022
+3,Web search,A Reduced Variable Neighborhood Search Approach to the Heterogeneous Vector Bin Packing Problem,"Stakić, Ð.; Živković, M.; Anokic, A.",2021
+4,Web search,Solving Bin Packing Problems Using VRPSolver Models,"Artur Pessoa, Ruslan Sadykov & Eduardo Uchoa",2021
+5,Web search,Monte carlo based server consolidation for energy efficient cloud data centers,"Pessoa, A.; Sadykov, R.; Uchoa, E.",2021
+6,Web search,Multi-objective container deployment on heterogeneous clusters,Yang Hu; Cees De Laat; Zhiming Zhao,2019
+7,Web search,Comparison of different grasp algorithms for the heterogeneous vector bin packing problem,"Harris, B.; Altiparmak, N.",2019
+8,Web search,Reducing the upfront cost of private clouds with clairvoyant virtual machine placement,"Hu, Y.; De Laat, C.; Zhao, Z.",2019
+9,Web search,Optimal edge user allocation in edge computing with variable sized vector bin packing,"Stakić, Ð.; Anokic, A.; Jovanovic, R.",2019
+10,Web search,Sharing-aware online virtual machine packing in heterogeneous resource clouds,"Zhao, Y.; Liu, H.; Wang, Y.; Zhang, Z.; Zuo, D.",2019
+11,Web search,Vector bin packing with heterogeneous bins: application to the machine reassignment problem,"Gabay, M.; Zaourar, S.",2016
+12,Web search,On variable-sized multidimensional packing,"Epstein, L.; van Stee, R.",2004
+13,Web search,Sharing-Aware Online Virtual Machine Packing in Heterogeneous Resource Clouds,"Rampersaud, S.; Grosu, D.",2017
+14,2,Variable neighbourhood search for the variable sized bin packing problem,"Hemmelmayr, Schmid, Blum",2012
+15,2,Heuristics for the variable sized bin-packing problem,"Haouari, Serairi",2009
