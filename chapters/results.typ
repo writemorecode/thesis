@@ -95,7 +95,7 @@ be the ratio between the solver's cost for the problem and the optimal cost for 
 The _performance profile_ for solver $s$ is defined as the function
 
 $
-  rho_s (tau) = 1/abs(P) abs({p in P | r_(p,s) < tau}).
+  rho_s (tau) = 1/abs(P) abs({p in P | r_(p,s) <= tau}).
 $
 
 The performance profile function $rho_s (tau)$ for a solver $s$ can be interpreted as the percentage of problem instances for which a performance ratio $r_(p,s)$ is within $tau$ of the optimal ratio across all problem instances.
@@ -108,8 +108,14 @@ We will use this performance profiles method as a second step in the process of 
 For each of the three datasets, we first present a summary table of the evaluation results for each scheduler algorithm.
 We also present a table of statistics of the previously discussed mean cost ratios, including their confidence intervals, for each dataset.
 Since this table would become unreasonably large if every algorithm was compared to every other algorithm, we only compare the two best algorithms in this table.
-Finally, we present a plot of the performance profiles for each of the algorithms.
+Next, we present a plot of the performance profiles for each of the algorithms.
 Here, $log(tau)$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for each solver $s$.
+Finally, we present a table of the performance ratio _"win rate"_ for each algorithm.
+This value is, for each algorithm $s$, by the performance profile function $rho_s (tau)$ at $tau = 1$.
+Note here that the sum of the win rates across all algorithm do not sum to $1$.
+The reason for this is that multiple algorithms can be tied for certain problem instances.
+
+Since the algorithm execution times are all nearly identical, we will not be comparing them.
 
 
 === Balanced dataset
@@ -153,6 +159,18 @@ Here, $log(tau)$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for e
   )
 ])
 
+#let perf_profiles_balanced = csv("../data/eval_performance_profiles_balanced.csv")
+#block(breakable: false, [
+  #figure(
+    table(
+      columns: 3,
+      [*Scheduler*], [*Wins*], [*Win fraction*],
+      ..perf_profiles_balanced.flatten(),
+    ),
+    caption: [Performance profile wins for the balanced dataset.],
+  )
+])
+
 === Job-heavy dataset
 
 #let summary_data_job_heavy = csv("../data/eval_summary_job_heavy.csv")
@@ -192,6 +210,18 @@ Here, $log(tau)$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for e
   )
 ])
 
+#let perf_profiles_job_heavy = csv("../data/eval_performance_profiles_job_heavy.csv")
+#block(breakable: false, [
+  #figure(
+    table(
+      columns: 3,
+      [*Scheduler*], [*Wins*], [*Win fraction*],
+      ..perf_profiles_job_heavy.flatten(),
+    ),
+    caption: [Performance profile wins for the job-heavy dataset.],
+  )
+])
+
 === Machine-heavy dataset
 
 #let summary_data_machine_heavy = csv("../data/eval_summary_machine_heavy.csv")
@@ -228,5 +258,17 @@ Here, $log(tau)$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for e
       fit: "contain",
     ),
     caption: [Performance profiles for the machine-heavy dataset.],
+  )
+])
+
+#let perf_profiles_machine_heavy = csv("../data/eval_performance_profiles_machine_heavy.csv")
+#block(breakable: false, [
+  #figure(
+    table(
+      columns: 3,
+      [*Scheduler*], [*Wins*], [*Win fraction*],
+      ..perf_profiles_machine_heavy.flatten(),
+    ),
+    caption: [Performance profile wins for the machine-heavy dataset.],
   )
 ])
