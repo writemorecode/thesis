@@ -21,6 +21,8 @@ The table below presents the parameters used to generate each dataset.
 
 == Evaluation method
 
+=== Mean cost ratio confidence intervals
+
 We want to determine which algorithm performs best on each of the three datasets.
 Let $N$ be the number of problem instances (fixed to 100 in this case).
 Let $c_(A,i)$ be the cost of algorithm $A$ for problem instance $i$, for $1<=i<=N$.
@@ -70,6 +72,36 @@ If this confidence interval does not contain the value $1$, i.e. $1 in.not [L_(A
 For example, suppose the confidence interval $[L_(A,B), U_(A,B)] = [0.895, 0.982]$.
 In this case, we can conclude with some degree of confidence that $mu_(A,B)$ is slightly less than $1$.
 This would then mean that, with some degree of confidence, algorithm $A$ has a lower average cost than algorithm $B$ across each problem instance of the dataset.
+
+=== Dolan-Moré performance profiles
+
+Another method of comparing the performance of different algorithms on a set of problem instances is to use _performance profiles_, presented by Elizabeth Doran and Jorge Moré @dolan_more_performance_profiles_2004.
+This method works as follows.
+
+Let $S$ be the set of solvers, or algorithms to evaluate.
+Let $P$ be the set of problem instances.
+Let $t_(p,s)$ be the cost of the solution for problem $p in P$ returned by solver $s in S$.
+Let
+$
+  t^*_p = min_(s in S) t_(p,s)
+$
+be the cost of the optimal solution for problem $p$.
+Let the _performance ratio_ for solver $s$ on problem $p$ be
+$
+  r_(p,s) = t_(p,s) / t^*_p
+$
+be the ratio between the solver's cost for the problem and the optimal cost for the problem.
+
+The _performance profile_ for solver $s$ is defined as the function
+
+$
+  rho_s (tau) = 1/abs(P) abs({p in P | r_(p,s) < tau}).
+$
+
+The performance profile function $rho_s (tau)$ for a solver $s$ can be interpreted as the percentage of problem instances for which a performance ratio $r_(p,s)$ is within $tau$ of the optimal ratio across all problem instances.
+Specifically, $rho_s (1)$ gives the percentage of problem instances for which solver $s$ achieved the optimal performance ratio, which can be interpreted as the solver's _"win rate"_.
+
+We will use this performance profiles method as a second step in the process of deciding which of the $sans("FFDNew")$ and $sans("BFD")$ algorithms is best.
 
 == Data
 
