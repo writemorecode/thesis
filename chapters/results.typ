@@ -75,7 +75,7 @@ This would then mean that, with some degree of confidence, algorithm $A$ has a l
 
 For each of the three datasets, we present a summary table of the evaluation results for each scheduler algorithm.
 
-== Balanced dataset
+=== Balanced dataset
 
 #let summary_data_balanced_dataset = csv("../data/eval_summary_balanced.csv")
 #block(breakable: false, [
@@ -98,7 +98,7 @@ For each of the three datasets, we present a summary table of the evaluation res
   )
 ])
 
-== Job-heavy dataset
+=== Job-heavy dataset
 
 #let summary_data_balanced_dataset = csv("../data/eval_summary_job_heavy.csv")
 #block(breakable: false, [
@@ -121,7 +121,7 @@ For each of the three datasets, we present a summary table of the evaluation res
   )
 ])
 
-== Machine-heavy dataset
+=== Machine-heavy dataset
 
 #let summary_data_balanced_dataset = csv("../data/eval_summary_machine_heavy.csv")
 #block(breakable: false, [
