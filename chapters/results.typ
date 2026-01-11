@@ -86,6 +86,17 @@ For each of the three datasets, we present a summary table of the evaluation res
   )
 ])
 
+#block(breakable: false, [
+  #figure(
+    image(
+      "../images/eval_performance_profiles_balanced.svg",
+      width: 100%,
+      height: 70%,
+      fit: "contain",
+    ),
+    caption: [Performance profiles for the balanced dataset.],
+  )
+])
 
 == Job-heavy dataset
 
@@ -98,6 +109,18 @@ For each of the three datasets, we present a summary table of the evaluation res
   )
 ])
 
+#block(breakable: false, [
+  #figure(
+    image(
+      "../images/eval_performance_profiles_job_heavy.svg",
+      width: 100%,
+      height: 70%,
+      fit: "contain",
+    ),
+    caption: [Performance profiles for the job-heavy dataset.],
+  )
+])
+
 == Machine-heavy dataset
 
 #let summary_data_balanced_dataset = csv("../data/eval_summary_machine_heavy.csv")
@@ -106,5 +129,17 @@ For each of the three datasets, we present a summary table of the evaluation res
     columns: 6,
     [*Scheduler*], [*Average cost*], [*Min cost*], [*Max cost*], [*Average runtime (sec)*], [*Average machine count*],
     ..summary_data_balanced_dataset.flatten(),
+  )
+])
+
+#block(breakable: false, [
+  #figure(
+    image(
+      "../images/eval_performance_profiles_machine_heavy.svg",
+      width: 100%,
+      height: 70%,
+      fit: "contain",
+    ),
+    caption: [Performance profiles for the machine-heavy dataset.],
   )
 ])
