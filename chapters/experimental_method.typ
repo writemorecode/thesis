@@ -1,7 +1,7 @@
 #import "@preview/algorithmic:1.0.6"
 #import algorithmic: algorithm-figure, style-algorithm
 
-== Experimental methodology
+== Experimental methodology <exp_method_section>
 
 === Problem instance generation
 

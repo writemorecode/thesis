@@ -4,7 +4,7 @@
 
 #let ZZnonneg = $ZZ_(>=0)$
 
-= Method
+= Method <method_section>
 
 == Literature review
 

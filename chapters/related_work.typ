@@ -3,7 +3,7 @@
 == Job-scheduling
 
 In 2010, Speitkamp and Bichler @speitkamp_bichler_2010 described a server consolidation problem.
-The authors presented an LP-based formulation of the problem, and a solution using a heuristic based on LP-relaxation. 
+The authors presented an LP-based formulation of the problem, and a solution using a heuristic based on LP-relaxation.
 They also showed that the problem is strongly NP-hard, by reducing the problem to the multidimensional bin-packing problem (MDBP).
 
 In 2012, Setzer and Wolke @setzer_wolke_2018 formulated a mathematical model for scheduling virtual machines in data centers.
@@ -23,7 +23,7 @@ Later in 2011, Khuller et al. @khuller_gma presented a generalization of their p
 == Bin-packing
 
 In 1972, Gary, Graham, and Ullman analyzed the worst-case performance of heuristics-based methods for bin-packing @garey_worst_mem_alloc.
-The authors viewed these algorithms from a more practical point of view, as algorithms for memory allocation. 
+The authors viewed these algorithms from a more practical point of view, as algorithms for memory allocation.
 
 David Johnson was first to study approximation algorithms for the bin-packing problem, in his 1973 Ph.D. thesis @johnson_1973_phd.
 He presented bounds for both the First-Fit and Best-fit algorithms.
@@ -33,8 +33,9 @@ With precedence constraints, certain jobs may need to be scheduled before others
 
 In 2004, Chekuri and Khanna studied approximation algorithms for multidimensional versions of classic packing problems, including the bin-packing problem @chekuri_multidim_packing.
 
-// Mommessin, Erlebach, Sahkhlevich (2025) 'Classification and evaluation of the algorithms for vector bin packing': studied VBP (vector bin packing problem), with heterogeneous bins.
-// missing? study of vector bin packing problem with heterogeneous bins
+In 2025, Mommessin, Erlebach, Sahkhlevich studied the vector bin packing problem (VBP) with homogeneous bins @MOMMESSIN2025106860.
+The authors present a systematic classification of heuristics for the problem.
+Existing VBP algorithms are combined, and new algorithms are proposed.
 
 
 == Research gap

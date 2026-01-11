@@ -3,7 +3,7 @@
 
 #let ZZnonneg = $ZZ_(>=0)$
 
-= Theory
+= Theory <theory_section>
 
 == Bin-packing problem definition
 
