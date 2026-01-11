@@ -75,7 +75,7 @@ This would then mean that, with some degree of confidence, algorithm $A$ has a l
 
 === Dolan-Moré performance profiles
 
-Another method of comparing the performance of different algorithms on a set of problem instances is to use _performance profiles_, presented by Elizabeth Doran and Jorge Moré @dolan_more_performance_profiles_2004.
+Another method of comparing the performance of different algorithms on a set of problem instances is to use _performance profiles_, presented in 2004 by Elizabeth Doran and Jorge Moré @dolan_more_performance_profiles_2004.
 This method works as follows.
 
 Let $S$ be the set of solvers, or algorithms to evaluate.
@@ -101,11 +101,16 @@ $
 The performance profile function $rho_s (tau)$ for a solver $s$ can be interpreted as the percentage of problem instances for which a performance ratio $r_(p,s)$ is within $tau$ of the optimal ratio across all problem instances.
 Specifically, $rho_s (1)$ gives the percentage of problem instances for which solver $s$ achieved the optimal performance ratio, which can be interpreted as the solver's _"win rate"_.
 
-We will use this performance profiles method as a second step in the process of deciding which of the $sans("FFDNew")$ and $sans("BFD")$ algorithms is best.
+We will use this performance profiles method as a second step in the process of determining which of the algorithms performs best on each of the datasets.
 
 == Data
 
-For each of the three datasets, we present a summary table of the evaluation results for each scheduler algorithm.
+For each of the three datasets, we first present a summary table of the evaluation results for each scheduler algorithm.
+We also present a table of statistics of the previously discussed mean cost ratios, including their confidence intervals, for each dataset.
+Since this table would become unreasonably large if every algorithm was compared to every other algorithm, we only compare the two best algorithms in this table.
+Finally, we present a plot of the performance profiles for each of the algorithms.
+Here, $log(tau)$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for each solver $s$.
+
 
 === Balanced dataset
 
