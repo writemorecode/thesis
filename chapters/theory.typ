@@ -203,7 +203,7 @@ In 2014, Dósa and Gyorgy @dosa_gyorgy_2014_bounds_bf showed that these same bou
 
 In David Johnson's 1973 Ph.D. thesis @johnson_1973_phd, the bounds $A(L) ≤ 2 "OPT"(L) - 1$ for the Next-Fit and Worst-Fit algorithms were presented.
 
-== Size measures for items and bins
+== Size measures for items and bins <size_measures>
 
 === Size measures
 

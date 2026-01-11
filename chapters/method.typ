@@ -6,28 +6,28 @@
 
 = Method
 
-== Solution flowchart
-
-This flowchart represents a simplified view of the solution.
-The problem variables, representing the machines, resource requirements, scheduled jobs, and costs, are passed to the scheduler.
-The scheduler then computes a solution, including the machines to buy, and the job packing configurations to use for each time slot.
-
-#diagram(
-  node-stroke: 1pt,
-  node((-1, 1), [
-    Problem instance \
-    $C,R,L,c^r,c^p$
-  ]),
-  edge("-|>"),
-  node((0, 1), align(center)[
-    Scheduler
-  ]),
-  edge("-|>"),
-  node((1, 1), [
-    Problem solution \
-    $bold(x), bold(z)_t, bold(Y)_i, bold(n)_(i,t)$
-  ]),
-)
+// == Solution flowchart
+//
+// This flowchart represents a simplified view of the solution.
+// The problem variables, representing the machines, resource requirements, scheduled jobs, and costs, are passed to the scheduler.
+// The scheduler then computes a solution, including the machines to buy, and the job packing configurations to use for each time slot.
+//
+// #diagram(
+//   node-stroke: 1pt,
+//   node((-1, 1), [
+//     Problem instance \
+//     $C,R,L,c^r,c^p$
+//   ]),
+//   edge("-|>"),
+//   node((0, 1), align(center)[
+//     Scheduler
+//   ]),
+//   edge("-|>"),
+//   node((1, 1), [
+//     Problem solution \
+//     $bold(x), bold(z)_t, bold(Y)_i, bold(n)_(i,t)$
+//   ]),
+// )
 
 
 == Research questions
@@ -35,39 +35,19 @@ The scheduler then computes a solution, including the machines to buy, and the j
 With this research, we aim to answer the following research questions:
 
 RQ1: How can we create a cloud job scheduler which is efficient with respect to energy consumption? \
-RQ2: How can we create a cloud job scheduler which is optimized for both scheduling quality and execution time?
+// RQ2: How can we create a cloud job scheduler which is optimized for both scheduling quality and execution time?
 
 == Algorithms
 
 === Adapting first-fit to heterogeneous bins with costs
 
-// TODO: update with "marginal-cost" stuff
-
 The first-fit algorithm described in @ff_algorithm is intended for the case of homogeneous bins with no costs.
 This algorithm does not take bin type opening costs into account when opening a new bin.
 This can lead to the algorithm selecting a more expensive bin type, when other less expensive bin types are available.
-We can solve this problem by sorting the machine capacity vector $bold(m)_i$ of the machine capacity matrix $bold(C)$, in non-decreasing order of the opening costs $c^r_i$ of the machine types.
-This can be achieved by multiplying the $bold(C)$ matrix with permutation matrix $bold(P)$, forming the new matrix $bold(C_s)=bold(C P)$.
+A simple method for solving this problem is to always choose to open the cheapest feasible bin type.
+However, this method turns out to not perform very well, and much better methods are available.
+One such superior bin selection method will be discussed in @bfd_algo.
 
-$
-  bold(C) = mat(|, |, , |; bold(m)_1, bold(m)_2, dots.c, bold(m)_M; |, |, , |), quad
-  bold(P) = mat(|, |, , |; bold(e)_(alpha_1), bold(e)_(alpha_2), dots.c, bold(e)_(alpha_M); |, |, , |), quad
-  bold(I) = mat(|, |, , |; bold(e)_(1), bold(e)_(2), dots.c, bold(e)_(M); |, |, , |) \
-  bold(c^r) = mat(c^r_1, c^r_2, dots.c, c^r_M), quad
-  c^r_(alpha_1) <= c^r_(alpha_2) <= dots.c <= c^r_(alpha_M) quad
-  1<=alpha_k<=M, quad 1<=k<=M \
-  bold(e)_1 = mat(1, 0, 0, dots.c, 0)^T, bold(e)_2 = mat(0, 1, 0, dots.c, 0)^T, ..., bold(e)_M = mat(0, 0, 0, dots.c, 1)^T.
-$
-
-Now, we can define the cost-optimal bin type $bold(gamma)_i$ for each item type $i$ as:
-
-$
-  bold(gamma) = mat(gamma_1, gamma_2, dots.c, gamma_J), quad
-  bold(gamma)_i = min {j | C_s e_j >= bold(r)_i , 1<=j<=M}, quad 1<=i<=J.
-$
-
-We shall refer to this version of the first-fit decreasing algorithm as FFD in the rest of the report.
-We can also use this bin selection method for the best-fit decreasing (BFD) algorithm.
 
 === Upper bound on machine types
 
@@ -83,7 +63,7 @@ We shall continue here to refer to these time slot vectors as $bold(l)_t$.
 Next, for each time slot vector $bold(l)_t$ and for each machine type $i$, we attempt to run FFD (First-Fit-Decreasing) on the jobs in $bold(l)_t$ using only machines of type $i$.
 This gives us an upper bound
 
-$ u_(i,t)="FFD"(bold(m)_i,bold(l)_t) $
+$ u_(i,t)="PackJobs"(bold(m)_i,bold(l)_t) $
 
 on the number of required machines of each type.
 We get each component of the upper bound $bold(x)_U$ by taking the maximum of $u_(i,t)$ across all time slots.
@@ -125,7 +105,7 @@ The algorithm can be described with the following pseudocode.
                 })
               })
               Comment[Pack jobs for time slot $t$ into machines of type $i$]
-              Assign($u_(i,t)$, $"FFD"(bold(m)_i, bold(lambda)_t)$)
+              Assign($u_(i,t)$, $"PackJobs"(bold(m)_i, bold(lambda)_t)$)
             })
             Comment[Take max number of machines needed across all time slots]
             Assign($(bold(x)_U)_i$, $max_t u_(i,t)$)
@@ -136,6 +116,9 @@ The algorithm can be described with the following pseudocode.
     )
   })
 ])
+
+This method for computing an upper-bound on the number of each machine type required is not practically interesting.
+This is because a far superior packing can be found by directly using a packing method such as first-fit decreasing, without first computing any upper-bound.
 
 === A first solution algorithm
 
@@ -157,7 +140,7 @@ FFD is guaranteed to yield a valid packing given a sufficiently large set of mac
 We can improve this packing by moving jobs from machines with lower utilization to machines with higher utilization.
 If all jobs running on some machines can be moved to another machine, then the now-empty machine can be shut down for the time slot.
 
-==== Job re-packing
+=== Job re-packing
 
 We will now describe how the job re-packing algorithm works.
 We begin with a few definitions.
@@ -176,24 +159,13 @@ $
   bold(l)_j <= bold(b)_j, quad forall 1<=j<=N.
 $
 
-For each bin $i$, we define the _bin utilization_ for dimension $k$ as the load-to-capacity ratio for dimension $k$:
+For each bin $i$, we define the _bin utilization_ $U_i$ as:
 
 $
-  U_(i,k) = cases(
-    l_(i,k) \/ b_(i,k) quad "if" b_(i,k)>0,
-    0 quad "else".
-  )
+  U_(i) = bold(alpha)^T (bold(b)_i - bold(l)_i)
 $
 
-Since we are re-packing a valid packing of items to bins, we know that no bins are over-packed.
-This means that for each bin and for each dimension, the load does not exceed the capacity.
-In other words, we have $U_(i,k) <= 1$ for all bins $i$ and dimensions $k$.
-
-With this definition, we can define the total utilization for bin $bold(b)_i$ as the maximum bin utilization across all dimensions:
-
-$
-  U_i = max_k U_(i,k).
-$
+where the vector $bold(alpha)$ is the resource weight vector.
 
 The goal of the job-repacking algorithm is reduce item fragmentation across all bins.
 We can achieve this by moving items from bins with lower utilization, to bins with higher utilization.
@@ -313,11 +285,13 @@ In any case, we re-sort the list of bins in non-decreasing order of utilization.
   })
 ])
 
+This repacking algorithm turned out to only be able to yield improved solutions when given deliberately poor starting solutions.
+When given solutions computed using more intelligent heuristics, the algorithm was unable to find improved solutions.
+Therefore, this algorithm will not be evaluated or discussed any further.
 
 ==== Algorithm description <first_alg>
 
 An initial basic solution algorithm proceeds as following.
-
 
 First, we compute an upper bound $bold(x_U)$ on the machine vector $bold(x)$.
 Next, we select $bold(x_U)$ as our initial machine vector.
@@ -360,7 +334,7 @@ $
 and let $hat(c)$ be its cost.
 If this neighbor solution $hat(X)$ has been seen previously (i.e. $hat(X) in S$), then we stop the algorithm.
 
-Next, we compute the new machine vector $bold(hat(x))$, using @eqn_x_z_vectors.
+Next, we compute the new machine vector $bold(hat(x)) = max_t bold(z)_t$.
 If the new machine vector is greater than the upper bound, i.e. $bold(hat(x)) > bold(x_U)$, then we stop the algorithm and return the current valid solution $X$ and cost $c$.
 Otherwise, if the new machine vector is not equal to the old, i.e. $bold(hat(x)) != bold(x)$, then we will attempt to re-pack the jobs into the machines given by $bold(hat(x))$.
 Let $bold(hat(X))$ be this job-packing configuration, and let $hat(c)$ be its cost.
@@ -448,6 +422,9 @@ Finally, if the maximum number of iterations has been reached, we stop the algor
   })
 ])
 
+This algorithm was greatly outperformed by much simpler algorithms, first-fit decreasing being one of them.
+Therefore, we will not be evaluating this algorithm or discussing it any further.
+
 ==== Alternate initial solution method <alt_initial_soln>
 
 The previously described algorithm uses the upper-bound machine vector $bold(x)_U$ as its initial solution.
@@ -533,12 +510,30 @@ Finally, we set the best solution $x_"best"$ to the best of $x_"best"$ and the c
     )
   })])
 
+Yet again, this more complex algorithm was greatly outperformed by much simpler algorithms, first-fit decreasing being one of them.
+Therefore, we will not be evaluating this algorithm or discussing it any further.
 
-== Resource-weighted cost-aware best-fit algorithm
+== Heuristics for FFD
+
+Here, we shall describe a number of different variations of the first-fit decreasing algorithm, each using a different heuristic.
+Many of these heuristics were first presented by in 2017 by Panigrahy et al. @Panigrahy2011HeuristicsFV.
+Some of these heuristics are also discussed in @size_measures.
+
+All of the algorithms described in this section always select the cheapest feasible bin when opening a new bin.
+The algorithms do differ in how they sort the item types before they are packed.
+
+The _FFDLex_ (also referred to in this report as just _FFD_) algorithm orders all item types at once using a single lexicographical sort.
+The _FFDSum_ algorithm orders item types in decreasing order of the sum of their resource demand vector $sum_k r_(j,k)$.
+The _FFDProd_ algorithm orders item types in decreasing order of the product of their resource demand vector $product_k r_(j,k)$.
+This algorithm works best when all resource demand values are positive.
+The _FFDMax_ algorithm orders item types in decreasing order of their maximum resource demand value $max_k r_(j,k)$.
+The _FFDL2_ algorithm orders item types in decreasing order of the Euclidean (L2) vector norm of their resource demand vector $norm(bold(r)_j)_2$.
+
+== Resource-weighted cost-aware best-fit algorithm <bfd_algo>
 
 Finally, we will now describe a packing algorithm based on the best-fit heuristic.
 This is a simpler algorithm, which does not make use of any of the previous _"ruin-and-recreate"_ or _"neighborhood search"_ methods used by the previously described algorithm.
-As we shall later see in the coming Results section (@results_section), this algorithm will dominate all other packing algorithms previously described in this report.
+As we shall later see in the coming Results section (@results_section), this algorithm yields excellent solutions, dominating all other packing algorithms previously described in this report.
 The strength of this algorithm comes from how it selects the type of bin to open for a new item.
 Previous algorithm have used naïve methods for this, such as simply selecting the cheapest feasible bin type.
 This algorithm takes a more intelligent approach to the problem, instead attempting to place multiple items of the same type into a new open bin, and selecting the bin type which can accomplish this with minimum remaining slack.
@@ -667,6 +662,7 @@ $
 Note here that each $hat(r)_(j,k)$ is an element of the job-demand matrix $bold(hat(R))$ formed by permuting the columns of $bold(R)$.
 For each bin $b$ which can accommodate at least one type $j$ item (i.e. $q_b >= 1$), we compute $n_b=min(q_b, eta)$.
 Next, we compute the remaining capacity (slack) $bold(u)=bold(rho) - n_b bold(hat(r))_j$ of bin $b$ after storing $n_b$ items of type $j$.
+This is inspired by the L2 Norm-based Greedy heuristic, described in @Panigrahy2011HeuristicsFV.
 Next, we compute a score $Phi_b$ representing the quality of the fit of the current item in bin $b$.
 
 $
