@@ -537,6 +537,27 @@ Finally, we set the best solution $x_"best"$ to the best of $x_"best"$ and the c
 Yet again, this more complex algorithm was greatly outperformed by much simpler algorithms, first-fit decreasing being one of them.
 Therefore, we will not be evaluating this algorithm or discussing it any further.
 
+== Peak demand scheduler
+
+Here, we briefly describe a new packing algorithm we shall call _"PeakDemand"_.
+This algorithm begins by finding the time-slot with _peak demand_.
+This is done by computing the vector $bold(v)$ of total time-slot costs:
+
+$
+  bold(v) = bold(alpha)^T bold(R) bold(L)^T
+$
+
+Next, we select the peak demand time-slot $t^*$:
+
+$
+  t^* = arg max_t v_t
+$
+
+Next, we pack the jobs $bold(l)_(t^*)$ for this time-slot.
+After this, we pack the remaining time slot, each time keeping the bins for the previous time-slot as open bins for packing the next time slot.
+The idea here is that any solution to the problem will need to be able to run all jobs for the peak-demand time-slot.
+Therefore, we should begin by packing this time-slot, and then attempt to pack all other time-slots using these open bins.
+
 == Heuristics for FFD
 
 Here, we shall describe a number of different variations of the first-fit decreasing algorithm, each using a different heuristic.
@@ -730,3 +751,7 @@ As with other previously discussed packing algorithms, this process is repeated 
 For each bin type $i$, we let $x_i = max_t X_(i,t)$ be the maximum number of bins of type $i$ used across all time slots.
 Finally, we return the bin-type vector $bold(x)$ and the item-bin-time slot packing variable $y$.
 
+We can create a new FFD-based packing algorithm based on this algorithm.
+We will call this algorithm _"FFDNew"_.
+The algorithm will use the same job-ordering and new bin selection methods as this algorithm.
+However, like first fit, it will place items in the first bin which accommodate it.
