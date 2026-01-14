@@ -1,7 +1,9 @@
 #import "@preview/algorithmic:1.0.6"
 #import algorithmic: algorithm-figure, style-algorithm
 
-== Experimental methodology <exp_method_section>
+= Experimental Methodology <exp_method_section>
+
+This chapter describes how the synthetic problem instances are generated and which parameters control the dataset structure.
 
 === Problem instance generation
 
