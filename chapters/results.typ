@@ -1,5 +1,7 @@
 = Results <results_section>
 
+This chapter presents the evaluation datasets, metrics, and empirical results for the scheduling algorithms.
+
 == Datasets
 
 We evaluate the algorithms on a three different datasets.
