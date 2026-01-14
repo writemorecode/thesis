@@ -5,6 +5,8 @@
 
 = Theory <theory_section>
 
+This chapter introduces the bin-packing formulations and algorithmic bounds that underpin the scheduler design.
+
 == Bin-packing problem definition
 
 === One-dimensional bin-packing problem
