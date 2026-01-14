@@ -6,6 +6,8 @@
 
 = Method <method_section>
 
+This chapter summarizes the research questions, the literature review scope, and the scheduling algorithms that are evaluated.
+
 == Literature review
 
 Since the literature on the bin-packing problem is so vast, we needed to reduce the number of search results by using a more precise search query.
