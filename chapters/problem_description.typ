@@ -1,4 +1,6 @@
-= Problem description <problem_description_section>
+= Problem Description <problem_description_section>
+
+This chapter formalizes the offline job scheduling problem and introduces the notation used throughout the thesis.
 
 #let ZZnonneg = $ZZ_(>=0)$
 #let ZZpos = $ZZ_(>0)$
