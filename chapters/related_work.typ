@@ -1,4 +1,6 @@
-= Related work
+= Related Work <chp-relatedwork>
+
+This chapter surveys prior research on energy-aware scheduling and multidimensional bin-packing, and positions this thesis within that landscape.
 
 == Job-scheduling
 
@@ -49,4 +51,3 @@ Second, the jobs scheduled across all time slots must then be allocated to these
 Finding a good solution to the problem will require weighing the amount of time spent solving each of the two subproblems.
 We want to create a scheduler which can return a good result within a reasonable amount of execution time.
 If we spend too much time searching for a good collection of available machines, then we will have little time remaining for job scheduling, and vice versa.
-
