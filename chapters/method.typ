@@ -21,16 +21,6 @@ We were forced to remove $1$ article due to not being able to access the article
 After filtering, we had a total of $13$ articles.
 From other articles cited by this set of articles, we found another $2$ articles.
 
-The table below presents the articles.
-
-#let article_list = csv("../data/article_list.csv")
-#block(
-  breakable: true,
-  table(
-    columns: 5,
-    ..article_list.flatten()
-  ),
-)
 
 // == Solution flowchart
 //
