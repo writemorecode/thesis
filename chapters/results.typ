@@ -124,154 +124,188 @@ Since the algorithm execution times are all nearly identical, we will not be com
 === Balanced dataset
 
 #let summary_data_balanced_dataset = csv("../data/eval_summary_balanced.csv")
-#block(breakable: false, [
-  #figure(
-    table(
-      columns: 6,
-      [*Scheduler*], [*Average cost*], [*Min cost*], [*Max cost*], [*Average runtime (sec)*], [*Average machine count*],
-      ..summary_data_balanced_dataset.flatten(),
-    ),
-    caption: [Summary of evaluation results for balanced dataset.],
-  )
-
-])
-
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      table(
+        columns: 6,
+        [*Scheduler*],
+        [*Average cost*],
+        [*Min cost*],
+        [*Max cost*],
+        [*Average runtime (sec)*],
+        [*Average machine count*],
+        ..summary_data_balanced_dataset.flatten(),
+      ),
+      caption: [Summary of evaluation results for balanced dataset.],
+    )
+  ])
+]
 
 #let ci_data_balanced = csv("../data/eval_log_ratio_balanced.csv")
-#block(breakable: false, [
-  #figure(
-    table(
-      columns: 9,
-      [*Alg. A*], [*Alg. B*], [*Mean*], [*Median*], [*Std. dev.*], [*Min*], [*Max*], [*CI low*], [*CI high*],
-      ..ci_data_balanced.flatten(),
-    ),
-    caption: [Confidence interval for mean algorithm cost ratios for balanced dataset.],
-  )
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      table(
+        columns: 9,
+        [*Alg. A*], [*Alg. B*], [*Mean*], [*Median*], [*Std. dev.*], [*Min*], [*Max*], [*CI low*], [*CI high*],
+        ..ci_data_balanced.flatten(),
+      ),
+      caption: [Confidence interval for mean algorithm cost ratios for balanced dataset.],
+    )
+  ])
+]
 
-])
-
-#block(breakable: false, [
-  #figure(
-    image(
-      "../images/eval_performance_profiles_balanced.svg",
-      width: 100%,
-      height: 50%,
-      fit: "contain",
-    ),
-    caption: [Performance profiles for the balanced dataset.],
-  )
-])
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      image(
+        "../images/eval_performance_profiles_balanced.svg",
+        width: 100%,
+        height: 50%,
+        fit: "contain",
+      ),
+      caption: [Performance profiles for the balanced dataset.],
+    )
+  ])
+]
 
 #let perf_profiles_balanced = csv("../data/eval_performance_profiles_balanced.csv")
-#block(breakable: false, [
-  #figure(
-    table(
-      columns: 3,
-      [*Scheduler*], [*Wins*], [*Win fraction*],
-      ..perf_profiles_balanced.flatten(),
-    ),
-    caption: [Performance profile wins for the balanced dataset.],
-  )
-])
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      table(
+        columns: 3,
+        [*Scheduler*], [*Wins*], [*Win fraction*],
+        ..perf_profiles_balanced.flatten(),
+      ),
+      caption: [Performance profile wins for the balanced dataset.],
+    )
+  ])
+]
 
 === Job-heavy dataset
 
 #let summary_data_job_heavy = csv("../data/eval_summary_job_heavy.csv")
-#block(breakable: false, [
-  #figure(
-    table(
-      columns: 6,
-      [*Scheduler*], [*Average cost*], [*Min cost*], [*Max cost*], [*Average runtime (sec)*], [*Average machine count*],
-      ..summary_data_job_heavy.flatten(),
-    ),
-    caption: [Summary of evaluation results for job-heavy dataset.],
-  )
-])
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      table(
+        columns: 6,
+        [*Scheduler*],
+        [*Average cost*],
+        [*Min cost*],
+        [*Max cost*],
+        [*Average runtime (sec)*],
+        [*Average machine count*],
+        ..summary_data_job_heavy.flatten(),
+      ),
+      caption: [Summary of evaluation results for job-heavy dataset.],
+    )
+  ])
+]
 
 #let ci_data_job_heavy = csv("../data/eval_log_ratio_job_heavy.csv")
-#block(breakable: false, [
-  #figure(
-    table(
-      columns: 9,
-      [*Alg. A*], [*Alg. B*], [*Mean*], [*Median*], [*Std. dev.*], [*Min*], [*Max*], [*CI low*], [*CI high*],
-      ..ci_data_job_heavy.flatten(),
-    ),
-    caption: [Confidence interval for mean algorithm cost ratios for job-heavy dataset.],
-  )
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      table(
+        columns: 9,
+        [*Alg. A*], [*Alg. B*], [*Mean*], [*Median*], [*Std. dev.*], [*Min*], [*Max*], [*CI low*], [*CI high*],
+        ..ci_data_job_heavy.flatten(),
+      ),
+      caption: [Confidence interval for mean algorithm cost ratios for job-heavy dataset.],
+    )
+  ])
+]
 
-])
-
-#block(breakable: false, [
-  #figure(
-    image(
-      "../images/eval_performance_profiles_job_heavy.svg",
-      width: 100%,
-      height: 50%,
-      fit: "contain",
-    ),
-    caption: [Performance profiles for the job-heavy dataset.],
-  )
-])
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      image(
+        "../images/eval_performance_profiles_job_heavy.svg",
+        width: 100%,
+        height: 50%,
+        fit: "contain",
+      ),
+      caption: [Performance profiles for the job-heavy dataset.],
+    )
+  ])
+]
 
 #let perf_profiles_job_heavy = csv("../data/eval_performance_profiles_job_heavy.csv")
-#block(breakable: false, [
-  #figure(
-    table(
-      columns: 3,
-      [*Scheduler*], [*Wins*], [*Win fraction*],
-      ..perf_profiles_job_heavy.flatten(),
-    ),
-    caption: [Performance profile wins for the job-heavy dataset.],
-  )
-])
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      table(
+        columns: 3,
+        [*Scheduler*], [*Wins*], [*Win fraction*],
+        ..perf_profiles_job_heavy.flatten(),
+      ),
+      caption: [Performance profile wins for the job-heavy dataset.],
+    )
+  ])
+]
 
 === Machine-heavy dataset
 
 #let summary_data_machine_heavy = csv("../data/eval_summary_machine_heavy.csv")
-#block(breakable: false, [
-  #figure(
-    table(
-      columns: 6,
-      [*Scheduler*], [*Average cost*], [*Min cost*], [*Max cost*], [*Average runtime (sec)*], [*Average machine count*],
-      ..summary_data_machine_heavy.flatten(),
-    ),
-    caption: [Summary of evaluation results for machine-heavy dataset.],
-  )
-])
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      table(
+        columns: 6,
+        [*Scheduler*],
+        [*Average cost*],
+        [*Min cost*],
+        [*Max cost*],
+        [*Average runtime (sec)*],
+        [*Average machine count*],
+        ..summary_data_machine_heavy.flatten(),
+      ),
+      caption: [Summary of evaluation results for machine-heavy dataset.],
+    )
+  ])
+]
 
 #let ci_data_machine_heavy = csv("../data/eval_log_ratio_machine_heavy.csv")
-#block(breakable: false, [
-  #figure(
-    table(
-      columns: 9,
-      [*Alg. A*], [*Alg. B*], [*Mean*], [*Median*], [*Std. dev.*], [*Min*], [*Max*], [*CI low*], [*CI high*],
-      ..ci_data_machine_heavy.flatten(),
-    ),
-    caption: [Confidence interval for mean algorithm cost ratios for machine-heavy dataset.],
-  )
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      table(
+        columns: 9,
+        [*Alg. A*], [*Alg. B*], [*Mean*], [*Median*], [*Std. dev.*], [*Min*], [*Max*], [*CI low*], [*CI high*],
+        ..ci_data_machine_heavy.flatten(),
+      ),
+      caption: [Confidence interval for mean algorithm cost ratios for machine-heavy dataset.],
+    )
+  ])
+]
 
-])
-
-#block(breakable: false, [
-  #figure(
-    image(
-      "../images/eval_performance_profiles_machine_heavy.svg",
-      width: 100%,
-      height: 50%,
-      fit: "contain",
-    ),
-    caption: [Performance profiles for the machine-heavy dataset.],
-  )
-])
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      image(
+        "../images/eval_performance_profiles_machine_heavy.svg",
+        width: 100%,
+        height: 50%,
+        fit: "contain",
+      ),
+      caption: [Performance profiles for the machine-heavy dataset.],
+    )
+  ])
+]
 
 #let perf_profiles_machine_heavy = csv("../data/eval_performance_profiles_machine_heavy.csv")
-#block(breakable: false, [
-  #figure(
-    table(
-      columns: 3,
-      [*Scheduler*], [*Wins*], [*Win fraction*],
-      ..perf_profiles_machine_heavy.flatten(),
-    ),
-    caption: [Performance profile wins for the machine-heavy dataset.],
-  )
-])
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      table(
+        columns: 3,
+        [*Scheduler*], [*Wins*], [*Win fraction*],
+        ..perf_profiles_machine_heavy.flatten(),
+      ),
+      caption: [Performance profile wins for the machine-heavy dataset.],
+    )
+  ])
+]
