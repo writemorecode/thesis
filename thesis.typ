@@ -4,19 +4,19 @@
 // -----------------------------
 // Thesis metadata (edit these)
 // -----------------------------
-#let thesis-degree = "Degree name"
-#let thesis-month = "Month"
-#let thesis-year = "Year"
-#let faculty = "Faculty"
-#let thesis-weeks = "Weeks"
+#let thesis-degree = "Civilingenjör i datorsäkerhet"
+#let thesis-month = "May"
+#let thesis-year = "2026"
+#let faculty = "DIDA"
+#let thesis-weeks = "30"
 #let thesis-title = "Efficient offline job scheduling in private clouds"
 #let thesis-subtitle = ""
 #let author-first = "Gustav Karlsson"
-#let author-first-mail = "...@student.bth.se"
+#let author-first-mail = "guka17student.bth.se"
 #let author-second = ""
 #let author-second-mail = "...@student.bth.se"
-#let supervisor = "Title Firstname Lastname"
-#let supervisor-affiliation = "Department"
+#let supervisor = "Professor Lars Lundberg"
+#let supervisor-affiliation = "DIDA"
 
 #let bth-logo = "bthnotext.pdf"
 
@@ -139,10 +139,8 @@
   columns: (1fr, auto),
   row-gutter: 0.2cm,
   column-gutter: 1cm,
-  [#thesis-degree],
-  [#image(bth-logo, width: 3cm)],
-  [#(thesis-month + " " + thesis-year)],
-  [],
+  [#thesis-degree], [#image(bth-logo, width: 3cm)],
+  [#(thesis-month + " " + thesis-year)], [],
 )
 
 #v(7.5cm)
