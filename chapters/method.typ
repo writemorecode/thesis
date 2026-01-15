@@ -60,8 +60,6 @@ A similar slack-based method is used to select which of the already open bins sh
 
 We begin by presenting a pseudocode description of the algorithm.
 Thereafter, we describe each step of the algorithm in greater detail.
-=== Pseudocode
-
 
 #block(breakable: false, [
   #show: style-algorithm
@@ -73,7 +71,7 @@ Thereafter, we describe each step of the algorithm in greater detail.
       {
         LineComment(
           Assign($(bold(hat(R)),bold(hat(L)))$, $"ResourceWeightSort"(bold(R),bold(L),bold(alpha))$),
-          $"Sort "bold(R) "and" bold(L) "by resource demand"$,
+          "Sort items",
         )
 
         LineComment(Assign($B$, $emptyset$), "Initialize empty set of bins")
@@ -98,7 +96,7 @@ Thereafter, we describe each step of the algorithm in greater detail.
                     )
                     LineComment(
                       Assign($q_b$, $min_(k: hat(r)_k>0) floor(rho_k\/hat(r)_(j,k))$),
-                      $"Number of type "j" items which fit in bin" b$,
+                      "Num. of items which fit in bin",
                     )
                     LineComment(Assign($n_b$, $min(q_b, eta)$), $"Number of type "j" items to place in bin" b$)
 
@@ -124,7 +122,7 @@ Thereafter, we describe each step of the algorithm in greater detail.
                   For($1<=i<=M$, {
                     LineComment(
                       Assign($q_i$, $min_(k: hat(r)_k>0) floor(m_(i,k)\/hat(r)_(j,k))$),
-                      $"Num. of type" j "items which fit in bin type" i$,
+                      "",
                     )
 
                     LineComment(Assign($n_i$, $min(eta, max(1, q_i))$), "")
@@ -158,8 +156,6 @@ Thereafter, we describe each step of the algorithm in greater detail.
       },
     )
   })])
-
-=== Algorithm description
 
 The algorithm uses a weighted best-fit heuristic, with resource demand-aware job type ordering and cost-aware bin type selection.
 The algorithm uses the resource weight vector $bold(alpha)$ to compute the item size vector $bold(v)=bold(R)^T bold(alpha)$, where each item type $j$ has scalar size $v_j$.
