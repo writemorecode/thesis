@@ -21,31 +21,6 @@ We were forced to remove $1$ article due to not being able to access the article
 After filtering, we had a total of $13$ articles.
 From other articles cited by this set of articles, we found another $2$ articles.
 
-
-// == Solution flowchart
-//
-// This flowchart represents a simplified view of the solution.
-// The problem variables, representing the machines, resource requirements, scheduled jobs, and costs, are passed to the scheduler.
-// The scheduler then computes a solution, including the machines to buy, and the job packing configurations to use for each time slot.
-//
-// #diagram(
-//   node-stroke: 1pt,
-//   node((-1, 1), [
-//     Problem instance \
-//     $C,R,L,c^r,c^p$
-//   ]),
-//   edge("-|>"),
-//   node((0, 1), align(center)[
-//     Scheduler
-//   ]),
-//   edge("-|>"),
-//   node((1, 1), [
-//     Problem solution \
-//     $bold(x), bold(z)_t, bold(Y)_i, bold(n)_(i,t)$
-//   ]),
-// )
-
-
 == Research questions
 
 With this research, we aim to answer the following research questions:
