@@ -61,9 +61,7 @@ $
 $
 
 Therefore, we choose to compute the logarithmic ratios $l_(A,B,i) = log(r_(A,B,i))$.
-
-
-Next, we compute the mean value $mu_(A,B)$ of $l_(A,B,i)$ across all problem instances $i$.
+We compute the mean value $mu_(A,B)$ of $l_(A,B,i)$ across all problem instances $i$.
 
 $
   mu_(A,B) = 1/N sum_(i=1)^N l_(A,B,i)
@@ -88,13 +86,12 @@ Let
 $
   t^*_p = min_(s in S) t_(p,s)
 $
-be the cost of the optimal solution for problem $p$.
+be the cost of the best solution for problem $p$ across all solvers in $S$.
 Let the _performance ratio_ for solver $s$ on problem $p$ be
 $
   r_(p,s) = t_(p,s) / t^*_p
 $
 be the ratio between the solver's cost for the problem and the optimal cost for the problem.
-
 The _performance profile_ for solver $s$ is defined as the function
 
 $
@@ -112,7 +109,7 @@ For each of the three datasets, we first present a summary table of the evaluati
 We also present a table of statistics of the previously discussed mean cost ratios, including their confidence intervals, for each dataset.
 Since this table would become unreasonably large if every algorithm was compared to every other algorithm, we only compare the two best algorithms in this table.
 Next, we present a plot of the performance profiles for each of the algorithms.
-Here, $log(tau)$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for each solver $s$.
+Here, $tau$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for each solver $s$.
 Finally, we present a table of the performance ratio _"win rate"_ for each algorithm.
 This value is, for each algorithm $s$, by the performance profile function $rho_s (tau)$ at $tau = 1$.
 Note here that the sum of the win rates across all algorithm do not sum to $1$.
