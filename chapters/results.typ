@@ -155,7 +155,7 @@ Since the algorithm execution times are all nearly identical, we will not be com
     image(
       "../images/eval_performance_profiles_balanced.svg",
       width: 100%,
-      height: 70%,
+      height: 50%,
       fit: "contain",
     ),
     caption: [Performance profiles for the balanced dataset.],
@@ -206,7 +206,7 @@ Since the algorithm execution times are all nearly identical, we will not be com
     image(
       "../images/eval_performance_profiles_job_heavy.svg",
       width: 100%,
-      height: 70%,
+      height: 50%,
       fit: "contain",
     ),
     caption: [Performance profiles for the job-heavy dataset.],
@@ -257,7 +257,7 @@ Since the algorithm execution times are all nearly identical, we will not be com
     image(
       "../images/eval_performance_profiles_machine_heavy.svg",
       width: 100%,
-      height: 70%,
+      height: 50%,
       fit: "contain",
     ),
     caption: [Performance profiles for the machine-heavy dataset.],
