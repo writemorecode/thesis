@@ -1,0 +1,24 @@
+[project]
+name = "thesis-tools"
+version = "0.1.0"
+description = "Evaluation and analysis scripts for the thesis."
+requires-python = ">=3.14"
+dependencies = [
+    "simulator @ git+https://github.com/writemorecode/thesis_scheduler_simulator.git@main",
+    "matplotlib>=3.10.7",
+    "numpy>=2.3.4",
+    "polars>=1.36.1",
+    "pulp>=2.9.0",
+    "scipy>=1.16.3",
+]
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["thesis_tools*"]
