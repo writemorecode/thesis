@@ -65,7 +65,7 @@ We compute the mean value $mu_(A,B)$ of $l_(A,B,i)$ across all problem instances
 
 $
   mu_(A,B) = 1/N sum_(i=1)^N l_(A,B,i)
-$
+$ <mean_log_cost_diff_eqn>
 
 Next, we compute a 95% confidence interval for the value of $l_(A,B,i)$.
 Let the upper and lower bounds of this confidence interval be $[L_(A,B), U_(A,B)]$.
@@ -73,6 +73,16 @@ If this confidence interval does not contain the value $1$, i.e. $1 in.not [L_(A
 For example, suppose the confidence interval $[L_(A,B), U_(A,B)] = [0.895, 0.982]$.
 In this case, we can conclude with some degree of confidence that $mu_(A,B)$ is slightly less than $1$.
 This would then mean that, with some degree of confidence, algorithm $A$ has a lower average cost than algorithm $B$ across each problem instance of the dataset.
+
+=== Paired two-tailed t-tests
+
+We wish to be able to determine if there exists a statistically significant difference in the average logarithmic cost difference across a dataset for a given pair of algorithms.
+In order to introduce more statistical rigor, we will use a paired two-tailed t-test.
+The data we will use are the values $mu_(A,B)$ @mean_log_cost_diff_eqn.
+The purpose of this statistical test is to determine if we can reject the null hypothesis $cal(H_0)$.
+For this test, we define the null hypothesis as: $cal(H_0): mu_(A,B) = 0$.
+If the results of the test show that we can reject $cal(H_0)$, then we can conclude that $mu_(A,B) != 0$.
+As with the confidence intervals described previously, we use a confidence level of $95%$, i.e. $alpha = 0.05$.
 
 === Dolan-Moré performance profiles
 
@@ -156,6 +166,19 @@ Since the algorithm execution times are all nearly identical, we will not be com
 #align(center)[
   #block(breakable: false, [
     #figure(
+      table(
+        columns: 3,
+        [*Alpha value*], [*p-value*], [*t-test statistic*],
+        [0.05], [8.713e-47], [-26.53],
+      ),
+      caption: [Result of t-test on $mu_(A,B)$ for balanced dataset],
+    )
+  ])
+]
+
+#align(center)[
+  #block(breakable: false, [
+    #figure(
       image(
         "../images/eval_performance_profiles_balanced.svg",
         width: 100%,
@@ -219,6 +242,19 @@ Since the algorithm execution times are all nearly identical, we will not be com
 #align(center)[
   #block(breakable: false, [
     #figure(
+      table(
+        columns: 3,
+        [*Alpha value*], [*p-value*], [*t-test statistic*],
+        [0.05], [9.665e-47], [-25.8],
+      ),
+      caption: [Result of t-test on $mu_(A,B)$ for job-heavy dataset],
+    )
+  ])
+]
+
+#align(center)[
+  #block(breakable: false, [
+    #figure(
       image(
         "../images/eval_performance_profiles_job_heavy.svg",
         width: 100%,
@@ -275,6 +311,19 @@ Since the algorithm execution times are all nearly identical, we will not be com
         ..ci_data_machine_heavy.flatten(),
       ),
       caption: [Confidence interval for mean algorithm cost ratios for machine-heavy dataset.],
+    )
+  ])
+]
+
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      table(
+        columns: 3,
+        [*Alpha value*], [*p-value*], [*t-test statistic*],
+        [0.05], [3.951e-50], [-28.96],
+      ),
+      caption: [Result of t-test on $mu_(A,B)$ for machine-heavy dataset],
     )
   ])
 ]

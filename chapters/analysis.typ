@@ -12,9 +12,11 @@ These conclusions hold for all three datasets.
 We shall study the evaluation results of the _BFD_ and _FFDNew_ algorithms.
 The two algorithms have nearly identical average costs on each of the datasets.
 For all three datasets, the confidence interval for the mean logarithmic cost ratio contains the value $1$.
-This means that it is not likely that _BFD_ is superior to _FFDNew_.
-This means that we must instead use the Dolan-Moré performance profiles to help us determine the superior algorithm.
-We find that the _BFD_ algorithm has the higher _"win-rate"_ on the balanced and job-heavy dataset, but that the _FFDNew_ algorithm has the higher win-rate on the machine-heavy dataset.
+This means that we can not conclude from this test _BFD_ is superior to _FFDNew_.
+
+Considering the paired two-tailed t-tests, we found that we could reject the null hypothesis $cal(H_0): mu_(A,B) = 0$ for all datasets.
+
+Studying the Dolan-Moré performance profile data, we find that the _BFD_ algorithm has the higher _"win-rate"_ on the balanced and job-heavy dataset, but that the _FFDNew_ algorithm has the higher win-rate on the machine-heavy dataset.
 However, let us assume that private cloud providers purchase their machines in bulk, preferring to keep large fleets consisting of relatively few machine types.
 Then, the number of job types would be either nearly equal to or far greater than the number of machine types.
 This would mean that the _BFD_ algorithm performs best on the more realistic datasets.

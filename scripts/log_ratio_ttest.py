@@ -13,12 +13,13 @@ Input: two per-instance evaluation CSVs that contain at least:
   - filename
   - total_cost
 
-Output: prints test statistics to stdout (no files written).
+Output: prints test statistics to stdout and can optionally write key stats to a CSV file.
 """
 
 from __future__ import annotations
 
 import argparse
+import csv
 from math import exp, sqrt
 from pathlib import Path
 
@@ -32,6 +33,36 @@ from eval_utils import (
 )
 
 SIG_FIGS = 4
+
+
+def write_stats_csv(
+    *,
+    output_csv: Path,
+    alpha: float,
+    p_value: float,
+    t_test_statistic_value: float,
+) -> None:
+    output_csv.parent.mkdir(parents=True, exist_ok=True)
+    with output_csv.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(
+            f,
+            fieldnames=["Alpha value", "p-value", "t-test statistic"],
+        )
+        writer.writeheader()
+        writer.writerow(
+            {
+                "Alpha value": alpha,
+                "p-value": p_value,
+                "t-test statistic": t_test_statistic_value,
+            }
+        )
+
+
+def _scalar_float(x: object) -> float:
+    arr = np.asarray(x, dtype=float)
+    if arr.size != 1:
+        raise ValueError(f"Expected scalar, got shape={arr.shape}")
+    return float(arr.item())
 
 
 def _fmt_sig(x: float) -> str:
@@ -68,7 +99,13 @@ def _resolve_pair(
 
 
 def run_test(
-    *, csv_a: Path, csv_b: Path, label_a: str, label_b: str, alpha: float
+    *,
+    csv_a: Path,
+    csv_b: Path,
+    label_a: str,
+    label_b: str,
+    alpha: float,
+    stats_csv: Path | None,
 ) -> int:
     if not (0.0 < alpha < 1.0):
         raise ValueError("--alpha must be between 0 and 1 (exclusive).")
@@ -117,9 +154,22 @@ def run_test(
     ci_low = mean - t_crit * se
     ci_high = mean + t_crit * se
 
-    pvalue = float(res.pvalue) if np.isfinite(res.pvalue) else float("nan")
-    reject = bool(np.isfinite(pvalue) and pvalue < alpha)
+    pvalue = _scalar_float(res.pvalue)
+    if not np.isfinite(pvalue):
+        pvalue = float("nan")
+    reject = bool(pvalue < alpha) if np.isfinite(pvalue) else False
     confidence_level = 1.0 - alpha
+    statistic = _scalar_float(res.statistic)
+    if not np.isfinite(statistic):
+        statistic = float("nan")
+
+    if stats_csv is not None:
+        write_stats_csv(
+            output_csv=stats_csv,
+            alpha=alpha,
+            p_value=pvalue,
+            t_test_statistic_value=statistic,
+        )
 
     print(f"Algorithm A: {label_a} ({csv_a})")
     print(f"Algorithm B: {label_b} ({csv_b})")
@@ -130,7 +180,7 @@ def run_test(
     print("")
     print(f"mean(log_ratio) = {_fmt_sig(mean)}")
     print(f"std(log_ratio)  = {_fmt_sig(std)}")
-    print(f"t(df={df})       = {_fmt_sig(float(res.statistic))}")
+    print(f"t(df={df})       = {_fmt_sig(statistic)}")
     print(f"p-value          = {_fmt_sig(pvalue)}")
     print(
         f"{_fmt_sig(confidence_level * 100)}% CI mean(log_ratio): {_fmt_ci(ci_low, ci_high)}"
@@ -172,6 +222,12 @@ def main() -> int:
         help="Significance level (default: 0.05).",
     )
     parser.add_argument(
+        "--stats-csv",
+        type=Path,
+        default=None,
+        help="Optional: write alpha/p-value/t-statistic to this CSV file.",
+    )
+    parser.add_argument(
         "csv_paths",
         nargs="*",
         type=Path,
@@ -186,7 +242,12 @@ def main() -> int:
         csv_paths=args.csv_paths,
     )
     return run_test(
-        csv_a=path_a, csv_b=path_b, label_a=label_a, label_b=label_b, alpha=args.alpha
+        csv_a=path_a,
+        csv_b=path_b,
+        label_a=label_a,
+        label_b=label_b,
+        alpha=args.alpha,
+        stats_csv=args.stats_csv,
     )
 
 
