@@ -4,14 +4,14 @@ This chapter presents the evaluation datasets, metrics, and empirical results fo
 
 == Datasets
 
-We evaluate the algorithms on a three different datasets.
-For evaluation, we developed a simulator in Python using the NumPy library @python_simulator_repo_github
+We evaluate the algorithms on three different datasets.
+For evaluation, we developed a simulator in Python using the NumPy library @python_simulator_repo_github.
 Each dataset was generated using the NumPy deterministic pseudorandom number generator, using the fixed seed value $5000$.
 Each dataset contains 100 randomly generated problem instances.
 
 The first dataset ("balanced") was generated with a balanced number of job types and machine types.
 The second dataset ("job heavy") was generated with a greater number of job types than machine types.
-The third dataset ("machine heavy") was generated with a greater number of machine types than machine types.
+The third dataset ("machine heavy") was generated with a greater number of machine types than job types.
 
 The table below presents the parameters used to generate each dataset.
 
@@ -24,69 +24,32 @@ The table below presents the parameters used to generate each dataset.
 
 == Evaluation method
 
-=== Mean cost ratio confidence intervals
+=== Paired comparison via log cost ratios
 
-We want to determine which algorithm performs best on each of the three datasets.
-Let $N$ be the number of problem instances (fixed to 100 in this case).
-Let $c_(A,i)$ be the cost of algorithm $A$ for problem instance $i$, for $1<=i<=N$.
-Let
+Each dataset contains the same set of problem instances evaluated by every algorithm.
+Therefore, comparisons between two algorithms are based on *paired* observations.
 
-$
-  r_(A,B,i) = c_(A,i) / c_(B,i)
-$
-
-be the ratio of costs for algorithms $A$ and $B$ on problem instance $i$.
-Because raw ratios are asymmetric.
-To see why this is the case, consider the case of two different algorithms $A$ and $B$, and two problem instances.
-On the first problem instance, algorithm $A$ performs twice as well as algorithm $B$.
-On the second problem instance, algorithm $B$ performs twice as well as algorithm $A$.
-This gives us the following cost ratios:
+Let $c_(A,i)$ and $c_(B,i)$ be the total costs of algorithms $A$ and $B$ on instance $i$, and define the per-instance log cost ratio
 
 $
-  r_(A,B,1) = (0.5 c_(B,1)) / c_(B,1) = 0.5, quad r_(A,B,2) = (c_(B,2)) / (0.5 c_(B,2)) = 2
+  d_i = log(c_(A,i) / c_(B,i)).
 $
 
-Together, we compute the raw mean cost ratio value $mu_(A,B)$.
+If $d_i < 0$, then $c_(A,i) < c_(B,i)$ and $A$ is better on instance $i$ (lower cost).
 
-$
-  mu_(A, B) = (0.5 + 2) / 2 = 1.25
-$
+We test whether the algorithms differ on average using a paired two-tailed t-test on the values $d_i$:
+$cal(H_0): E[d] = 0$ and $cal(H_1): E[d] != 0$, with $alpha = 0.05$.
+From the same test, we report a 95% confidence interval $[L, U]$ for $E[d]$.
 
-This results is unexpected, since each of the two algorithm outperformed the other algorithm equally much on one of the two problem instances.
-Therefore, none of the algorithm outperformed the other, and we would expect to have $mu_(A,B) = 1$.
-If we instead use logarithmic mean ratios, then we get the expected value of:
+For interpretation, we exponentiate back to the ratio scale:
 
-$
-  mu_(A,B) = (log(2) + log(0.5))/2 = 0
-$
+$R = exp(E[d])$ with 95% confidence interval $[exp(L), exp(U)]$.
 
-Therefore, we choose to compute the logarithmic ratios $l_(A,B,i) = log(r_(A,B,i))$.
-We compute the mean value $mu_(A,B)$ of $l_(A,B,i)$ across all problem instances $i$.
-
-$
-  mu_(A,B) = 1/N sum_(i=1)^N l_(A,B,i)
-$ <mean_log_cost_diff_eqn>
-
-Next, we compute a 95% confidence interval for the value of $l_(A,B,i)$.
-Let the upper and lower bounds of this confidence interval be $[L_(A,B), U_(A,B)]$.
-If this confidence interval does not contain the value $1$, i.e. $1 in.not [L_(A,B), U_(A,B)]$ , then it is statistically likely that algorithm $A$ outperforms algorithm $B$ on each problem instance of the dataset.
-For example, suppose the confidence interval $[L_(A,B), U_(A,B)] = [0.895, 0.982]$.
-In this case, we can conclude with some degree of confidence that $mu_(A,B)$ is slightly less than $1$.
-This would then mean that, with some degree of confidence, algorithm $A$ has a lower average cost than algorithm $B$ across each problem instance of the dataset.
-
-=== Paired two-tailed t-tests
-
-We wish to be able to determine if there exists a statistically significant difference in the average logarithmic cost difference across a dataset for a given pair of algorithms.
-In order to introduce more statistical rigor, we will use a paired two-tailed t-test.
-The data we will use are the values $mu_(A,B)$ @mean_log_cost_diff_eqn.
-The purpose of this statistical test is to determine if we can reject the null hypothesis $cal(H_0)$.
-For this test, we define the null hypothesis as: $cal(H_0): mu_(A,B) = 0$.
-If the results of the test show that we can reject $cal(H_0)$, then we can conclude that $mu_(A,B) != 0$.
-As with the confidence intervals described previously, we use a confidence level of $95%$, i.e. $alpha = 0.05$.
+Here, $R < 1$ indicates that $A$ has lower cost than $B$ on average, and $R > 1$ indicates the opposite.
 
 === Dolan-Moré performance profiles
 
-Another method of comparing the performance of different algorithms on a set of problem instances is to use _performance profiles_, presented in 2004 by Elizabeth Doran and Jorge Moré @dolan_more_performance_profiles_2004.
+Another method of comparing the performance of different algorithms on a set of problem instances is to use _performance profiles_, presented in 2004 by Elizabeth Dolan and Jorge Moré @dolan_more_performance_profiles_2004.
 This method works as follows.
 
 Let $S$ be the set of solvers, or algorithms to evaluate.
@@ -115,14 +78,14 @@ We will use this performance profiles method as a second step in the process of 
 
 == Data
 
-For each of the three datasets, we first present a summary table of the evaluation results for each scheduler algorithm.
-We also present a table of statistics of the previously discussed mean cost ratios, including their confidence intervals, for each dataset.
-Since this table would become unreasonably large if every algorithm was compared to every other algorithm, we only compare the two best algorithms in this table.
+For each dataset, we first present a summary table of the evaluation results for each scheduler algorithm.
+We then compare the two best algorithms for the dataset, defined as the two schedulers with the lowest average total cost in the summary table.
+This comparison uses a paired two-tailed t-test on per-instance log cost ratios and reports both the $p$-value and a 95% confidence interval for the geometric mean cost ratio.
 Next, we present a plot of the performance profiles for each of the algorithms.
 Here, $tau$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for each solver $s$.
 Finally, we present a table of the performance ratio _"win rate"_ for each algorithm.
-This value is, for each algorithm $s$, by the performance profile function $rho_s (tau)$ at $tau = 1$.
-Note here that the sum of the win rates across all algorithm do not sum to $1$.
+This value is, for each algorithm $s$, given by the performance profile function $rho_s (tau)$ at $tau = 1$.
+Note here that the sum of the win rates across all algorithms do not sum to $1$.
 The reason for this is that multiple algorithms can be tied for certain problem instances.
 
 Since the algorithm execution times are all nearly identical, we will not be comparing them.
@@ -149,29 +112,25 @@ Since the algorithm execution times are all nearly identical, we will not be com
   ])
 ]
 
-#let ci_data_balanced = csv("../data/eval_log_ratio_balanced.csv")
-#align(center)[
-  #block(breakable: false, [
-    #figure(
-      table(
-        columns: 9,
-        [*Alg. A*], [*Alg. B*], [*Mean*], [*Median*], [*Std. dev.*], [*Min*], [*Max*], [*CI low*], [*CI high*],
-        ..ci_data_balanced.flatten(),
-      ),
-      caption: [Confidence interval for mean algorithm cost ratios for balanced dataset.],
-    )
-  ])
-]
+The two best algorithms on this dataset are _BFD_ and _FFDNew_.
+Using the paired log-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
 
+#let ttest_balanced = csv("../data/eval_log_ratio_ttest_balanced.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 3,
-        [*Alpha value*], [*p-value*], [*t-test statistic*],
-        [0.05], [8.713e-47], [-26.53],
+        columns: 4,
+        [*Ratio*],
+        [*Confidence interval*],
+        [*Ratio exp. mean*],
+        [*$p$-value*],
+        [#(ttest_balanced.at(1).at(1) + " / " + ttest_balanced.at(2).at(1))],
+        [#(ttest_balanced.at(13).at(1) + "–" + ttest_balanced.at(14).at(1))],
+        [#(ttest_balanced.at(12).at(1))],
+        [#(ttest_balanced.at(7).at(1))],
       ),
-      caption: [Result of t-test on $mu_(A,B)$ for balanced dataset],
+      caption: [Paired log-ratio t-test summary for balanced dataset (_BFD_ vs _FFDNew_).],
     )
   ])
 ]
@@ -225,29 +184,25 @@ Since the algorithm execution times are all nearly identical, we will not be com
   ])
 ]
 
-#let ci_data_job_heavy = csv("../data/eval_log_ratio_job_heavy.csv")
-#align(center)[
-  #block(breakable: false, [
-    #figure(
-      table(
-        columns: 9,
-        [*Alg. A*], [*Alg. B*], [*Mean*], [*Median*], [*Std. dev.*], [*Min*], [*Max*], [*CI low*], [*CI high*],
-        ..ci_data_job_heavy.flatten(),
-      ),
-      caption: [Confidence interval for mean algorithm cost ratios for job-heavy dataset.],
-    )
-  ])
-]
+The two best algorithms on this dataset are _BFD_ and _FFDNew_.
+Using the paired log-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
 
+#let ttest_job_heavy = csv("../data/eval_log_ratio_ttest_job_heavy.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 3,
-        [*Alpha value*], [*p-value*], [*t-test statistic*],
-        [0.05], [9.665e-47], [-25.8],
+        columns: 4,
+        [*Ratio*],
+        [*Confidence interval*],
+        [*Ratio exp. mean*],
+        [*$p$-value*],
+        [#(ttest_job_heavy.at(1).at(1) + " / " + ttest_job_heavy.at(2).at(1))],
+        [#(ttest_job_heavy.at(13).at(1) + "–" + ttest_job_heavy.at(14).at(1))],
+        [#(ttest_job_heavy.at(12).at(1))],
+        [#(ttest_job_heavy.at(7).at(1))],
       ),
-      caption: [Result of t-test on $mu_(A,B)$ for job-heavy dataset],
+      caption: [Paired log-ratio t-test summary for job-heavy dataset (_BFD_ vs _FFDNew_).],
     )
   ])
 ]
@@ -301,29 +256,25 @@ Since the algorithm execution times are all nearly identical, we will not be com
   ])
 ]
 
-#let ci_data_machine_heavy = csv("../data/eval_log_ratio_machine_heavy.csv")
-#align(center)[
-  #block(breakable: false, [
-    #figure(
-      table(
-        columns: 9,
-        [*Alg. A*], [*Alg. B*], [*Mean*], [*Median*], [*Std. dev.*], [*Min*], [*Max*], [*CI low*], [*CI high*],
-        ..ci_data_machine_heavy.flatten(),
-      ),
-      caption: [Confidence interval for mean algorithm cost ratios for machine-heavy dataset.],
-    )
-  ])
-]
+The two best algorithms on this dataset are _BFD_ and _FFDNew_.
+Using the paired log-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
 
+#let ttest_machine_heavy = csv("../data/eval_log_ratio_ttest_machine_heavy.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 3,
-        [*Alpha value*], [*p-value*], [*t-test statistic*],
-        [0.05], [3.951e-50], [-28.96],
+        columns: 4,
+        [*Ratio*],
+        [*Confidence interval*],
+        [*Ratio exp. mean*],
+        [*$p$-value*],
+        [#(ttest_machine_heavy.at(1).at(1) + " / " + ttest_machine_heavy.at(2).at(1))],
+        [#(ttest_machine_heavy.at(13).at(1) + "–" + ttest_machine_heavy.at(14).at(1))],
+        [#(ttest_machine_heavy.at(12).at(1))],
+        [#(ttest_machine_heavy.at(7).at(1))],
       ),
-      caption: [Result of t-test on $mu_(A,B)$ for machine-heavy dataset],
+      caption: [Paired log-ratio t-test summary for machine-heavy dataset (_BFD_ vs _FFDNew_).],
     )
   ])
 ]

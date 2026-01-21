@@ -1,0 +1,18 @@
+Dataset,Machine-heavy
+Algorithm A,BFD
+Algorithm B,FFDNew
+N,100
+df,99
+alpha,0.05
+t,1.252
+p,0.2134
+mean(log_ratio),0.000189
+std(log_ratio),0.001509
+CI low (log),-0.0001105
+CI high (log),0.0004885
+ratio exp(mean),1
+CI low (ratio),0.9999
+CI high (ratio),1
+wins(A<B),9
+wins(B<A),12
+ties,79

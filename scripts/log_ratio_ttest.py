@@ -35,27 +35,67 @@ from eval_utils import (
 SIG_FIGS = 4
 
 
+def _display_scheduler_name(name: str) -> str:
+    normalized = normalize_scheduler_name(name)
+    mapping = {
+        "bfd": "BFD",
+        "ffd": "FFD",
+        "ffd_l2": "FFDL2",
+        "ffd_max": "FFDMax",
+        "ffd_new": "FFDNew",
+        "ffd_prod": "FFDProd",
+        "ffd_sum": "FFDSum",
+        "peak_demand": "PeakDemand",
+    }
+    return mapping.get(normalized, normalized)
+
+
 def write_stats_csv(
     *,
     output_csv: Path,
+    dataset_name: str | None,
+    label_a: str,
+    label_b: str,
+    n: int,
+    df: int,
     alpha: float,
     p_value: float,
     t_test_statistic_value: float,
+    mean_log_ratio: float,
+    std_log_ratio: float,
+    ci_low_log: float,
+    ci_high_log: float,
+    ratio: float,
+    ci_low_ratio: float,
+    ci_high_ratio: float,
+    wins_a: int,
+    wins_b: int,
+    ties: int,
 ) -> None:
     output_csv.parent.mkdir(parents=True, exist_ok=True)
     with output_csv.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(
-            f,
-            fieldnames=["Alpha value", "p-value", "t-test statistic"],
-        )
-        writer.writeheader()
-        writer.writerow(
-            {
-                "Alpha value": alpha,
-                "p-value": p_value,
-                "t-test statistic": t_test_statistic_value,
-            }
-        )
+        writer = csv.writer(f)
+        rows: list[tuple[str, str]] = [
+            ("Dataset", dataset_name or ""),
+            ("Algorithm A", _display_scheduler_name(label_a)),
+            ("Algorithm B", _display_scheduler_name(label_b)),
+            ("N", str(n)),
+            ("df", str(df)),
+            ("alpha", _fmt_sig(alpha)),
+            ("t", _fmt_sig(t_test_statistic_value)),
+            ("p", _fmt_sig(p_value)),
+            ("mean(log_ratio)", _fmt_sig(mean_log_ratio)),
+            ("std(log_ratio)", _fmt_sig(std_log_ratio)),
+            ("CI low (log)", _fmt_sig(ci_low_log)),
+            ("CI high (log)", _fmt_sig(ci_high_log)),
+            ("ratio exp(mean)", _fmt_sig(ratio)),
+            ("CI low (ratio)", _fmt_sig(ci_low_ratio)),
+            ("CI high (ratio)", _fmt_sig(ci_high_ratio)),
+            ("wins(A<B)", str(wins_a)),
+            ("wins(B<A)", str(wins_b)),
+            ("ties", str(ties)),
+        ]
+        writer.writerows(rows)
 
 
 def _scalar_float(x: object) -> float:
@@ -104,6 +144,7 @@ def run_test(
     csv_b: Path,
     label_a: str,
     label_b: str,
+    dataset_name: str | None,
     alpha: float,
     stats_csv: Path | None,
 ) -> int:
@@ -132,6 +173,9 @@ def run_test(
     n = int(log_ratio.size)
     if n < 2:
         raise ValueError("Need at least two paired instances for a t-test.")
+    wins_a = int(np.sum(a < b))
+    wins_b = int(np.sum(b < a))
+    ties = int(n - wins_a - wins_b)
 
     try:
         from scipy import stats
@@ -166,9 +210,24 @@ def run_test(
     if stats_csv is not None:
         write_stats_csv(
             output_csv=stats_csv,
+            dataset_name=dataset_name,
+            label_a=label_a,
+            label_b=label_b,
+            n=n,
+            df=df,
             alpha=alpha,
             p_value=pvalue,
             t_test_statistic_value=statistic,
+            mean_log_ratio=mean,
+            std_log_ratio=std,
+            ci_low_log=ci_low,
+            ci_high_log=ci_high,
+            ratio=float(exp(mean)),
+            ci_low_ratio=float(exp(ci_low)),
+            ci_high_ratio=float(exp(ci_high)),
+            wins_a=wins_a,
+            wins_b=wins_b,
+            ties=ties,
         )
 
     print(f"Algorithm A: {label_a} ({csv_a})")
@@ -196,6 +255,12 @@ def run_test(
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Paired two-tailed t-test for mean log(total_cost ratio) between two algorithms."
+    )
+    parser.add_argument(
+        "--dataset-name",
+        type=str,
+        default=None,
+        help="Optional: dataset label to include in --stats-csv output.",
     )
     parser.add_argument(
         "--results-dir",
@@ -246,6 +311,7 @@ def main() -> int:
         csv_b=path_b,
         label_a=label_a,
         label_b=label_b,
+        dataset_name=args.dataset_name,
         alpha=args.alpha,
         stats_csv=args.stats_csv,
     )
