@@ -36,8 +36,8 @@ The second constraint ensures that no bin capacity is exceeded by the items plac
 
 We now consider a more general case, where both items and bins have different sizes and capacities in multiple dimensions.
 Items and bins have $D$ dimensions.
-The size of item $i$ is given by $bold(s)(i) in ZZnonneg^D$.
-The capacity of bin $j$ is given by $bold(c)(j) in ZZnonneg^D$.
+The size of item $i$ is given by the vector $bold(s)(i) in ZZnonneg^D$.
+The capacity of bin $j$ is given by the vector $bold(c)(j) in ZZnonneg^D$.
 
 The problem can be formulated as an integer LP problem:
 
@@ -299,8 +299,7 @@ In this case, we will want to use weights $w_k=d^*_k$ where we only consider the
 Similarly, if we are using bin-centric algorithms such as Next Fit Decreasing, we shall want to use weights based on bin capacities, such as $w_k=b_k$.
 These weights shall then also be updated after each time an item is placed in a bin.
 
-// TODO: Change '&' to 'and'
-=== Alternative method for item & bin size normalization
+=== Alternative method for item and bin size normalization
 
 We can normalize the sizes of items and bins by, for each resource dimension $k$, dividing each item type $bold(r)_i$ and machine type $bold(m)_j$ by a scale $M_k$.
 Here, we define $M_k$ as the maximum resource demand or capacity across all item and machine types.

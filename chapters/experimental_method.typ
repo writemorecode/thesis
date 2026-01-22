@@ -5,8 +5,7 @@
 
 This chapter describes how the synthetic problem instances are generated and which parameters control the dataset structure.
 
-// TODO: Fix incorrect section numbering "6.0.1."?
-=== Problem instance generation
+== Problem instance generation
 
 In order to evaluate these algorithms, we use randomly generated problem instances.
 Each problem instance is generated as follows.
@@ -15,24 +14,27 @@ The generation of problem instances is controlled by a set of configurable param
 The table below describes each of these parameters.
 
 #block(breakable: false, [
-  #table(
-    columns: 3,
-    [*Parameter*], [*Purpose*], [*Default value*],
-    [$c_0$], [Base machine capacity value], [$20$],
-    [$d_0$], [Base job demand value], [$8$],
-    [$lambda_0$], [Base job type count value], [$12$],
-    [$[c_"min",c_"max"]$], [Random machine capacity jitter interval], [$(0.8,1.3)$],
-    [$[d_"min",d_"max"]$], [Random job demand jitter interval], [$(0.8,1.3)$],
-    [$[lambda_"min",lambda_"max"]$], [Random job type count jitter interval], [$(0.6,1.4)$],
-    [$[u_"min",u_"max"]$], [Primary resource amplification interval], [$(2,4)$],
-    [$[v_"min",v_"max"]$], [Job type count amplification interval], [$(5,8)$],
-    [$rho^"machine"$], [Machine resource specialization ratio], [$?$],
-    [$rho^"job"$], [Job resource specialization ratio], [$?$],
-    [$rho^"slot"$], [Time slot specialization ratio], [$0.6$],
-    [$eta$], [Machine-job primary resource correlation factor], [$?$],
+  #figure(
+    table(
+      columns: 3,
+      [*Parameter*], [*Purpose*], [*Default value*],
+      [$c_0$], [Base machine capacity value], [$20$],
+      [$d_0$], [Base job demand value], [$8$],
+      [$lambda_0$], [Base job type count value], [$12$],
+      [$[c_"min",c_"max"]$], [Random machine capacity jitter interval], [$(0.8,1.3)$],
+      [$[d_"min",d_"max"]$], [Random job demand jitter interval], [$(0.8,1.3)$],
+      [$[lambda_"min",lambda_"max"]$], [Random job type count jitter interval], [$(0.6,1.4)$],
+      [$[u_"min",u_"max"]$], [Primary resource amplification interval], [$(2,4)$],
+      [$[v_"min",v_"max"]$], [Job type count amplification interval], [$(5,8)$],
+      [$rho^"machine"$], [Machine resource specialization ratio], [$0.7$],
+      [$rho^"job"$], [Job resource specialization ratio], [$0.7$],
+      [$rho^"slot"$], [Time slot specialization ratio], [$0.6$],
+      [$eta^"machine"$], [Machine-job primary resource correlation factor], [$0.7$],
+      [$eta^"slot"$], [Time slot-job primary resource correlation factor], [$0.7$],
+    ),
+    caption: [Table of parameters used for problem instance generation],
   )
 ])
-// TODO: Add table caption
 
 // TODO: Justify and motivate, explain, why these values were selected?
 
@@ -396,7 +398,7 @@ $
   ) quad
 $
 
-=== Dataset generation
+== Dataset generation
 
 With the description of the method for generating a single problem instance completed, we now move on to describing how a dataset of multiple problem instances is generated.
 
