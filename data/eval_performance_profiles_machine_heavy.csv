@@ -1,8 +1,9 @@
-FFDNew,90,0.9
-BFD,88,0.88
-FFDMax,1,0.01
-FFDSum,1,0.01
-FFD,0,0.0
-FFDL2,0,0.0
-FFDProd,0,0.0
-PeakDemand,0,0.0
+scheduler,wins,total_instances,win_fraction
+ffd_new,90,100,0.9
+bfd,88,100,0.88
+ffd_max,1,100,0.01
+ffd_sum,1,100,0.01
+ffd,0,100,0.0
+ffd_l2,0,100,0.0
+ffd_prod,0,100,0.0
+peak_demand,0,100,0.0

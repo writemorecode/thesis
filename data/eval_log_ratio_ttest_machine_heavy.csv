@@ -12,7 +12,7 @@ CI low (log),-0.0001105
 CI high (log),0.0004885
 ratio exp(mean),1
 CI low (ratio),0.9999
-CI high (ratio),1
+CI high (ratio),1.0004886606551104
 wins(A<B),9
 wins(B<A),12
 ties,79
