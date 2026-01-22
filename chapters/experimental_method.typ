@@ -5,6 +5,7 @@
 
 This chapter describes how the synthetic problem instances are generated and which parameters control the dataset structure.
 
+// TODO: Fix incorrect section numbering "6.0.1."?
 === Problem instance generation
 
 In order to evaluate these algorithms, we use randomly generated problem instances.
@@ -31,6 +32,9 @@ The table below describes each of these parameters.
     [$eta$], [Machine-job primary resource correlation factor], [$?$],
   )
 ])
+// TODO: Add table caption
+
+// TODO: Justify and motivate, explain, why these values were selected?
 
 Each machine type resource capacity value $C_(i,k)$ is initialized according to a configurable positive base resource capacity parameter $c_0$.
 Each job type resource demand value $R_(j,k)$ is initialized according to a configurable positive base resource demand parameter $d_0$.

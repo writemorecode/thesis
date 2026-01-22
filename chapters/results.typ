@@ -2,6 +2,8 @@
 
 This chapter presents the evaluation datasets, metrics, and empirical results for the scheduling algorithms.
 
+// TODO: Move 'Datasets' and 'Evaluation' method to 'Experimental methodology'
+
 == Datasets
 
 We evaluate the algorithms on three different datasets.
@@ -23,6 +25,8 @@ The table below presents the parameters used to generate each dataset.
 )
 
 == Evaluation method
+
+// TODO: re-run evaluation with raw data (without logarithmic transform)
 
 === Paired comparison via log cost ratios
 
@@ -121,10 +125,7 @@ Using the paired log-ratio t-test, we find that the two algorithms are statistic
     #figure(
       table(
         columns: 4,
-        [*Ratio*],
-        [*Confidence interval*],
-        [*Ratio exp. mean*],
-        [*$p$-value*],
+        [*Ratio*], [*Confidence interval*], [*Ratio exp. mean*], [*$p$-value*],
         [#(ttest_balanced.at(1).at(1) + " / " + ttest_balanced.at(2).at(1))],
         [#(ttest_balanced.at(13).at(1) + "–" + ttest_balanced.at(14).at(1))],
         [#(ttest_balanced.at(12).at(1))],
@@ -193,10 +194,7 @@ Using the paired log-ratio t-test, we find that the two algorithms are statistic
     #figure(
       table(
         columns: 4,
-        [*Ratio*],
-        [*Confidence interval*],
-        [*Ratio exp. mean*],
-        [*$p$-value*],
+        [*Ratio*], [*Confidence interval*], [*Ratio exp. mean*], [*$p$-value*],
         [#(ttest_job_heavy.at(1).at(1) + " / " + ttest_job_heavy.at(2).at(1))],
         [#(ttest_job_heavy.at(13).at(1) + "–" + ttest_job_heavy.at(14).at(1))],
         [#(ttest_job_heavy.at(12).at(1))],
@@ -265,10 +263,7 @@ Using the paired log-ratio t-test, we find that the two algorithms are statistic
     #figure(
       table(
         columns: 4,
-        [*Ratio*],
-        [*Confidence interval*],
-        [*Ratio exp. mean*],
-        [*$p$-value*],
+        [*Ratio*], [*Confidence interval*], [*Ratio exp. mean*], [*$p$-value*],
         [#(ttest_machine_heavy.at(1).at(1) + " / " + ttest_machine_heavy.at(2).at(1))],
         [#(ttest_machine_heavy.at(13).at(1) + "–" + ttest_machine_heavy.at(14).at(1))],
         [#(ttest_machine_heavy.at(12).at(1))],
