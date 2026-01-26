@@ -97,7 +97,7 @@ Since the algorithm execution times are all nearly identical, we will not be com
 
 === Balanced dataset
 
-#let summary_data_balanced_dataset = csv("../data/eval_summary_balanced.csv")
+#let summary_data_balanced_dataset = csv("../evaluation/results/balanced/eval_summary_balanced.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -119,7 +119,7 @@ Since the algorithm execution times are all nearly identical, we will not be com
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
 Using the paired log-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
 
-#let ttest_balanced = csv("../data/eval_log_ratio_ttest_balanced.csv")
+#let ttest_balanced = csv("../evaluation/results/balanced/eval_log_ratio_ttest_balanced.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -150,7 +150,7 @@ Using the paired log-ratio t-test, we find that the two algorithms are statistic
   ])
 ]
 
-#let perf_profiles_balanced = csv("../data/eval_performance_profiles_balanced.csv")
+#let perf_profiles_balanced = csv("../evaluation/results/balanced/eval_performance_profiles_balanced.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -166,7 +166,7 @@ Using the paired log-ratio t-test, we find that the two algorithms are statistic
 
 === Job-heavy dataset
 
-#let summary_data_job_heavy = csv("../data/eval_summary_job_heavy.csv")
+#let summary_data_job_heavy = csv("../evaluation/results/job_heavy/eval_summary_job_heavy.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -188,7 +188,7 @@ Using the paired log-ratio t-test, we find that the two algorithms are statistic
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
 Using the paired log-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
 
-#let ttest_job_heavy = csv("../data/eval_log_ratio_ttest_job_heavy.csv")
+#let ttest_job_heavy = csv("../evaluation/results/job_heavy/eval_log_ratio_ttest_job_heavy.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -219,7 +219,7 @@ Using the paired log-ratio t-test, we find that the two algorithms are statistic
   ])
 ]
 
-#let perf_profiles_job_heavy = csv("../data/eval_performance_profiles_job_heavy.csv")
+#let perf_profiles_job_heavy = csv("../evaluation/results/job_heavy/eval_performance_profiles_job_heavy.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -235,7 +235,7 @@ Using the paired log-ratio t-test, we find that the two algorithms are statistic
 
 === Machine-heavy dataset
 
-#let summary_data_machine_heavy = csv("../data/eval_summary_machine_heavy.csv")
+#let summary_data_machine_heavy = csv("../evaluation/results/machine_heavy/eval_summary_machine_heavy.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -257,7 +257,7 @@ Using the paired log-ratio t-test, we find that the two algorithms are statistic
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
 Using the paired log-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
 
-#let ttest_machine_heavy = csv("../data/eval_log_ratio_ttest_machine_heavy.csv")
+#let ttest_machine_heavy = csv("../evaluation/results/machine_heavy/eval_log_ratio_ttest_machine_heavy.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -288,7 +288,7 @@ Using the paired log-ratio t-test, we find that the two algorithms are statistic
   ])
 ]
 
-#let perf_profiles_machine_heavy = csv("../data/eval_performance_profiles_machine_heavy.csv")
+#let perf_profiles_machine_heavy = csv("../evaluation/results/machine_heavy/eval_performance_profiles_machine_heavy.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
