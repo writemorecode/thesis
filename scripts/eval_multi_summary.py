@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 
 from eval_utils import (
+    display_scheduler_name,
     normalize_scheduler_name,
     parse_scheduler_list,
     scheduler_output_filename,
@@ -45,8 +46,9 @@ def _summarize_scheduler(
     runtimes_array = np.asarray(runtimes, dtype=float)
     machines_array = np.asarray(machine_counts, dtype=int)
 
+    display_name = display_scheduler_name(scheduler_name)
     row = {
-        "scheduler": scheduler_name,
+        "scheduler": display_name,
         "avg_cost": float(costs_array.mean()),
         "min_cost": float(costs_array.min()),
         "max_cost": float(costs_array.max()),
@@ -56,7 +58,7 @@ def _summarize_scheduler(
 
     if verbose:
         print(
-            f"{scheduler_name}: avg_cost={row['avg_cost']:.2f}, "
+            f"{display_name}: avg_cost={row['avg_cost']:.2f}, "
             f"min_cost={row['min_cost']:.2f}, max_cost={row['max_cost']:.2f}, "
             f"avg_runtime={row['avg_runtime_sec']:.2f}s, "
             f"avg_machines={row['avg_machines']:.2f}"

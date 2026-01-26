@@ -11,6 +11,17 @@ from simulator.algorithms import ScheduleResult
 from simulator.problem import ProblemInstance
 from simulator.schedulers import get_scheduler, normalize_scheduler_name
 
+DISPLAY_SCHEDULER_NAMES = {
+    "bfd": "BFD",
+    "ffd": "FFD",
+    "ffd_l2": "FFDL2",
+    "ffd_max": "FFDMax",
+    "ffd_new": "FFDNew",
+    "ffd_prod": "FFDProd",
+    "ffd_sum": "FFDSum",
+    "peak_demand": "PeakDemand",
+}
+
 
 def parse_scheduler_list(value: str) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
@@ -19,6 +30,11 @@ def parse_scheduler_list(value: str) -> list[str]:
 def scheduler_output_filename(name: str) -> str:
     canonical = normalize_scheduler_name(name)
     return f"eval_{canonical}.csv"
+
+
+def display_scheduler_name(name: str) -> str:
+    canonical = normalize_scheduler_name(name)
+    return DISPLAY_SCHEDULER_NAMES.get(canonical, canonical)
 
 
 def build_scheduler(

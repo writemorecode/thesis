@@ -10,6 +10,7 @@ from pathlib import Path
 import numpy as np
 
 from eval_utils import (
+    display_scheduler_name,
     normalize_scheduler_name,
     parse_scheduler_list,
     scheduler_output_filename,
@@ -189,7 +190,7 @@ def _plot_performance_profiles(
         ax.plot(
             tau_values,
             profiles[name],
-            label=name,
+            label=display_scheduler_name(name),
             color=color,
             linestyle=linestyle,
         )
@@ -290,7 +291,7 @@ def main() -> None:
     for scheduler_name in sorted(wins, key=lambda name: (-wins[name], name)):
         rows.append(
             {
-                "scheduler": scheduler_name,
+                "scheduler": display_scheduler_name(scheduler_name),
                 "wins": wins[scheduler_name],
                 "ties": ties[scheduler_name],
                 "total_instances": total_instances,

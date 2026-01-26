@@ -26,6 +26,7 @@ from pathlib import Path
 import numpy as np
 
 from eval_utils import (
+    display_scheduler_name,
     ensure_matching_filenames,
     load_total_costs,
     normalize_scheduler_name,
@@ -33,21 +34,6 @@ from eval_utils import (
 )
 
 SIG_FIGS = 4
-
-
-def _display_scheduler_name(name: str) -> str:
-    normalized = normalize_scheduler_name(name)
-    mapping = {
-        "bfd": "BFD",
-        "ffd": "FFD",
-        "ffd_l2": "FFDL2",
-        "ffd_max": "FFDMax",
-        "ffd_new": "FFDNew",
-        "ffd_prod": "FFDProd",
-        "ffd_sum": "FFDSum",
-        "peak_demand": "PeakDemand",
-    }
-    return mapping.get(normalized, normalized)
 
 
 def write_stats_csv(
@@ -73,7 +59,7 @@ def write_stats_csv(
         )
         writer.writeheader()
         comparison = (
-            f"{_display_scheduler_name(label_a)} / {_display_scheduler_name(label_b)}"
+            f"{display_scheduler_name(label_a)} / {display_scheduler_name(label_b)}"
         )
         ci_ratio = f"{_fmt_sig(ci_low_ratio)}-{_fmt_sig(ci_high_ratio)}"
         writer.writerow(
