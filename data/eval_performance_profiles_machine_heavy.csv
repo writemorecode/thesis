@@ -1,9 +1,0 @@
-scheduler,wins,total_instances,win_fraction
-ffd_new,90,100,0.9
-bfd,88,100,0.88
-ffd_max,1,100,0.01
-ffd_sum,1,100,0.01
-ffd,0,100,0.0
-ffd_l2,0,100,0.0
-ffd_prod,0,100,0.0
-peak_demand,0,100,0.0
