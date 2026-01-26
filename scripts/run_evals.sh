@@ -45,19 +45,12 @@ evaluate_dataset() {
     --output "${results_dir}/eval_summary_${name}.csv" \
     --verbose
 
-  echo "Running paired log-ratio t-test (BFD vs FFDNew)..."
-  local dataset_label="${name}"
-  case "${name}" in
-    balanced) dataset_label="Balanced" ;;
-    job_heavy) dataset_label="Job-heavy" ;;
-    machine_heavy) dataset_label="Machine-heavy" ;;
-  esac
-  uv run python scripts/log_ratio_ttest.py \
-    --dataset-name "${dataset_label}" \
+  echo "Running paired raw-ratio t-test (BFD vs FFDNew)..."
+  uv run python scripts/raw_ratio_ttest.py \
     --results-dir "${raw_dir}" \
     --algo-a "bfd" \
     --algo-b "ffd_new" \
-    --stats-csv "${results_dir}/eval_log_ratio_ttest_${name}.csv"
+    --stats-csv "${results_dir}/eval_raw_ratio_ttest_${name}.csv"
 
   echo "Running performance profiles for schedulers..."
   local perf_profile_csv="${results_dir}/eval_performance_profiles_${name}.csv"
