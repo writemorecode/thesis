@@ -26,30 +26,24 @@ The table below presents the parameters used to generate each dataset.
 
 == Evaluation method
 
-// TODO: re-run evaluation with raw data (without logarithmic transform)
-
-=== Paired comparison via log cost ratios
+=== Paired comparison via cost ratios
 
 Each dataset contains the same set of problem instances evaluated by every algorithm.
 Therefore, comparisons between two algorithms are based on *paired* observations.
 
-Let $c_(A,i)$ and $c_(B,i)$ be the total costs of algorithms $A$ and $B$ on instance $i$, and define the per-instance log cost ratio
+Let $c_(A,i)$ and $c_(B,i)$ be the total costs of algorithms $A$ and $B$ on instance $i$, and define the per-instance cost ratio
 
 $
-  d_i = log(c_(A,i) / c_(B,i)).
+  r_i = c_(A,i) / c_(B,i).
 $
 
-If $d_i < 0$, then $c_(A,i) < c_(B,i)$ and $A$ is better on instance $i$ (lower cost).
+If $r_i < 1$, then $c_(A,i) < c_(B,i)$ and $A$ is better on instance $i$ (lower cost).
 
-We test whether the algorithms differ on average using a paired two-tailed t-test on the values $d_i$:
-$cal(H_0): E[d] = 0$ and $cal(H_1): E[d] != 0$, with $alpha = 0.05$.
-From the same test, we report a 95% confidence interval $[L, U]$ for $E[d]$.
+We test whether the algorithms differ on average using a paired two-tailed t-test on the values $r_i$:
+$cal(H_0): E[r] = 1$ and $cal(H_1): E[r] != 1$, with $alpha = 0.05$.
+From the same test, we report a 95% confidence interval $[L, U]$ for $E[r]$.
 
-For interpretation, we exponentiate back to the ratio scale:
-
-$R = exp(E[d])$ with 95% confidence interval $[exp(L), exp(U)]$.
-
-Here, $R < 1$ indicates that $A$ has lower cost than $B$ on average, and $R > 1$ indicates the opposite.
+Here, $E[r] < 1$ indicates that $A$ has lower cost than $B$ on average, and $E[r] > 1$ indicates the opposite.
 
 === Dolan-Moré performance profiles
 
