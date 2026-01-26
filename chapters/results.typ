@@ -91,7 +91,7 @@ Since the algorithm execution times are all nearly identical, we will not be com
 
 === Balanced dataset
 
-#let summary_data_balanced_dataset = csv("../evaluation/results/balanced/eval_summary_balanced.csv")
+#let summary_data_balanced_dataset = csv("../evaluation/results/balanced/eval_summary_balanced.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -113,7 +113,7 @@ Since the algorithm execution times are all nearly identical, we will not be com
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
 Using the paired raw-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
 
-#let ttest_balanced = csv("../evaluation/results/balanced/eval_raw_ratio_ttest_balanced.csv")
+#let ttest_balanced = csv("../evaluation/results/balanced/eval_raw_ratio_ttest_balanced.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -141,13 +141,13 @@ Using the paired raw-ratio t-test, we find that the two algorithms are statistic
   ])
 ]
 
-#let perf_profiles_balanced = csv("../evaluation/results/balanced/eval_performance_profiles_balanced.csv")
+#let perf_profiles_balanced = csv("../evaluation/results/balanced/eval_performance_profiles_balanced.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 3,
-        [*Scheduler*], [*Wins*], [*Win fraction*],
+        columns: 4,
+        [*Scheduler*], [*Wins*], [*Ties*], [*Total*],
         ..perf_profiles_balanced.flatten(),
       ),
       caption: [Performance profile wins for the balanced dataset.],
@@ -157,7 +157,7 @@ Using the paired raw-ratio t-test, we find that the two algorithms are statistic
 
 === Job-heavy dataset
 
-#let summary_data_job_heavy = csv("../evaluation/results/job_heavy/eval_summary_job_heavy.csv")
+#let summary_data_job_heavy = csv("../evaluation/results/job_heavy/eval_summary_job_heavy.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -179,7 +179,7 @@ Using the paired raw-ratio t-test, we find that the two algorithms are statistic
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
 Using the paired raw-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
 
-#let ttest_job_heavy = csv("../evaluation/results/job_heavy/eval_raw_ratio_ttest_job_heavy.csv")
+#let ttest_job_heavy = csv("../evaluation/results/job_heavy/eval_raw_ratio_ttest_job_heavy.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -207,13 +207,13 @@ Using the paired raw-ratio t-test, we find that the two algorithms are statistic
   ])
 ]
 
-#let perf_profiles_job_heavy = csv("../evaluation/results/job_heavy/eval_performance_profiles_job_heavy.csv")
+#let perf_profiles_job_heavy = csv("../evaluation/results/job_heavy/eval_performance_profiles_job_heavy.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 3,
-        [*Scheduler*], [*Wins*], [*Win fraction*],
+        columns: 4,
+        [*Scheduler*], [*Wins*], [*Ties*], [*Total*],
         ..perf_profiles_job_heavy.flatten(),
       ),
       caption: [Performance profile wins for the job-heavy dataset.],
@@ -223,7 +223,7 @@ Using the paired raw-ratio t-test, we find that the two algorithms are statistic
 
 === Machine-heavy dataset
 
-#let summary_data_machine_heavy = csv("../evaluation/results/machine_heavy/eval_summary_machine_heavy.csv")
+#let summary_data_machine_heavy = csv("../evaluation/results/machine_heavy/eval_summary_machine_heavy.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -245,7 +245,7 @@ Using the paired raw-ratio t-test, we find that the two algorithms are statistic
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
 Using the paired raw-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
 
-#let ttest_machine_heavy = csv("../evaluation/results/machine_heavy/eval_raw_ratio_ttest_machine_heavy.csv")
+#let ttest_machine_heavy = csv("../evaluation/results/machine_heavy/eval_raw_ratio_ttest_machine_heavy.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -273,13 +273,15 @@ Using the paired raw-ratio t-test, we find that the two algorithms are statistic
   ])
 ]
 
-#let perf_profiles_machine_heavy = csv("../evaluation/results/machine_heavy/eval_performance_profiles_machine_heavy.csv")
+#let perf_profiles_machine_heavy = csv(
+  "../evaluation/results/machine_heavy/eval_performance_profiles_machine_heavy.csv",
+).slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 3,
-        [*Scheduler*], [*Wins*], [*Win fraction*],
+        columns: 4,
+        [*Scheduler*], [*Wins*], [*Ties*], [*Total*],
         ..perf_profiles_machine_heavy.flatten(),
       ),
       caption: [Performance profile wins for the machine-heavy dataset.],
