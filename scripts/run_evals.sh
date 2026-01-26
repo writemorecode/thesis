@@ -44,7 +44,6 @@ evaluate_dataset() {
     --results-dir "${raw_dir}" \
     --output "${results_dir}/eval_summary_${name}.csv" \
     --verbose
-  cp "${results_dir}/eval_summary_${name}.csv" "data/eval_summary_${name}.csv"
 
   echo "Running paired log-ratio t-test (BFD vs FFDNew)..."
   local dataset_label="${name}"
@@ -59,7 +58,6 @@ evaluate_dataset() {
     --algo-a "bfd" \
     --algo-b "ffd_new" \
     --stats-csv "${results_dir}/eval_log_ratio_ttest_${name}.csv"
-  cp "${results_dir}/eval_log_ratio_ttest_${name}.csv" "data/eval_log_ratio_ttest_${name}.csv"
 
   echo "Running performance profiles for schedulers..."
   local perf_profile_csv="${results_dir}/eval_performance_profiles_${name}.csv"
@@ -100,7 +98,6 @@ evaluate_dataset() {
     plot_file="${perf_profile_png}"
   fi
 
-  cp "${perf_profile_csv}" "data/eval_performance_profiles_${name}.csv"
 }
 
 mkdir -p "${EVAL_ROOT}"
