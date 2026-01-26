@@ -94,23 +94,31 @@ def _ensure_matching_instances(
     return sorted(base_filenames)
 
 
-def compute_tau1_wins(
+def compute_tau1_wins_and_ties(
     costs_by_scheduler: dict[str, dict[str, float]],
     filenames: list[str],
     *,
     rel_tol: float,
     abs_tol: float,
-) -> dict[str, int]:
+) -> tuple[dict[str, int], dict[str, int]]:
     wins = {name: 0 for name in costs_by_scheduler}
+    ties = {name: 0 for name in costs_by_scheduler}
     for filename in filenames:
         instance_costs = {
             name: costs[filename] for name, costs in costs_by_scheduler.items()
         }
         best_cost = min(instance_costs.values())
-        for name, cost in instance_costs.items():
-            if math.isclose(cost, best_cost, rel_tol=rel_tol, abs_tol=abs_tol):
-                wins[name] += 1
-    return wins
+        best_names = [
+            name
+            for name, cost in instance_costs.items()
+            if math.isclose(cost, best_cost, rel_tol=rel_tol, abs_tol=abs_tol)
+        ]
+        if len(best_names) == 1:
+            wins[best_names[0]] += 1
+        else:
+            for name in best_names:
+                ties[name] += 1
+    return wins, ties
 
 
 def _build_tau_values(max_ratio: float, num_points: int = 200) -> list[float]:
@@ -205,7 +213,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Compute Dolan-More performance profile at tau=1 "
-            "(win counts for best total_cost per instance)."
+            "(wins and ties for best total_cost per instance)."
         )
     )
     parser.add_argument(
@@ -270,7 +278,7 @@ def main() -> None:
         costs_by_scheduler[scheduler_name] = _load_costs(csv_path)
 
     filenames = _ensure_matching_instances(costs_by_scheduler)
-    wins = compute_tau1_wins(
+    wins, ties = compute_tau1_wins_and_ties(
         costs_by_scheduler,
         filenames,
         rel_tol=args.rel_tol,
@@ -280,13 +288,12 @@ def main() -> None:
 
     rows = []
     for scheduler_name in sorted(wins, key=lambda name: (-wins[name], name)):
-        count = wins[scheduler_name]
         rows.append(
             {
                 "scheduler": scheduler_name,
-                "wins": count,
+                "wins": wins[scheduler_name],
+                "ties": ties[scheduler_name],
                 "total_instances": total_instances,
-                "win_fraction": count / total_instances,
             }
         )
 
@@ -294,7 +301,7 @@ def main() -> None:
     with args.output.open("w", newline="") as handle:
         writer = csv.DictWriter(
             handle,
-            fieldnames=["scheduler", "wins", "total_instances", "win_fraction"],
+            fieldnames=["scheduler", "wins", "ties", "total_instances"],
         )
         writer.writeheader()
         writer.writerows(rows)
@@ -308,10 +315,7 @@ def main() -> None:
 
     if args.verbose:
         for row in rows:
-            print(
-                f"{row['scheduler']}: wins={row['wins']}, "
-                f"fraction={row['win_fraction']:.3f}"
-            )
+            print(f"{row['scheduler']}: wins={row['wins']}, ties={row['ties']}")
 
 
 if __name__ == "__main__":
