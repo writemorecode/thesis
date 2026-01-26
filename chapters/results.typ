@@ -84,7 +84,7 @@ We will use this performance profiles method as a second step in the process of 
 
 For each dataset, we first present a summary table of the evaluation results for each scheduler algorithm.
 We then compare the two best algorithms for the dataset, defined as the two schedulers with the lowest average total cost in the summary table.
-This comparison uses a paired two-tailed t-test on per-instance log cost ratios and reports both the $p$-value and a 95% confidence interval for the geometric mean cost ratio.
+This comparison uses a paired two-tailed t-test on per-instance cost ratios and reports both the $p$-value and a 95% confidence interval for the mean cost ratio.
 Next, we present a plot of the performance profiles for each of the algorithms.
 Here, $tau$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for each solver $s$.
 Finally, we present a table of the performance ratio _"win rate"_ for each algorithm.
@@ -117,21 +117,18 @@ Since the algorithm execution times are all nearly identical, we will not be com
 ]
 
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
-Using the paired log-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
+Using the paired raw-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
 
-#let ttest_balanced = csv("../evaluation/results/balanced/eval_log_ratio_ttest_balanced.csv")
+#let ttest_balanced = csv("../evaluation/results/balanced/eval_raw_ratio_ttest_balanced.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
         columns: 4,
-        [*Ratio*], [*Confidence interval*], [*Ratio exp. mean*], [*$p$-value*],
-        [#(ttest_balanced.at(1).at(1) + " / " + ttest_balanced.at(2).at(1))],
-        [#(ttest_balanced.at(13).at(1) + "–" + ttest_balanced.at(14).at(1))],
-        [#(ttest_balanced.at(12).at(1))],
-        [#(ttest_balanced.at(7).at(1))],
+        [*Comparison*], [*Confidence interval*], [*Mean ratio*], [*$p$-value*],
+        ..ttest_balanced.flatten(),
       ),
-      caption: [Paired log-ratio t-test summary for balanced dataset (_BFD_ vs _FFDNew_).],
+      caption: [Paired raw-ratio t-test summary for balanced dataset (_BFD_ vs _FFDNew_).],
     )
   ])
 ]
@@ -186,21 +183,18 @@ Using the paired log-ratio t-test, we find that the two algorithms are statistic
 ]
 
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
-Using the paired log-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
+Using the paired raw-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
 
-#let ttest_job_heavy = csv("../evaluation/results/job_heavy/eval_log_ratio_ttest_job_heavy.csv")
+#let ttest_job_heavy = csv("../evaluation/results/job_heavy/eval_raw_ratio_ttest_job_heavy.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
         columns: 4,
-        [*Ratio*], [*Confidence interval*], [*Ratio exp. mean*], [*$p$-value*],
-        [#(ttest_job_heavy.at(1).at(1) + " / " + ttest_job_heavy.at(2).at(1))],
-        [#(ttest_job_heavy.at(13).at(1) + "–" + ttest_job_heavy.at(14).at(1))],
-        [#(ttest_job_heavy.at(12).at(1))],
-        [#(ttest_job_heavy.at(7).at(1))],
+        [*Comparison*], [*Confidence interval*], [*Mean ratio*], [*$p$-value*],
+        ..ttest_job_heavy.flatten(),
       ),
-      caption: [Paired log-ratio t-test summary for job-heavy dataset (_BFD_ vs _FFDNew_).],
+      caption: [Paired raw-ratio t-test summary for job-heavy dataset (_BFD_ vs _FFDNew_).],
     )
   ])
 ]
@@ -255,21 +249,18 @@ Using the paired log-ratio t-test, we find that the two algorithms are statistic
 ]
 
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
-Using the paired log-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
+Using the paired raw-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
 
-#let ttest_machine_heavy = csv("../evaluation/results/machine_heavy/eval_log_ratio_ttest_machine_heavy.csv")
+#let ttest_machine_heavy = csv("../evaluation/results/machine_heavy/eval_raw_ratio_ttest_machine_heavy.csv")
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
         columns: 4,
-        [*Ratio*], [*Confidence interval*], [*Ratio exp. mean*], [*$p$-value*],
-        [#(ttest_machine_heavy.at(1).at(1) + " / " + ttest_machine_heavy.at(2).at(1))],
-        [#(ttest_machine_heavy.at(13).at(1) + "–" + ttest_machine_heavy.at(14).at(1))],
-        [#(ttest_machine_heavy.at(12).at(1))],
-        [#(ttest_machine_heavy.at(7).at(1))],
+        [*Comparison*], [*Confidence interval*], [*Mean ratio*], [*$p$-value*],
+        ..ttest_machine_heavy.flatten(),
       ),
-      caption: [Paired log-ratio t-test summary for machine-heavy dataset (_BFD_ vs _FFDNew_).],
+      caption: [Paired raw-ratio t-test summary for machine-heavy dataset (_BFD_ vs _FFDNew_).],
     )
   ])
 ]
