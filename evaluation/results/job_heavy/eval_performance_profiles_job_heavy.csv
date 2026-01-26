@@ -1,0 +1,9 @@
+scheduler,wins,ties,total_instances
+BFD,37,36,100
+FFDNew,25,36,100
+FFDProd,1,1,100
+FFD,0,0,100
+FFDL2,0,0,100
+FFDMax,0,0,100
+FFDSum,0,1,100
+PeakDemand,0,0,100
