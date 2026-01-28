@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+from numbers import Real
 from pathlib import Path
 
 import numpy as np
@@ -12,6 +13,12 @@ from eval_utils import (
     parse_scheduler_list,
     scheduler_output_filename,
 )
+
+
+def _format_numeric(value: object) -> str:
+    if isinstance(value, Real):
+        return f"{float(value):.2f}"
+    raise TypeError(f"Expected a numeric value, got {type(value)!r}")
 
 
 def _discover_results(results_dir: Path) -> dict[str, Path]:
@@ -169,7 +176,7 @@ def main() -> None:
         for row in rows:
             formatted_row = dict(row)
             for field in numeric_fields:
-                formatted_row[field] = f"{float(row[field]):.2f}"
+                formatted_row[field] = _format_numeric(row[field])
             writer.writerow(formatted_row)
 
 

@@ -16,7 +16,7 @@ from problem_generation import generate_dataset, generate_random_instance
 
 def run_scheduler(
     problem: ProblemInstance,
-    scheduler=Callable[[ProblemInstance], ScheduleResult],
+    scheduler: Callable[[ProblemInstance], ScheduleResult],
 ) -> None:
     start = time.time()
     try:

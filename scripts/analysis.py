@@ -15,6 +15,7 @@ import warnings
 from collections.abc import Iterable
 from dataclasses import dataclass
 from math import sqrt
+from numbers import Real
 from pathlib import Path
 from statistics import NormalDist
 
@@ -35,6 +36,12 @@ class AlgorithmData:
     name: str
     path: Path
     df: pl.DataFrame
+
+
+def _coerce_real(value: object, *, name: str) -> float:
+    if isinstance(value, Real):
+        return float(value)
+    raise TypeError(f"{name} must be a real number, got {type(value)!r}")
 
 
 def _t_critical(df: int, confidence: float = 0.95) -> float:
@@ -142,7 +149,12 @@ def add_log_ratio_columns(
     for algo in algos:
         col = f"total_cost_{algo}"
         min_val = df[col].min()  # type: ignore[index]
-        if min_val is None or min_val <= 0:
+        if min_val is None:
+            raise ValueError(
+                f"total_cost for {algo} contains no values; cannot take log ratios"
+            )
+        min_val_real = _coerce_real(min_val, name=f"{col} minimum")
+        if min_val_real <= 0:
             raise ValueError(
                 f"total_cost for {algo} contains non-positive values; cannot take log ratios"
             )
@@ -190,12 +202,14 @@ def summarize_ratios(df: pl.DataFrame, ratio_columns: Iterable[str]) -> pl.DataF
         min_val = series.min()
         max_val = series.max()
         ci_low = ci_high = None
-        if mean is not None and std is not None and count >= 2:
-            se = std / sqrt(count)
+        mean_val = None if mean is None else _coerce_real(mean, name=f"{col} mean")
+        std_val = None if std is None else _coerce_real(std, name=f"{col} std")
+        if mean_val is not None and std_val is not None and count >= 2:
+            se = std_val / sqrt(count)
             t_crit = _t_critical(count - 1, confidence=0.95)
             half_width = t_crit * se
-            ci_low = np.exp(mean - half_width)
-            ci_high = np.exp(mean + half_width)
+            ci_low = float(np.exp(mean_val - half_width))
+            ci_high = float(np.exp(mean_val + half_width))
         summaries.append(
             {
                 "Algorithm A": algo_a,
