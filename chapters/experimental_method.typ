@@ -80,11 +80,11 @@ This means that, for example, if there are many job types with memory as a prima
         Procedure(
           "ChoosePrimaryResources",
           (
-            $"count" n$,
-            $"resource count" K$,
-            $"specialization fraction" rho$,
-            $"probability vector" bold(q)$,
-            $"RNG" G$,
+            $n$,
+            $K$,
+            $rho$,
+            $bold(q)$,
+            $G$,
           ),
           {
             Assign($s$, $ceil(n rho)$)
@@ -170,7 +170,7 @@ This is handled by the function $sans("GenerateCapacitiesAndRequirements")$.
               Comment[Check if machine type $i$ was assigned a primary resource]
               If($p^"machine"_i >= 0$, {
                 LineComment(Assign($k^*$, $p^"machine"_i$), $"Let" k^* "be primary resource of machine type "i$)
-                LineComment(Assign($u$, $"UniformInteger"([u_"min", u_"max"])$), "Sample random amplification factor")
+                LineComment(Assign($u$, $cal(U)([u_"min", u_"max"])$), "Sample capacity amplification factor")
                 LineComment(Assign($C_(i,k^*)$, $u dot C_(i,k^*)$), "Scale the capacity of primary resource")
               })
             })
@@ -180,7 +180,7 @@ This is handled by the function $sans("GenerateCapacitiesAndRequirements")$.
               Comment[Check if job type $j$ was assigned a primary resource]
               If($p^"job"_j >= 0$, {
                 LineComment(Assign($k^*$, $p^"job"_j$), $"Let" k^* "be primary resource of job type "j$)
-                LineComment(Assign($u$, $"UniformInteger"([u_"min", u_"max"])$), "Sample random amplification factor")
+                LineComment(Assign($u$, $cal(U)([u_"min", u_"max"])$), "Sample demand amplification factor")
                 LineComment(Assign($R_(j,k^*)$, $u dot R_(j,k^*)$), "Scale the demand of primary resource")
               })
             })
@@ -205,10 +205,7 @@ This is handled by the function $sans("GenerateCapacitiesAndRequirements")$.
                     )
                   },
                   {
-                    LineComment(
-                      Assign($i$, $arg max_m sum_k C_(m,k)$),
-                      "Fallback to machine type with max capacity sum",
-                    )
+                    Assign($i$, $arg max_m sum_k C_(m,k)$)
                   },
                 )
                 LineComment(Assign($bold(m)_i$, $bold(r)_j - bold(m)_i$), "Add deficit capacity to target machine type")
@@ -307,7 +304,7 @@ This is handled by the $"COMPUTECOSTS"$ function.
   #show: style-algorithm
   #algorithm-figure("Compute costs", vstroke: .5pt + luma(200), {
     import algorithmic: *
-    Procedure("COMPUTECOSTS", ($C$, $"resource weights" bold(alpha)$, $"running cost fraction" gamma$, $"RNG" G$), {
+    Procedure("COMPUTECOSTS", ($C$, $bold(alpha)$, $gamma$, $G$), {
       Assign($bold(c^p)$, $C^T bold(alpha)$)
       Assign($bold(c^r)$, $gamma bold(c^p)$)
       Return($bold(c^p), bold(c^r)$)
@@ -402,7 +399,7 @@ $
 
 With the description of the method for generating a single problem instance completed, we now move on to describing how a dataset of multiple problem instances is generated.
 
-Each generated problem instance samples its dimensions $K$, $J$, $M$, and $T$ uniformly from configurable intervals $[K_"min", K_"max"]$, $[J_"min", J_"max"]$, $[M_"min", M_"max"]$, and $[T_"min", T_"max"]$.
+Each generated problem instance samples its dimensions $K$, $J$, $M$, and $T$ uniformly from configurable intervals $I_K$, $I_J$, $I_M$, $I_T$, respectively.
 
 #block(breakable: false, [
   #show: style-algorithm
@@ -412,20 +409,20 @@ Each generated problem instance samples its dimensions $K$, $J$, $M$, and $T$ un
       "GENERATEDATASET",
       (
         $N$,
-        $[K_"min", K_"max"]$,
-        $[J_"min", J_"max"]$,
-        $[M_"min", M_"max"]$,
-        $[T_"min", T_"max"]$,
+        $I_K$,
+        $I_J$,
+        $I_M$,
+        $I_T$,
         $"hyperparameters"$,
         $G$,
       ),
       {
         Assign($S$, $emptyset$)
         For($1<=i<=N$, {
-          Assign($K$, $"UniformInteger"([K_"min", K_"max"] ; G)$)
-          Assign($J$, $"UniformInteger"([J_"min", J_"max"] ; G)$)
-          Assign($M$, $"UniformInteger"([M_"min", M_"max"] ; G)$)
-          Assign($T$, $"UniformInteger"([T_"min", T_"max"] ; G)$)
+          Assign($K$, $"UniformInteger"(I_K; G)$)
+          Assign($J$, $"UniformInteger"(I_J; G)$)
+          Assign($M$, $"UniformInteger"(I_M; G)$)
+          Assign($T$, $"UniformInteger"(I_T; G)$)
           Assign($(C,R,L,T,bold(c)^p, bold(c)^r)$, $"GenerateRandomInstance"(K, J, M, T, G)$)
           Assign($S$, $S union {(C,R,L,T,bold(c)^p, bold(c)^r)}$)
         })
