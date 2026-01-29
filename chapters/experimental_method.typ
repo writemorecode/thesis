@@ -3,7 +3,8 @@
 
 = Experimental Methodology <exp_method_section>
 
-This chapter describes how the synthetic problem instances are generated and which parameters control the dataset structure.
+This chapter describes how problem instances are generated, and how datasets are generated from these problem instances.
+We also describe how our method for evaluating these algorithms using these datasets.
 
 == Problem instance generation
 
@@ -34,6 +35,16 @@ The table below describes each of these parameters.
     ),
     caption: [Table of parameters used for problem instance generation],
   )
+])
+
+#block(breakable: false, [
+  #rect(stroke: red, [
+    *Anteckning till läsare!*
+    Anledningen till att motivering för dessa parametervärden saknas är att jag nu tycker att metoden som presenteras här är för abstrakt.
+    Vill ändra formuleringen, så att jag kan ha olika basvärden för kapacitet och efterfrågan (capacity/demand) för olika resurser (CPU, minne, disk, GPU, etc).
+    Detta kommer göra det lättare att beskriva och motivera varför vissa basvärden har valts.
+    Just nu är det svårt att motivera detta.
+  ])
 ])
 
 // TODO: Justify and motivate, explain, why these values were selected?
@@ -430,3 +441,73 @@ Each generated problem instance samples its dimensions $K$, $J$, $M$, and $T$ un
       },
     )
   })])
+
+== Datasets
+
+We evaluate the algorithms on three different datasets.
+For evaluation, we developed a simulator in Python using the NumPy library @python_simulator_repo_github.
+Each dataset was generated using the NumPy deterministic pseudorandom number generator, using the fixed seed value $5000$.
+Each dataset contains 100 randomly generated problem instances.
+
+The first dataset ("balanced") was generated with a balanced number of job types and machine types.
+The second dataset ("job heavy") was generated with a greater number of job types than machine types.
+The third dataset ("machine heavy") was generated with a greater number of machine types than job types.
+
+The table below presents the parameters used to generate each dataset.
+
+#let all_datasets_csv_file = csv("../data/all_datasets.csv")
+#table(
+  columns: 9,
+  [*$"Name"$*], [*$K_min$*], [*$K_max$*], [*$J_min$*], [*$J_max$*], [*$M_min$*], [*$M_max$*], [*$T_min$*], [*$T_max$*],
+  ..all_datasets_csv_file.flatten(),
+)
+
+== Evaluation method
+
+=== Paired comparison via cost ratios
+
+Each dataset contains the same set of problem instances evaluated by every algorithm.
+Therefore, comparisons between two algorithms are based on *paired* observations.
+
+Let $c_(A,i)$ and $c_(B,i)$ be the total costs of algorithms $A$ and $B$ on instance $i$, and define the per-instance cost ratio
+
+$
+  r_i = c_(A,i) / c_(B,i).
+$
+
+If $r_i < 1$, then $c_(A,i) < c_(B,i)$ and $A$ is better on instance $i$ (lower cost).
+
+We test whether the algorithms differ on average using a paired two-tailed t-test on the values $r_i$:
+$cal(H_0): bb(E)[r] = 1$ and $cal(H_1): bb(E)[r] != 1$, with $alpha = 0.05$.
+From the same test, we report a 95% confidence interval $[L, U]$ for $E[r]$.
+
+Here, $bb(E)[r] < 1$ indicates that $A$ has lower cost than $B$ on average, and $bb(E)[r] > 1$ indicates the opposite.
+
+=== Dolan-Moré performance profiles
+
+Another method of comparing the performance of different algorithms on a set of problem instances is to use _performance profiles_, presented in 2004 by Elizabeth Dolan and Jorge Moré @dolan_more_performance_profiles_2004.
+This method works as follows.
+
+Let $S$ be the set of solvers, or algorithms to evaluate.
+Let $P$ be the set of problem instances.
+Let $t_(p,s)$ be the cost of the solution for problem $p in P$ returned by solver $s in S$.
+Let
+$
+  t^*_p = min_(s in S) t_(p,s)
+$
+be the cost of the best solution for problem $p$ across all solvers in $S$.
+Let the _performance ratio_ for solver $s$ on problem $p$ be
+$
+  r_(p,s) = t_(p,s) / t^*_p
+$
+be the ratio between the solver's cost for the problem and the optimal cost for the problem.
+The _performance profile_ for solver $s$ is defined as the function
+
+$
+  rho_s (tau) = 1/abs(P) abs({p in P | r_(p,s) <= tau}).
+$
+
+The performance profile function $rho_s (tau)$ for a solver $s$ can be interpreted as the percentage of problem instances for which a performance ratio $r_(p,s)$ is within $tau$ of the optimal ratio across all problem instances.
+Specifically, $rho_s (1)$ gives the percentage of problem instances for which solver $s$ achieved the optimal performance ratio, which can be interpreted as the solver's _"win rate"_.
+
+We will use this performance profiles method as a second step in the process of determining which of the algorithms performs best on each of the datasets.

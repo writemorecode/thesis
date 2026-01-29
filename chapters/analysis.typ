@@ -1,32 +1,19 @@
 = Analysis and Discussion <analysis_section>
 
+== Analysis
+
 This chapter interprets the evaluation results and discusses their implications for offline scheduling in private clouds.
 
 The results of the evaluation are clear.
 We can divide the packing algorithms into two classes: the naive _FFDLex_, _FFDSum_, _FFDProd_, _FFDMax_, _FFDL2_, etc, and the more intelligent _BFD_ and _FFDNew_.
 We can make two initial conclusions.
 The performance of the naive algorithms are all comparable, with exception of one or two outliers with exceedingly poor performance.
-The performance of _BFD_ and _FFDNew_ are nearly, but not completely identical.
+Any difference in performance between _BFD_ and _FFDNew_ is statistically indistinguishable.
 These conclusions hold for all three datasets.
 
 We shall study the evaluation results of the _BFD_ and _FFDNew_ algorithms.
 The two algorithms have nearly identical average costs on each of the datasets.
-For all three datasets, the 95% confidence interval for the geometric mean cost ratio between _BFD_ and _FFDNew_ contains the value $1$.
-Accordingly, the paired two-tailed t-tests on per-instance log cost ratios fail to reject the null hypothesis at $alpha=0.05$.
-This means that we can not conclude that _BFD_ is superior to _FFDNew_ on any of the datasets based on these tests alone.
+For all three datasets, the paired two-tailed t-tests on per-instance cost ratios reject the null hypothesis at $alpha=0.05$.
+This means that we can not conclude that _BFD_ outperforms _FFDNew_ on any of the datasets based on these tests alone.
 
-Studying the Dolan-Moré performance profile data, we find that the _BFD_ algorithm has the higher _"win-rate"_ on the balanced and job-heavy dataset, but that the _FFDNew_ algorithm has the higher win-rate on the machine-heavy dataset.
-However, let us assume that private cloud providers purchase their machines in bulk, preferring to keep large fleets consisting of relatively few machine types.
-Then, the number of job types would be either nearly equal to or far greater than the number of machine types.
-This suggests that, in the more realistic settings, _BFD_ is a reasonable practical choice even if the two algorithms are statistically indistinguishable under the paired log-ratio t-tests.
-
-This result is not unexpected.
-Recall the details of how the problem instances used for algorithm evaluation were generated.
-A subset of the job types and machine types were assigned a primary resource.
-For these job and machine types, the resource demands and capacities, respectively, were amplified.
-The primary resources of the job types and machine types were also correlated to some degree.
-Clearly, a job type with a certain primary resource would be best placed in a machine type with a matching primary resource.
-This placement would make the best use of the machine's resource capacity, especially for the machine's primary resource capacity.
-Since the _BFD_ packing algorithm is based on the best-fit heuristic, it is clear that the algorithm will be better able to find these optimal packings.
-Compare this to the _FFDNew_ algorithm, which is based on the simpler first-fit heuristic.
-This algorithm will instead place each item in the first bin which can accommodate it, regardless of how well the item fits in the bin.
+== Discussion

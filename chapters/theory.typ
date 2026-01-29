@@ -66,13 +66,11 @@ If an item does not fit in any open bin, a new bin is opened, and the item is pl
         For($"bin" j = 1,2,...,m$, {
           If($"object i fits in bin j"$, {
             Comment[Place object i in bin j]
-            // Assign($"bin j"$, $"object i"$)
             Break
           })
         })
         If($"object i did not fit in any open bin"$, {
           Comment[Open and place object i in a new bin]
-          // Assign($"new bin"$, $"object i"$)
         })
       })
     },
@@ -81,7 +79,7 @@ If an item does not fit in any open bin, a new bin is opened, and the item is pl
 
 In the worst case, a new bin must be opened for each of the $n$ items.
 This means that placing the $k$:th item will require $k$ bin size checks.
-This gives the algorithm the quadratic time complexity $Omicron (m n)$.
+This gives the algorithm the time complexity $Omicron (m n)$.
 
 === (BF) Best fit
 Place each item into the bin with the smallest remaining capacity which is at least as large as the size of item.
@@ -115,9 +113,6 @@ If an item does not fit in any open bin, a new bin is opened, and the item is pl
 
 For the worst case, we must check each of the $m$ bins for each of the $n$ items.
 This gives the algorithm the time complexity $Omicron (m n)$.
-The algorithm can be improved by storing the bin capacities in a sorted data structure, such as a binary heap.
-Binary heaps allow us to retrieve the smallest element from a heap of $m$ elements in $Omicron (log m)$ time.
-This gives the algorithm an improved time complexity of $Omicron (n log m)$.
 
 === (WF) Worst fit
 A variation of best-fit, where we instead select the bin with the largest remaining capacity @garey_graham_ullman_1972.

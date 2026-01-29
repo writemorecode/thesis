@@ -4,6 +4,28 @@ This chapter surveys prior research on energy-aware scheduling and multidimensio
 
 == Job-scheduling
 
+In 2012, Beloglazov et al. have proposed energy-aware VM allocation heuristics for provisioning physical machines while satisfying service-level agreements (SLAs) @beloglazov_energy-aware_2012
+These SLAs were related to metrics such as total data center energy consumption, overloaded physical machines, the number of VM migrations, and the unmet resource demands from VMs.
+The authors presented heuristics for both placement of VMs and migration of VMs between physical machines.
+The authors used the CloudSim toolkit @cloudsim_2011 for evaluating their heuristics.
+One of the heuristics presented by the authors resulted in significantly lower number of VM migrations and SLA violations.
+The results showed that dynamic migration of VMs between physical machines resulted a substantial reduction in total data center energy consumption.
+The authors also discussed a number of open challenges in the field of energy-efficient data centers.
+Among these was the optimization of VM placement according to utilization of multiple system resources.
+
+In 2016, Mosa and Paton presented similar work, applying genetic algorithm to the problem of finding an optimal VM placement strategy minimizing costs of both energy and SLA violations.
+The genetic algorithms are used to find a VM placement with maximum utility.
+The utility of a VM placement during a time period is defined by the authors as its future financial return after total costs over that period.
+Here, the cost of a VM placement is defined as the sum of costs from energy, SLA violations, and performance degradation from VM overallocation.
+The authors' proposed solution was evaluated using the CloudSim simulator, and compared to a heuristics-based solution presented by Beloglazov et al. @beloglazov_energy-aware_2012.
+Evaluation results showed that the proposed solution outperformed other existing heuristics-based solution, in terms of energy savings and SLA violations.
+
+In 2015, Mann presented a survey article on the subject of virtual machine allocation in cloud data centers @mann_allocation_2015
+The survey considered different problem models and optimization algorithms.
+The same year, Mann presented another article discussing how well the VM allocation problem could be approximated as a bin-packing problem @mann_approximability_2015.
+Mann discussed various cases of the problem, such as multi-dimensionality, VM migration, heterogeneous physical machines, etc.
+The author found that the VM allocation problem is in many cases more complex than the bin-packing problem.
+
 In 2010, Speitkamp and Bichler @speitkamp_bichler_2010 described a server consolidation problem.
 The authors presented an LP-based formulation of the problem, and a solution using a heuristic based on LP-relaxation.
 They also showed that the problem is strongly NP-hard, by reducing the problem to the multidimensional bin-packing problem (MDBP).
@@ -12,8 +34,6 @@ In 2012, Setzer and Wolke @setzer_wolke_2018 formulated a mathematical model for
 This model was optimized for minimizing the number of powered-on physical machines over time, while also attempting to minimize the overhead from virtual machine migration between physical machines.
 
 In 2013, Ghribi et al. @ghribi_hadji_djamal_2013 presented two exact algorithms for energy-efficient cloud job scheduling.
-
-In 2016, Mosa and Paton @mosa_paton_2016 developed an optimized energy- and SLA-aware virtual machine placement strategy based on genetic algorithms.
 
 In 2018, Lei et al. @liu_li_li_2018 presented, analyzed, and benchmarked a randomized approximation algorithm for solving the minimal cost job-server configuration problem.
 
