@@ -16,4 +16,8 @@ The two algorithms have nearly identical average costs on each of the datasets.
 For all three datasets, the paired two-tailed t-tests on per-instance cost ratios reject the null hypothesis at $alpha=0.05$.
 This means that we can not conclude that _BFD_ outperforms _FFDNew_ on any of the datasets based on these tests alone.
 
+The one-tailed t-tests comparing _BFD_ to the remaining algorithms (excluding _FFDNew_) are all decisive.
+Across all three datasets, the mean ratios are below $1$, the one-sided $p$-values are far below $0.05$, and the 95% upper confidence bounds remain below $1$.
+Taken together, these results indicate that _BFD_ consistently yields lower solution cost than the other evaluated baselines.
+
 == Discussion

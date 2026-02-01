@@ -52,6 +52,13 @@ evaluate_dataset() {
     --algo-b "ffd_new" \
     --stats-csv "${results_dir}/eval_raw_ratio_ttest_${name}.csv"
 
+  echo "Running paired one-tailed raw-ratio t-tests (BFD vs others)..."
+  uv run python scripts/raw_ratio_ttest_one_sided.py \
+    --results-dir "${raw_dir}" \
+    --base "bfd" \
+    --exclude "ffd_new" \
+    --stats-csv "${results_dir}/eval_raw_ratio_ttest_one_sided_${name}.csv"
+
   echo "Running performance profiles for schedulers..."
   local perf_profile_csv="${results_dir}/eval_performance_profiles_${name}.csv"
   local perf_profile_svg="${results_dir}/eval_performance_profiles_${name}.svg"

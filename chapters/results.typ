@@ -55,6 +55,22 @@ Using the paired raw-ratio t-test, we find that the two algorithms are statistic
   ])
 ]
 
+The table below summarizes the one-tailed comparisons between _BFD_ and the remaining algorithms (excluding _FFDNew_).
+
+#let ttest_one_sided_balanced = csv("../evaluation/results/balanced/eval_raw_ratio_ttest_one_sided_balanced.csv").slice(1)
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      table(
+        columns: 4,
+        [*Comparison*], [*Upper 95% bound*], [*Mean ratio*], [*$p$-value*],
+        ..ttest_one_sided_balanced.flatten(),
+      ),
+      caption: [One-tailed raw-ratio t-tests for balanced dataset (_BFD_ vs other algorithms except _FFDNew_; H1: mean ratio < 1).],
+    )
+  ])
+]
+
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -121,6 +137,22 @@ Using the paired raw-ratio t-test, we find that the two algorithms are statistic
   ])
 ]
 
+The table below summarizes the one-tailed comparisons between _BFD_ and the remaining algorithms (excluding _FFDNew_).
+
+#let ttest_one_sided_job_heavy = csv("../evaluation/results/job_heavy/eval_raw_ratio_ttest_one_sided_job_heavy.csv").slice(1)
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      table(
+        columns: 4,
+        [*Comparison*], [*Upper 95% bound*], [*Mean ratio*], [*$p$-value*],
+        ..ttest_one_sided_job_heavy.flatten(),
+      ),
+      caption: [One-tailed raw-ratio t-tests for job-heavy dataset (_BFD_ vs other algorithms except _FFDNew_; H1: mean ratio < 1).],
+    )
+  ])
+]
+
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -183,6 +215,22 @@ Using the paired raw-ratio t-test, we find that the two algorithms are statistic
         ..ttest_machine_heavy.flatten(),
       ),
       caption: [Paired raw-ratio t-test summary for machine-heavy dataset (_BFD_ vs _FFDNew_).],
+    )
+  ])
+]
+
+The table below summarizes the one-tailed comparisons between _BFD_ and the remaining algorithms (excluding _FFDNew_).
+
+#let ttest_one_sided_machine_heavy = csv("../evaluation/results/machine_heavy/eval_raw_ratio_ttest_one_sided_machine_heavy.csv").slice(1)
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      table(
+        columns: 4,
+        [*Comparison*], [*Upper 95% bound*], [*Mean ratio*], [*$p$-value*],
+        ..ttest_one_sided_machine_heavy.flatten(),
+      ),
+      caption: [One-tailed raw-ratio t-tests for machine-heavy dataset (_BFD_ vs other algorithms except _FFDNew_; H1: mean ratio < 1).],
     )
   ])
 ]

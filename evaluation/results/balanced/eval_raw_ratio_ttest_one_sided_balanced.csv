@@ -1,0 +1,7 @@
+comparison,upper_bound,mean_ratio,p_value
+BFD / FFD,0.8839,0.8767,1.527e-49
+BFD / FFDL2,0.817,0.8089,2.596e-62
+BFD / FFDSum,0.9133,0.9068,4.417e-43
+BFD / FFDMax,0.9122,0.9056,3.621e-43
+BFD / FFDProd,0.9118,0.9053,1.524e-43
+BFD / PeakDemand,0.681,0.6722,3.04e-81

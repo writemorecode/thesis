@@ -483,6 +483,9 @@ From the same test, we report a 95% confidence interval $[L, U]$ for $E[r]$.
 
 Here, $bb(E)[r] < 1$ indicates that $A$ has lower cost than $B$ on average, and $bb(E)[r] > 1$ indicates the opposite.
 
+In addition to the two-tailed comparison of the two best algorithms, we also run paired one-tailed t-tests to assess whether _BFD_ has lower cost than each remaining algorithm (excluding _FFDNew_).
+For these tests, we use $cal(H_0): bb(E)[r] = 1$ and $cal(H_1): bb(E)[r] < 1$, and report the one-sided $p$-value together with a 95% upper confidence bound for $bb(E)[r]$.
+
 === Dolan-Moré performance profiles
 
 Another method of comparing the performance of different algorithms on a set of problem instances is to use _performance profiles_, presented in 2004 by Elizabeth Dolan and Jorge Moré @dolan_more_performance_profiles_2004.
