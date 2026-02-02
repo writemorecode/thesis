@@ -104,9 +104,9 @@ mkdir -p "${EVAL_ROOT}"
 
 # name Kmin Kmax Jmin Jmax Mmin Mmax Tmin Tmax
 DATASET_CONFIGS=(
-  "balanced     3 6 12 16 12 16 100 200"
-  "job_heavy    3 6 16 24  8 12 100 200"
-  "machine_heavy 3 6  8 12 16 24 100 200"
+  "balanced     4 4 12 16 12 16 100 200"
+  "job_heavy    4 4 16 24  8 12 100 200"
+  "machine_heavy 4 4  8 12 16 24 100 200"
 )
 
 while read -r name kmin kmax jmin jmax mmin mmax tmin tmax; do

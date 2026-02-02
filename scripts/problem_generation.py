@@ -455,22 +455,30 @@ def generate_dataset_instances(
     J_range: tuple[int, int],
     M_range: tuple[int, int],
     T_range: tuple[int, int],
+    base_capacity: ResourceValues | None = None,
+    base_demand: ResourceValues | None = None,
     rng: np.random.Generator,
 ) -> list[DatasetInstance]:
     """
     Generate a dataset of random problem instances without persisting them.
 
-    Each instance samples K, J, M, and T uniformly within the provided ranges,
-    then forwards those values to ``generate_random_instance``.
+    Each instance samples J, M, and T uniformly within the provided ranges. K is fixed
+    and must be equal to ``RESOURCE_COUNT``.
     """
 
     if num_instances <= 0:
         raise ValueError("num_instances must be a positive integer.")
 
+    if K_range != (RESOURCE_COUNT, RESOURCE_COUNT):
+        raise ValueError(
+            f"K_range must be fixed to ({RESOURCE_COUNT}, {RESOURCE_COUNT})."
+        )
+
     instances: list[DatasetInstance] = []
 
+    K = RESOURCE_COUNT
+
     for _ in range(num_instances):
-        K = _sample_dimension(rng, K_range, "K_range")
         J = _sample_dimension(rng, J_range, "J_range")
         M = _sample_dimension(rng, M_range, "M_range")
         T = _sample_dimension(rng, T_range, "T_range")
@@ -480,6 +488,8 @@ def generate_dataset_instances(
             J=J,
             M=M,
             T=T,
+            base_capacity=base_capacity,
+            base_demand=base_demand,
             rng=rng,
         )
 
@@ -558,6 +568,14 @@ def write_dataset_parameters_csv(
         "iterations",
         "K_min",
         "K_max",
+        "base_capacity_cpu",
+        "base_capacity_memory",
+        "base_capacity_disk",
+        "base_capacity_io",
+        "base_demand_cpu",
+        "base_demand_memory",
+        "base_demand_disk",
+        "base_demand_io",
         "J_min",
         "J_max",
         "M_min",
@@ -659,6 +677,8 @@ def generate_dataset(
     J_range: tuple[int, int],
     M_range: tuple[int, int],
     T_range: tuple[int, int],
+    base_capacity: ResourceValues | None = None,
+    base_demand: ResourceValues | None = None,
     dataset_dir: str | Path = "dataset",
     rng: np.random.Generator,
 ) -> list[dict[str, int | str]]:
@@ -674,6 +694,8 @@ def generate_dataset(
         J_range=J_range,
         M_range=M_range,
         T_range=T_range,
+        base_capacity=base_capacity,
+        base_demand=base_demand,
         rng=rng,
     )
     return write_dataset(instances, dataset_dir=dataset_dir)
