@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import csv
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -9,6 +9,24 @@ from pathlib import Path
 import numpy as np
 
 from simulator.problem import ProblemInstance
+
+RESOURCE_TYPES = ("cpu", "memory", "disk", "io")
+RESOURCE_COUNT = len(RESOURCE_TYPES)
+
+DEFAULT_BASE_CAPACITY = {
+    "cpu": 10,
+    "memory": 20,
+    "disk": 50,
+    "io": 15,
+}
+DEFAULT_BASE_DEMAND = {
+    "cpu": 4,
+    "memory": 8,
+    "disk": 20,
+    "io": 6,
+}
+
+ResourceValues = Mapping[str, int] | Sequence[int] | np.ndarray
 
 
 @dataclass(frozen=True)
@@ -34,6 +52,41 @@ def _validate_range(name: str, bounds: tuple[float, float]) -> tuple[float, floa
             f"{name} must have positive bounds with low <= high, got {bounds}."
         )
     return low, high
+
+
+def _normalize_resource_values(
+    name: str,
+    values: ResourceValues | None,
+    *,
+    resource_types: Sequence[str] = RESOURCE_TYPES,
+    default: Mapping[str, int],
+) -> np.ndarray:
+    if values is None:
+        values = default
+
+    if isinstance(values, Mapping):
+        missing = [res for res in resource_types if res not in values]
+        if missing:
+            raise ValueError(f"{name} is missing values for resources: {missing}.")
+        extra = [key for key in values if key not in resource_types]
+        if extra:
+            raise ValueError(f"{name} contains unknown resources: {extra}.")
+        vector = np.array([values[res] for res in resource_types], dtype=float)
+    else:
+        vector = np.asarray(list(values), dtype=float)
+        if vector.shape != (len(resource_types),):
+            raise ValueError(
+                f"{name} must have length {len(resource_types)} (got {vector.shape})."
+            )
+
+    if not np.all(np.isfinite(vector)):
+        raise ValueError(f"{name} must contain finite values.")
+    if np.any(vector <= 0):
+        raise ValueError(f"{name} must contain positive values.")
+    if not np.all(np.equal(vector, np.rint(vector))):
+        raise ValueError(f"{name} must contain integer values.")
+
+    return vector.astype(float)
 
 
 def _sample_dimension(
@@ -75,8 +128,8 @@ def _generate_capacities_and_requirements(
     K: int,
     M: int,
     J: int,
-    base_capacity: int,
-    base_demand: int,
+    base_capacities: np.ndarray,
+    base_demands: np.ndarray,
     mult_low: int,
     mult_high: int,
     cap_jitter_low: float,
@@ -87,8 +140,11 @@ def _generate_capacities_and_requirements(
     machine_primary: np.ndarray,
     rng: np.random.Generator,
 ) -> tuple[np.ndarray, np.ndarray]:
-    capacities = np.full((K, M), base_capacity, dtype=float)
-    requirements = np.full((K, J), base_demand, dtype=float)
+    if base_capacities.shape != (K,) or base_demands.shape != (K,):
+        raise ValueError("base_capacities and base_demands must have shape (K,).")
+
+    capacities = np.repeat(base_capacities[:, None], M, axis=1).astype(float)
+    requirements = np.repeat(base_demands[:, None], J, axis=1).astype(float)
 
     capacities *= rng.uniform(cap_jitter_low, cap_jitter_high, size=(K, M))
     requirements *= rng.uniform(dem_jitter_low, dem_jitter_high, size=(K, J))
@@ -209,8 +265,8 @@ def generate_random_instance(
     J: int,
     T: int,
     *,
-    base_capacity: int = 20,
-    base_demand: int = 8,
+    base_capacity: ResourceValues | None = None,
+    base_demand: ResourceValues | None = None,
     specialization_multiplier: tuple[int, int] = (2, 4),
     capacity_jitter: tuple[float, float] = (0.8, 1.3),
     demand_jitter: tuple[float, float] = (0.8, 1.2),
@@ -231,7 +287,7 @@ def generate_random_instance(
     Generate heterogeneous capacity (C) and demand (R) matrices with correlated specializations.
 
     Each job and machine type may have a primary resource that gets amplified by a multiplier,
-    creating CPU-, memory-, or disk-leaning profiles. Machine specialization probabilities are
+    creating CPU-, memory-, disk-, or I/O-leaning profiles. Machine specialization probabilities are
     biased toward job specializations via ``correlation`` so that CPU-heavy jobs are more likely
     to have CPU-optimized machines available. All outputs are integers and every job type is
     guaranteed to be packable into at least one machine type. The job-count matrix L (J×T)
@@ -240,9 +296,11 @@ def generate_random_instance(
 
     Parameters
     ----------
-    K, M, J, T: dimensionality of resources, machines, jobs, and time slots.
-    base_capacity: mean capacity per resource per machine before jitter and specialization.
-    base_demand: mean requirement per resource per job before jitter and specialization.
+    K, M, J, T: dimensionality of resources, machines, jobs, and time slots. K must be 4.
+    base_capacity: per-resource base capacities for CPU, memory, disk, and I/O. Accepts
+        a mapping keyed by {"cpu", "memory", "disk", "io"} or a length-4 sequence.
+    base_demand: per-resource base demands for CPU, memory, disk, and I/O. Accepts
+        a mapping keyed by {"cpu", "memory", "disk", "io"} or a length-4 sequence.
     specialization_multiplier: low/high integer multiplier applied to a primary resource when
         a job or machine is specialized.
     capacity_jitter: multiplicative jitter range applied to base capacities.
@@ -263,8 +321,11 @@ def generate_random_instance(
     rng/seed: random generator or seed used for reproducibility.
     """
 
-    if K <= 0 or M <= 0 or J <= 0 or T <= 0:
-        raise ValueError("K, M, J, and T must be positive integers.")
+    if K != RESOURCE_COUNT:
+        raise ValueError(f"K must be fixed to {RESOURCE_COUNT}.")
+
+    if M <= 0 or J <= 0 or T <= 0:
+        raise ValueError("M, J, and T must be positive integers.")
 
     _validate_ratio("specialized_job_ratio", specialized_job_ratio)
     _validate_ratio("specialized_machine_ratio", specialized_machine_ratio)
@@ -272,8 +333,16 @@ def generate_random_instance(
     _validate_ratio("slot_focus_ratio", slot_focus_ratio)
     _validate_ratio("slot_specialization_correlation", slot_specialization_correlation)
 
-    if base_capacity <= 0 or base_demand <= 0:
-        raise ValueError("base_capacity and base_demand must be positive integers.")
+    base_capacities = _normalize_resource_values(
+        "base_capacity",
+        base_capacity,
+        default=DEFAULT_BASE_CAPACITY,
+    )
+    base_demands = _normalize_resource_values(
+        "base_demand",
+        base_demand,
+        default=DEFAULT_BASE_DEMAND,
+    )
 
     mult_low, mult_high = specialization_multiplier
     if mult_low < 1 or mult_high < mult_low:
@@ -334,8 +403,8 @@ def generate_random_instance(
         K=K,
         M=M,
         J=J,
-        base_capacity=base_capacity,
-        base_demand=base_demand,
+        base_capacities=base_capacities,
+        base_demands=base_demands,
         mult_low=mult_low,
         mult_high=mult_high,
         cap_jitter_low=cap_jitter_low,
