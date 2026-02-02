@@ -19,8 +19,14 @@ The table below describes each of these parameters.
     table(
       columns: 3,
       [*Parameter*], [*Purpose*], [*Default value*],
-      [$c_0$], [Base machine capacity value], [$20$],
-      [$d_0$], [Base job demand value], [$8$],
+      [$c_0^"cpu"$], [Base CPU capacity value], [$20$],
+      [$c_0^"memory"$], [Base memory capacity value], [$40$],
+      [$c_0^"disk"$], [Base disk capacity value], [$100$],
+      [$c_0^"io"$], [Base I/O capacity value], [$30$],
+      [$d_0^"cpu"$], [Base CPU demand value], [$8$],
+      [$d_0^"memory"$], [Base memory demand value], [$16$],
+      [$d_0^"disk"$], [Base disk demand value], [$40$],
+      [$d_0^"io"$], [Base I/O demand value], [$12$],
       [$lambda_0$], [Base job type count value], [$12$],
       [$[c_"min",c_"max"]$], [Random machine capacity jitter interval], [$(0.8,1.3)$],
       [$[d_"min",d_"max"]$], [Random job demand jitter interval], [$(0.8,1.3)$],
@@ -37,25 +43,19 @@ The table below describes each of these parameters.
   )
 ])
 
-#block(breakable: false, [
-  #rect(stroke: red, [
-    *Anteckning till läsare!*
-    Anledningen till att motivering för dessa parametervärden saknas är att jag nu tycker att metoden som presenteras här är för abstrakt.
-    Vill ändra formuleringen, så att jag kan ha olika basvärden för kapacitet och efterfrågan (capacity/demand) för olika resurser (CPU, minne, disk, GPU, etc).
-    Detta kommer göra det lättare att beskriva och motivera varför vissa basvärden har valts.
-    Just nu är det svårt att motivera detta.
-  ])
-])
-
 // TODO: Justify and motivate, explain, why these values were selected?
 
-Each machine type resource capacity value $C_(i,k)$ is initialized according to a configurable positive base resource capacity parameter $c_0$.
-Each job type resource demand value $R_(j,k)$ is initialized according to a configurable positive base resource demand parameter $d_0$.
+We fix the set of resource types to CPU, memory, disk, and I/O, so $K=4$ throughout.
+Each resource type $k$ has its own base machine capacity $c_(0,k)$ and base job demand $d_(0,k)$, collected in the vectors
+$bold(c)_0=(c_0^"cpu", c_0^"memory", c_0^"disk", c_0^"io")$ and
+$bold(d)_0=(d_0^"cpu", d_0^"memory", d_0^"disk", d_0^"io")$.
+Each machine type resource capacity value $C_(i,k)$ is initialized according to the corresponding base capacity $c_(0,k)$.
+Each job type resource demand value $R_(j,k)$ is initialized according to the corresponding base demand $d_(0,k)$.
 Next, some variation is introduced to each element $C_(i,k)$ and $R_(j,k)$ with multiplicative jitter values sampled uniformly from the configurable ranges $[c_"min",c_"max"]$ and $[d_"min",d_"max"]$, respectively.
 
 $
-  C_(i,k) arrow.l ceil(c_0 U([c_"min", c_"max"])), quad
-  R_(i,j) arrow.l ceil(d_0 U([d_"min", d_"max"])), quad forall i,j,k.
+  C_(i,k) arrow.l ceil(c_(0,k) U([c_"min", c_"max"])), quad
+  R_(j,k) arrow.l ceil(d_(0,k) U([d_"min", d_"max"])), quad forall i,j,k.
 $
 
 In order to generate more realistic problem instances, we want to avoid having nearly uniform machine types, job types, and time slots.
@@ -158,8 +158,8 @@ This is handled by the function $sans("GenerateCapacitiesAndRequirements")$.
             $K$,
             $M$,
             $J$,
-            $c_0$,
-            $d_0$,
+            $bold(c)_0$,
+            $bold(d)_0$,
             $bold(p)^"machine"$,
             $bold(p)^"job"$,
             $"hyperparameters"$,
@@ -167,12 +167,12 @@ This is handled by the function $sans("GenerateCapacitiesAndRequirements")$.
           ),
           {
             LineComment(
-              Assign($C_(i,k)$, $ceil(c_0 dot U(c_"min", c_"max"))$),
+              Assign($C_(i,k)$, $ceil(c_(0,k) dot U(c_"min", c_"max"))$),
               $"Initialize" bold(C) "with base capacity and jitter"$,
             )
 
             LineComment(
-              Assign($R_(j,k)$, $ceil(d_0 dot U(d_"min", d_"max"))$),
+              Assign($R_(j,k)$, $ceil(d_(0,k) dot U(d_"min", d_"max"))$),
               $"Initialize" bold(R) "with base demand and jitter"$,
             )
 
@@ -344,8 +344,8 @@ This is handled by the $"GENERATERANDOMINSTANCE"$ function.
             K,
             M,
             J,
-            c_0,
-            d_0,
+            bold(c)_0,
+            bold(d)_0,
             bold(p)^"machine",
             bold(p)^"job",
             G
@@ -410,7 +410,8 @@ $
 
 With the description of the method for generating a single problem instance completed, we now move on to describing how a dataset of multiple problem instances is generated.
 
-Each generated problem instance samples its dimensions $K$, $J$, $M$, and $T$ uniformly from configurable intervals $I_K$, $I_J$, $I_M$, $I_T$, respectively.
+Each generated problem instance samples its dimensions $J$, $M$, and $T$ uniformly from configurable intervals $I_J$, $I_M$, $I_T$, respectively.
+The number of resource types is fixed to $K=4$ (CPU, memory, disk, I/O).
 
 #block(breakable: false, [
   #show: style-algorithm
@@ -420,7 +421,6 @@ Each generated problem instance samples its dimensions $K$, $J$, $M$, and $T$ un
       "GENERATEDATASET",
       (
         $N$,
-        $I_K$,
         $I_J$,
         $I_M$,
         $I_T$,
@@ -429,8 +429,8 @@ Each generated problem instance samples its dimensions $K$, $J$, $M$, and $T$ un
       ),
       {
         Assign($S$, $emptyset$)
+        Assign($K$, $4$)
         For($1<=i<=N$, {
-          Assign($K$, $"UniformInteger"(I_K; G)$)
           Assign($J$, $"UniformInteger"(I_J; G)$)
           Assign($M$, $"UniformInteger"(I_M; G)$)
           Assign($T$, $"UniformInteger"(I_T; G)$)
