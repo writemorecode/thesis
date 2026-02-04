@@ -1,0 +1,3 @@
+algorithm,w_statistic,p_value,reject
+BFD,0.9556,0.001975,YES
+FFDNew,0.9557,0.002011,YES
