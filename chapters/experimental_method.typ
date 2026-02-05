@@ -464,7 +464,7 @@ The table below presents the parameters used to generate each dataset.
 
 == Evaluation method
 
-=== Paired comparison via cost ratios
+=== Paired comparison via cost ratios <cost_ratios>
 
 Each dataset contains the same set of problem instances evaluated by every algorithm.
 Therefore, comparisons between two algorithms are based on *paired* observations.

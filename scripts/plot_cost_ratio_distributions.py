@@ -6,11 +6,11 @@ the paired raw-ratio t-tests (see raw_ratio_ttest.py).
 
 For each dataset directory (containing eval_*.csv files), this script:
   - loads per-instance total_cost for two algorithms (A and B),
-  - computes r_i = cost_a_i / cost_b_i and log(r_i),
+  - computes r_i = cost_a_i / cost_b_i,
   - prints summary stats and the most extreme ratios,
   - writes an SVG figure with:
       (1) histogram of r_i with a reference line at 1,
-      (2) Q-Q plot of log(r_i) against a normal distribution.
+      (2) Q-Q plot of r_i against a normal distribution.
 """
 
 from __future__ import annotations
@@ -115,15 +115,20 @@ def _plot(
         }
     )
 
-    log_ratio = np.log(ratio)
-
     fig, (ax_hist, ax_qq) = plt.subplots(
-        ncols=2, figsize=(7.2, 2.6), constrained_layout=True
+        nrows=2, figsize=(6.4, 5.2), constrained_layout=True
     )
 
     edges = _hist_edges(ratio)
     ax_hist.hist(ratio, bins=edges, color="#4C78A8", edgecolor="white", linewidth=0.5)
-    ax_hist.axvline(1.0, color="black", linestyle="--", linewidth=1.0)
+    mean = float(ratio.mean())
+    std = float(ratio.std(ddof=1))
+    # ax_hist.axvline(1.0, color="black", linestyle="--", linewidth=1.0)
+    # ax_hist.axvline(mean, color="#E45756", linestyle="-", linewidth=1.2)
+    ax_hist.axvline(mean - std, color="#E45756", linestyle="--", linewidth=1.0)
+    ax_hist.axvline(mean + std, color="#E45756", linestyle="--", linewidth=1.0)
+    ax_hist.axvline(mean - 2 * std, color="#F58518", linestyle=":", linewidth=1.0)
+    ax_hist.axvline(mean + 2 * std, color="#F58518", linestyle=":", linewidth=1.0)
     ax_hist.set_xlabel(
         f"Cost ratio ({display_scheduler_name(label_a)} / {display_scheduler_name(label_b)})"
     )
@@ -131,10 +136,10 @@ def _plot(
     ax_hist.set_title(f"{dataset_label}: raw ratios")
     ax_hist.grid(True, which="both", linestyle=":", linewidth=0.6, alpha=0.8)
 
-    stats.probplot(log_ratio, dist="norm", plot=ax_qq)
-    ax_qq.set_title(f"{dataset_label}: Q-Q of log-ratio")
+    stats.probplot(ratio, dist="norm", plot=ax_qq, rvalue=True)
+    ax_qq.set_title(f"{dataset_label}: Q-Q of ratios")
     ax_qq.set_xlabel("Theoretical quantiles")
-    ax_qq.set_ylabel("Ordered log-ratios")
+    ax_qq.set_ylabel("Ordered ratios")
     ax_qq.grid(True, which="both", linestyle=":", linewidth=0.6, alpha=0.8)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)

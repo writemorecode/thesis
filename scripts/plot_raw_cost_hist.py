@@ -148,6 +148,10 @@ def _compute_bin_edges(
     return edges
 
 
+def _normal_pdf(x: np.ndarray, mean: float, variance: float) -> np.ndarray:
+    return np.exp(-0.5 * ((x - mean) ** 2) / variance) / np.sqrt(2.0 * np.pi * variance)
+
+
 def main() -> None:
     args = parse_args()
 
@@ -163,6 +167,10 @@ def main() -> None:
         values = values[values > 0]
         if values.size == 0:
             raise ValueError("--log-x requires at least one positive cost value.")
+
+    mean = float(values.mean())
+    median = float(np.median(values))
+    variance = float(values.var(ddof=0)) if values.size >= 2 else 0.0
 
     print(f"{algo} ({dataset_label or results_dir}): {_summary(values)}")
 
@@ -192,19 +200,49 @@ def main() -> None:
         edgecolor="white",
     )
     ax.axvline(
-        float(values.mean()),
+        mean,
         color="black",
         linewidth=1.0,
         linestyle=":",
         label="mean",
     )
     ax.axvline(
-        float(np.median(values)),
+        median,
         color="black",
         linewidth=1.0,
         linestyle="--",
         label="median",
     )
+
+    if variance > 0:
+        x_min = float(bin_edges[0])
+        x_max = float(bin_edges[-1])
+        if x_min == x_max:
+            x_min -= 1.0
+            x_max += 1.0
+        if args.log_x:
+            x_min = max(x_min, np.finfo(float).tiny)
+            x_grid = np.logspace(np.log10(x_min), np.log10(x_max), 400)
+        else:
+            x_grid = np.linspace(x_min, x_max, 400)
+
+        pdf = _normal_pdf(x_grid, mean, variance)
+        pdf_label = "Normal PDF"
+        if not args.density:
+            bin_widths = np.diff(bin_edges)
+            if bin_widths.size > 0:
+                pdf = pdf * values.size * float(bin_widths.mean())
+                pdf_label = "Normal PDF (scaled)"
+
+        ax.plot(
+            x_grid,
+            pdf,
+            color="#4c72b0",
+            linewidth=1.5,
+            label=pdf_label,
+        )
+    else:
+        print("Variance is zero; skipping normal PDF overlay.")
 
     if args.log_x:
         ax.set_xscale("log")
