@@ -22,3 +22,8 @@ package-dir = {"" = "src"}
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["thesis_tools*"]
+
+[tool.uv]
+override-dependencies = [
+  "simulator @ file:${PROJECT_ROOT}/../simulator",
+]

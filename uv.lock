@@ -2,6 +2,9 @@ version = 1
 revision = 3
 requires-python = ">=3.14"
 
+[manifest]
+overrides = [{ name = "simulator", directory = "../simulator" }]
+
 [[package]]
 name = "contourpy"
 version = "1.3.3"
@@ -299,9 +302,19 @@ wheels = [
 [[package]]
 name = "simulator"
 version = "0.1.0"
-source = { git = "https://github.com/writemorecode/thesis_scheduler_simulator.git?rev=main#15c410e85a2ecdaaa386d7c45cfc9f8a5ebec917" }
+source = { directory = "../simulator" }
 dependencies = [
     { name = "numpy" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "numpy", specifier = ">=2.3.4" }]
+provides-extras = ["exact"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "ruff", specifier = ">=0.14.14" },
+    { name = "ty", specifier = ">=0.0.14" },
 ]
 
 [[package]]

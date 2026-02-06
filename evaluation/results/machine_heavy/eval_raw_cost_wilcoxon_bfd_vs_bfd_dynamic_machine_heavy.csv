@@ -1,0 +1,2 @@
+comparison,n_total,n_nonzero,mean_diff,median_diff,w_statistic,p_value
+BFD vs BFDDynamic,100,37,18.22,0,0,1.14e-07

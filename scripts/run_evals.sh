@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-SCHEDULERS="${SCHEDULERS:-ffd_l2,ffd,ffd_sum,ffd_max,ffd_prod,peak_demand,ffd_new,bfd}"
+# SCHEDULERS="${SCHEDULERS:-ffd_l2,ffd,ffd_sum,ffd_max,ffd_prod,peak_demand,ffd_new,bfd}"
+SCHEDULERS="bfd_dynamic,bfd"
 SEED="${SEED:-5000}"
 EVAL_ROOT="${EVAL_ROOT:-evaluation}"
 
@@ -45,19 +46,24 @@ evaluate_dataset() {
     --output "${results_dir}/eval_summary_${name}.csv" \
     --verbose
 
-  echo "Running paired raw-ratio t-test (BFD vs FFDNew)..."
-  uv run python scripts/raw_ratio_ttest.py \
+  echo "Running paired Wilcoxon test on raw costs (BFD vs FFDNew)..."
+  uv run python scripts/raw_cost_wilcoxon.py \
     --results-dir "${raw_dir}" \
     --algo-a "bfd" \
     --algo-b "ffd_new" \
-    --stats-csv "${results_dir}/eval_raw_ratio_ttest_${name}.csv"
+    --stats-csv "${results_dir}/eval_raw_cost_wilcoxon_${name}.csv"
 
-  echo "Running paired one-tailed raw-ratio t-tests (BFD vs others)..."
-  uv run python scripts/raw_ratio_ttest_one_sided.py \
-    --results-dir "${raw_dir}" \
-    --base "bfd" \
-    --exclude "ffd_new" \
-    --stats-csv "${results_dir}/eval_raw_ratio_ttest_one_sided_${name}.csv"
+  echo "Running paired Wilcoxon tests on raw costs (BFD vs others)..."
+  for scheduler in ${SCHEDULERS//,/ }; do
+    if [[ "${scheduler}" == "bfd" || "${scheduler}" == "ffd_new" ]]; then
+      continue
+    fi
+    uv run python scripts/raw_cost_wilcoxon.py \
+      --results-dir "${raw_dir}" \
+      --algo-a "bfd" \
+      --algo-b "${scheduler}" \
+      --stats-csv "${results_dir}/eval_raw_cost_wilcoxon_bfd_vs_${scheduler}_${name}.csv"
+  done
 
   echo "Running performance profiles for schedulers..."
   local perf_profile_csv="${results_dir}/eval_performance_profiles_${name}.csv"

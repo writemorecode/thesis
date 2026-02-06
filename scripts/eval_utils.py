@@ -13,6 +13,7 @@ from simulator.schedulers import get_scheduler, normalize_scheduler_name
 
 DISPLAY_SCHEDULER_NAMES = {
     "bfd": "BFD",
+    "bfd_dynamic": "BFDDynamic",
     "ffd": "FFD",
     "ffd_l2": "FFDL2",
     "ffd_max": "FFDMax",
