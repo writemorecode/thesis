@@ -6,7 +6,8 @@ This chapter presents the evaluation datasets, metrics, and empirical results fo
 
 For each dataset, we first present a summary table of the evaluation results for each scheduler algorithm.
 We then compare the two best algorithms for the dataset, defined as the two schedulers with the lowest average total cost in the summary table.
-This comparison uses a paired two-tailed t-test on per-instance cost ratios and reports both the $p$-value and a 95% confidence interval for the mean cost ratio.
+This comparison uses a paired Wilcoxon signed-rank test on per-instance raw total_cost differences and reports the $W$ statistic, $p$-value, and summary statistics for the paired differences.
+Because the cost data are not normally distributed, we avoid $t$-tests and use this non-parametric alternative instead; see the normality investigation in the Discussion section @discussion_section.
 Next, we present a plot of the performance profiles for each of the algorithms.
 Here, $tau$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for each solver $s$.
 Finally, we present a table of the performance ratio _"win rate"_ for each algorithm.
@@ -39,34 +40,46 @@ Since the algorithm execution times are all nearly identical, we will not be com
 ]
 
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
-Using the paired raw-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
+Using the paired Wilcoxon signed-rank test on raw total_cost differences, we fail to reject the null hypothesis at $alpha=0.05$, and the average differences are small.
 
-#let ttest_balanced = csv("../evaluation/results/balanced/eval_raw_ratio_ttest_balanced.csv").slice(1)
+#let wilcoxon_balanced = csv("../evaluation/results/balanced/eval_raw_cost_wilcoxon_balanced.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 4,
-        [*Comparison*], [*Confidence interval*], [*Mean ratio*], [*$p$-value*],
-        ..ttest_balanced.flatten(),
+        columns: 7,
+        [*Comparison*],
+        [*$n$*],
+        [*Non-zero*],
+        [*Mean diff*],
+        [*Median diff*],
+        [*$W$*],
+        [*$p$-value*],
+        ..wilcoxon_balanced.flatten(),
       ),
-      caption: [Paired raw-ratio t-test summary for balanced dataset (_BFD_ vs _FFDNew_).],
+      caption: [Paired Wilcoxon signed-rank test summary for balanced dataset (_BFD_ vs _FFDNew_).],
     )
   ])
 ]
 
-The table below summarizes the one-tailed comparisons between _BFD_ and the remaining algorithms (excluding _FFDNew_).
+The table below summarizes the pairwise Wilcoxon signed-rank tests between _BFD_ and the remaining algorithms (excluding _FFDNew_).
 
-#let ttest_one_sided_balanced = csv("../evaluation/results/balanced/eval_raw_ratio_ttest_one_sided_balanced.csv").slice(1)
+#let wilcoxon_pairwise_balanced = csv("../evaluation/results/balanced/eval_raw_cost_wilcoxon_pairwise_balanced.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 4,
-        [*Comparison*], [*Upper 95% bound*], [*Mean ratio*], [*$p$-value*],
-        ..ttest_one_sided_balanced.flatten(),
+        columns: 7,
+        [*Comparison*],
+        [*$n$*],
+        [*Non-zero*],
+        [*Mean diff*],
+        [*Median diff*],
+        [*$W$*],
+        [*$p$-value*],
+        ..wilcoxon_pairwise_balanced.flatten(),
       ),
-      caption: [One-tailed raw-ratio t-tests for balanced dataset (_BFD_ vs other algorithms except _FFDNew_; H1: mean ratio < 1).],
+      caption: [Paired Wilcoxon signed-rank tests for balanced dataset (_BFD_ vs other algorithms except _FFDNew_).],
     )
   ])
 ]
@@ -121,34 +134,46 @@ The table below summarizes the one-tailed comparisons between _BFD_ and the rema
 ]
 
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
-Using the paired raw-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
+Using the paired Wilcoxon signed-rank test on raw total_cost differences, we fail to reject the null hypothesis at $alpha=0.05$, and the average differences are small.
 
-#let ttest_job_heavy = csv("../evaluation/results/job_heavy/eval_raw_ratio_ttest_job_heavy.csv").slice(1)
+#let wilcoxon_job_heavy = csv("../evaluation/results/job_heavy/eval_raw_cost_wilcoxon_job_heavy.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 4,
-        [*Comparison*], [*Confidence interval*], [*Mean ratio*], [*$p$-value*],
-        ..ttest_job_heavy.flatten(),
+        columns: 7,
+        [*Comparison*],
+        [*$n$*],
+        [*Non-zero*],
+        [*Mean diff*],
+        [*Median diff*],
+        [*$W$*],
+        [*$p$-value*],
+        ..wilcoxon_job_heavy.flatten(),
       ),
-      caption: [Paired raw-ratio t-test summary for job-heavy dataset (_BFD_ vs _FFDNew_).],
+      caption: [Paired Wilcoxon signed-rank test summary for job-heavy dataset (_BFD_ vs _FFDNew_).],
     )
   ])
 ]
 
-The table below summarizes the one-tailed comparisons between _BFD_ and the remaining algorithms (excluding _FFDNew_).
+The table below summarizes the pairwise Wilcoxon signed-rank tests between _BFD_ and the remaining algorithms (excluding _FFDNew_).
 
-#let ttest_one_sided_job_heavy = csv("../evaluation/results/job_heavy/eval_raw_ratio_ttest_one_sided_job_heavy.csv").slice(1)
+#let wilcoxon_pairwise_job_heavy = csv("../evaluation/results/job_heavy/eval_raw_cost_wilcoxon_pairwise_job_heavy.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 4,
-        [*Comparison*], [*Upper 95% bound*], [*Mean ratio*], [*$p$-value*],
-        ..ttest_one_sided_job_heavy.flatten(),
+        columns: 7,
+        [*Comparison*],
+        [*$n$*],
+        [*Non-zero*],
+        [*Mean diff*],
+        [*Median diff*],
+        [*$W$*],
+        [*$p$-value*],
+        ..wilcoxon_pairwise_job_heavy.flatten(),
       ),
-      caption: [One-tailed raw-ratio t-tests for job-heavy dataset (_BFD_ vs other algorithms except _FFDNew_; H1: mean ratio < 1).],
+      caption: [Paired Wilcoxon signed-rank tests for job-heavy dataset (_BFD_ vs other algorithms except _FFDNew_).],
     )
   ])
 ]
@@ -203,34 +228,46 @@ The table below summarizes the one-tailed comparisons between _BFD_ and the rema
 ]
 
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
-Using the paired raw-ratio t-test, we find that the two algorithms are statistically indistinguishable at $alpha=0.05$, and any average difference is very small.
+Using the paired Wilcoxon signed-rank test on raw total_cost differences, we fail to reject the null hypothesis at $alpha=0.05$, and the average differences are small.
 
-#let ttest_machine_heavy = csv("../evaluation/results/machine_heavy/eval_raw_ratio_ttest_machine_heavy.csv").slice(1)
+#let wilcoxon_machine_heavy = csv("../evaluation/results/machine_heavy/eval_raw_cost_wilcoxon_machine_heavy.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 4,
-        [*Comparison*], [*Confidence interval*], [*Mean ratio*], [*$p$-value*],
-        ..ttest_machine_heavy.flatten(),
+        columns: 7,
+        [*Comparison*],
+        [*$n$*],
+        [*Non-zero*],
+        [*Mean diff*],
+        [*Median diff*],
+        [*$W$*],
+        [*$p$-value*],
+        ..wilcoxon_machine_heavy.flatten(),
       ),
-      caption: [Paired raw-ratio t-test summary for machine-heavy dataset (_BFD_ vs _FFDNew_).],
+      caption: [Paired Wilcoxon signed-rank test summary for machine-heavy dataset (_BFD_ vs _FFDNew_).],
     )
   ])
 ]
 
-The table below summarizes the one-tailed comparisons between _BFD_ and the remaining algorithms (excluding _FFDNew_).
+The table below summarizes the pairwise Wilcoxon signed-rank tests between _BFD_ and the remaining algorithms (excluding _FFDNew_).
 
-#let ttest_one_sided_machine_heavy = csv("../evaluation/results/machine_heavy/eval_raw_ratio_ttest_one_sided_machine_heavy.csv").slice(1)
+#let wilcoxon_pairwise_machine_heavy = csv("../evaluation/results/machine_heavy/eval_raw_cost_wilcoxon_pairwise_machine_heavy.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 4,
-        [*Comparison*], [*Upper 95% bound*], [*Mean ratio*], [*$p$-value*],
-        ..ttest_one_sided_machine_heavy.flatten(),
+        columns: 7,
+        [*Comparison*],
+        [*$n$*],
+        [*Non-zero*],
+        [*Mean diff*],
+        [*Median diff*],
+        [*$W$*],
+        [*$p$-value*],
+        ..wilcoxon_pairwise_machine_heavy.flatten(),
       ),
-      caption: [One-tailed raw-ratio t-tests for machine-heavy dataset (_BFD_ vs other algorithms except _FFDNew_; H1: mean ratio < 1).],
+      caption: [Paired Wilcoxon signed-rank tests for machine-heavy dataset (_BFD_ vs other algorithms except _FFDNew_).],
     )
   ])
 ]

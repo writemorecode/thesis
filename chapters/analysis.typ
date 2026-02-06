@@ -13,25 +13,24 @@ These conclusions hold for all three datasets.
 
 We shall study the evaluation results of the _BFD_ and _FFDNew_ algorithms.
 The two algorithms have nearly identical average costs on each of the datasets.
-For all three datasets, the paired two-tailed t-tests on per-instance cost ratios reject the null hypothesis at $alpha=0.05$.
+For all three datasets, the paired Wilcoxon signed-rank tests on raw total_cost differences fail to reject the null hypothesis at $alpha=0.05$.
 This means that we can not conclude that _BFD_ outperforms _FFDNew_ on any of the datasets based on these tests alone.
 
-The one-tailed t-tests comparing _BFD_ to the remaining algorithms (excluding _FFDNew_) are all decisive.
-Across all three datasets, the mean ratios are below $1$, the one-sided $p$-values are far below $0.05$, and the 95% upper confidence bounds remain below $1$.
-Taken together, these results indicate that _BFD_ consistently yields lower solution cost than the other evaluated baselines.
+The pairwise Wilcoxon signed-rank tests comparing _BFD_ to the remaining algorithms (excluding _FFDNew_) are all decisive.
+Across all three datasets, the median differences are negative, the $p$-values are far below $0.05$, and the results are consistent with _BFD_ yielding lower solution cost than the other evaluated baselines.
 
-== Discussion
+== Discussion <discussion_section>
 
 We shall now discuss the validity of our experimental methods, and of our results.
-We begin with discussing the first two-tailed t-test, which determined if there existed some statistically significant difference in solution cost between the _BFD_ and _FFDNew_ algorithms.
-The null hypothesis for this t-test could not be rejected for any of three datasets.
-However, for these results to be valid, the data must meet certain requirements.
+We begin with discussing the paired comparison between the _BFD_ and _FFDNew_ algorithms.
+We use a Wilcoxon signed-rank test on per-instance raw total_cost differences, which does not require normality assumptions.
+Nevertheless, it is instructive to examine the distribution of cost ratios to understand why we avoid $t$-tests here.
 
 First of all, all data points must be independent.
 We meet this requirement, since all problem instances are randomly generated using a deterministic pseudo-random number generated with a fixed seed value.
 No problem instances were generated based on other problem instances as input.
 
-The second requirement is that the data must be, at least approximately, normally distributed.
+The second requirement for a $t$-test is that the data must be, at least approximately, normally distributed.
 This requirement is met by only the balanced dataset.
 Below, we present a histogram plot and a quantile-quantile (Q-Q) plot for each of the three datasets.
 For each dataset, the histogram plot is generated from the set of cost-ratio values (see @cost_ratios)
@@ -39,7 +38,7 @@ $
   r_i = c_("BFD",i) / c_("FFDNew",i),
 $
 for each problem instance $i$.
-In order for these t-tests to be valid, we must have $r_i ~ cal(N)(mu_r, sigma_r^2)$ for some distribution parameters $mu_r$ and $sigma_r$.
+In order for such $t$-tests to be valid, we must have $r_i ~ cal(N)(mu_r, sigma_r^2)$ for some distribution parameters $mu_r$ and $sigma_r$.
 Note that for all three datasets, the two algorithms perform equally well on a large number of problem instances (see also the performance profile plots in @results_section).
 This is shown in the histograms as the large spike at the cost ratio value at $1.0$.
 
@@ -173,12 +172,12 @@ The results of these tests for _BFD_ and _FFDNew_ on all three datasets are pres
 
 For the balanced dataset, we fail to reject normality for both _BFD_ and _FFDNew_ at $alpha=0.05$.
 For the job-heavy and machine-heavy datasets, the Shapiro-Wilk test rejects normality for both algorithms.
-This suggests the per-instance total-cost distributions may be non-normal in those datasets, so the $t$-test assumptions should be interpreted with caution, even though the sample size is large ($n=100$).
+This suggests the per-instance cost-ratio distributions are non-normal in those datasets, which motivates using the Wilcoxon signed-rank test instead of ratio-based $t$-tests, even though the sample size is large ($n=100$).
 
 We see here how a few outliers can affect the outcome of statistical tests.
 The outliers represent solution costs to problem instances which were either much easier or much more difficult than average.
 It may be a good idea to see if the test outcomes change if these outliers are controlled for.
 This could be done by, for example, dropping all data points further than $2$ or $3$ standard deviations from the mean.
 
-Since the sample size ($n = 100$) is greater than $30-40$, the _Central Limit Theorem_ does generally allow using t-tests on data that is not from a normal distribution.
-This would allow using t-tests for the cost ratios from the job-heavy and machine-heavy datasets, which were shown to not have a normal distribution.
+Since the sample size ($n = 100$) is greater than $30-40$, the _Central Limit Theorem_ does generally allow using $t$-tests on data that is not from a normal distribution.
+Nevertheless, we prefer the Wilcoxon signed-rank test here to avoid reliance on distributional assumptions for the paired comparisons.

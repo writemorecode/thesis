@@ -477,14 +477,17 @@ $
 
 If $r_i < 1$, then $c_(A,i) < c_(B,i)$ and $A$ is better on instance $i$ (lower cost).
 
-We test whether the algorithms differ on average using a paired two-tailed t-test on the values $r_i$:
-$cal(H_0): bb(E)[r] = 1$ and $cal(H_1): bb(E)[r] != 1$, with $alpha = 0.05$.
-From the same test, we report a 95% confidence interval $[L, U]$ for $E[r]$.
+We use the ratios $r_i$ to describe relative performance, but for statistical testing we compare paired *differences* in raw total cost:
+$
+  d_i = c_(A,i) - c_(B,i).
+$
+We test whether the algorithms differ using a paired Wilcoxon signed-rank test on the values $d_i$:
+$cal(H_0): med(d) = 0$ and $cal(H_1): med(d) != 0$, with $alpha = 0.05$.
+From this test, we report the $W$ statistic, the two-sided $p$-value, and summary statistics (mean/median difference and the number of non-zero pairs).
 
-Here, $bb(E)[r] < 1$ indicates that $A$ has lower cost than $B$ on average, and $bb(E)[r] > 1$ indicates the opposite.
+Here, $med(d) < 0$ indicates that $A$ has lower cost than $B$ on average, and $med(d) > 0$ indicates the opposite.
 
-In addition to the two-tailed comparison of the two best algorithms, we also run paired one-tailed t-tests to assess whether _BFD_ has lower cost than each remaining algorithm (excluding _FFDNew_).
-For these tests, we use $cal(H_0): bb(E)[r] = 1$ and $cal(H_1): bb(E)[r] < 1$, and report the one-sided $p$-value together with a 95% upper confidence bound for $bb(E)[r]$.
+In addition to the comparison of the two best algorithms, we also run paired Wilcoxon signed-rank tests between _BFD_ and each remaining algorithm (excluding _FFDNew_).
 
 === Dolan-Moré performance profiles
 
