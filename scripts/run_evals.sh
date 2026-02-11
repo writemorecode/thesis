@@ -2,8 +2,7 @@
 
 set -euo pipefail
 
-# SCHEDULERS="${SCHEDULERS:-ffd_l2,ffd,ffd_sum,ffd_max,ffd_prod,peak_demand,ffd_new,bfd}"
-SCHEDULERS="bfd_dynamic,bfd"
+SCHEDULERS="${SCHEDULERS:-ffd_l2,ffd,ffd_sum,ffd_max,ffd_prod,peak_demand,ffd_new,bfd}"
 SEED="${SEED:-5000}"
 EVAL_ROOT="${EVAL_ROOT:-evaluation}"
 

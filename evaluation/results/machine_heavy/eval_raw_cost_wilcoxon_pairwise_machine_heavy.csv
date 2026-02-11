@@ -1,7 +1,0 @@
-comparison,n_total,n_nonzero,mean_diff,median_diff,w_statistic,p_value
-BFD vs FFD,100,100,-1263,-1156,0,3.897e-18
-BFD vs FFDL2,100,100,-1759,-1657,0,3.897e-18
-BFD vs FFDMax,100,100,-1176,-1064,0,3.897e-18
-BFD vs FFDProd,100,100,-1047,-953.7,0,3.897e-18
-BFD vs FFDSum,100,100,-1048,-985.1,0,3.897e-18
-BFD vs PeakDemand,100,100,-3431,-3245,0,3.897e-18

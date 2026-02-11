@@ -1,9 +1,0 @@
-scheduler,wins,ties,total_instances
-BFD,27,57,100
-FFDNew,15,57,100
-FFDSum,1,0,100
-FFD,0,0,100
-FFDL2,0,0,100
-FFDMax,0,0,100
-FFDProd,0,0,100
-PeakDemand,0,0,100
