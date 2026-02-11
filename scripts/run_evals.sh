@@ -5,6 +5,7 @@ set -euo pipefail
 SCHEDULERS="${SCHEDULERS:-ffd_l2,ffd,ffd_sum,ffd_max,ffd_prod,peak_demand,ffd_new,bfd}"
 SEED="${SEED:-5000}"
 EVAL_ROOT="${EVAL_ROOT:-evaluation}"
+IMAGE_DIR="${IMAGE_DIR:-images}"
 
 evaluate_dataset() {
   local name="$1"
@@ -52,60 +53,57 @@ evaluate_dataset() {
     --algo-b "ffd_new" \
     --stats-csv "${results_dir}/eval_raw_cost_wilcoxon_${name}.csv"
 
+  echo "Running Shapiro-Wilk tests on raw costs (BFD and FFDNew)..."
+  uv run python scripts/raw_cost_shapiro.py \
+    --results-dir "${raw_dir}" \
+    --algorithm "bfd,ffd_new" \
+    --stats-csv "${results_dir}/eval_raw_cost_shapiro.csv"
+
   echo "Running paired Wilcoxon tests on raw costs (BFD vs others)..."
+  local pairwise_wilcoxon_csv="${results_dir}/eval_raw_cost_wilcoxon_pairwise_${name}.csv"
+  cat > "${pairwise_wilcoxon_csv}" <<'EOF'
+comparison,n_total,n_nonzero,mean_diff,median_diff,w_statistic,p_value
+EOF
+
   for scheduler in ${SCHEDULERS//,/ }; do
     if [[ "${scheduler}" == "bfd" || "${scheduler}" == "ffd_new" ]]; then
       continue
     fi
+    local pair_output_csv="${results_dir}/eval_raw_cost_wilcoxon_bfd_vs_${scheduler}_${name}.csv"
     uv run python scripts/raw_cost_wilcoxon.py \
       --results-dir "${raw_dir}" \
       --algo-a "bfd" \
       --algo-b "${scheduler}" \
-      --stats-csv "${results_dir}/eval_raw_cost_wilcoxon_bfd_vs_${scheduler}_${name}.csv"
+      --stats-csv "${pair_output_csv}"
+    tail -n +2 "${pair_output_csv}" >> "${pairwise_wilcoxon_csv}"
   done
 
   echo "Running performance profiles for schedulers..."
   local perf_profile_csv="${results_dir}/eval_performance_profiles_${name}.csv"
   local perf_profile_svg="${results_dir}/eval_performance_profiles_${name}.svg"
-  local perf_profile_png="${results_dir}/eval_performance_profiles_${name}.png"
-  local plot_file=""
+  local chapter_plot_svg="${IMAGE_DIR}/eval_performance_profiles_${name}.svg"
 
-  if uv run python scripts/performance_profile.py \
+  uv run python scripts/performance_profile.py \
     --results-dir "${raw_dir}" \
     --schedulers "${SCHEDULERS}" \
     --output "${perf_profile_csv}" \
     --plot-filename "${perf_profile_svg}" \
-    --verbose; then
-    if [[ -s "${perf_profile_svg}" ]]; then
-      echo "Wrote performance profile plot: ${perf_profile_svg}"
-      plot_file="${perf_profile_svg}"
-    fi
-    if [[ -z "${plot_file}" ]]; then
-      echo "SVG plot command succeeded but '${perf_profile_svg}' is missing/empty; falling back to PNG."
-    fi
-  else
-    echo "Failed to generate SVG performance profile plot; falling back to PNG."
+    --verbose
+
+  if [[ ! -s "${perf_profile_svg}" ]]; then
+    echo "Failed to generate SVG performance profile plot: ${perf_profile_svg}"
+    return 1
   fi
 
-  if [[ -z "${plot_file}" ]]; then
-    uv run python scripts/performance_profile.py \
-      --results-dir "${raw_dir}" \
-      --schedulers "${SCHEDULERS}" \
-      --output "${perf_profile_csv}" \
-      --plot-filename "${perf_profile_png}" \
-      --verbose
-
-    if [[ ! -s "${perf_profile_png}" ]]; then
-      echo "Failed to generate performance profile plot (SVG and PNG both unavailable)."
-      return 1
-    fi
-    echo "Wrote performance profile plot: ${perf_profile_png}"
-    plot_file="${perf_profile_png}"
-  fi
+  mkdir -p "${IMAGE_DIR}"
+  cp "${perf_profile_svg}" "${chapter_plot_svg}"
+  echo "Wrote performance profile plot: ${perf_profile_svg}"
+  echo "Copied performance profile plot for thesis chapter: ${chapter_plot_svg}"
 
 }
 
 mkdir -p "${EVAL_ROOT}"
+mkdir -p "${IMAGE_DIR}"
 
 # name Kmin Kmax Jmin Jmax Mmin Mmax Tmin Tmax
 DATASET_CONFIGS=(
