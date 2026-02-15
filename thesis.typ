@@ -225,7 +225,13 @@ Faculty of #faculty, Blekinge Institute of Technology, 371 79 Karlskrona, Sweden
 
 // ABSTRACT IN ENGLISH
 #front-heading("Abstract")
-#todo[Add abstract.]
+#par(first-line-indent: 0pt)[
+  Many organizations are migrating from public clouds to private cloud environments, where they must provision a fleet of machines that can support a predicted workload while keeping both capital costs and energy-related running costs low.
+  This thesis studies an offline multi-resource scheduling problem in which job demands are known for a finite planning horizon.
+  We formulate the problem as an offline variable-sized multidimensional bin-packing problem with machine purchase costs and per time-slot running costs, and we evaluate a set of heuristic scheduling algorithms.
+  Due to the lack of an existing realistic dataset for this setting, we describe how to generate random problem instances and construct three datasets with balanced, job-heavy, and machine-heavy load profiles.
+  The evaluation results show that the proposed cost-aware heuristics (_BFD_ and _FFDNew_) consistently outperform standard first-fit decreasing baselines, while their cost differences are statistically indistinguishable under paired Wilcoxon signed-rank tests.
+]
 
 #v(1cm)
 #par(first-line-indent: 0pt)[
