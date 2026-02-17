@@ -235,14 +235,20 @@ Faculty of #faculty, Blekinge Institute of Technology, 371 79 Karlskrona, Sweden
 
 #v(1cm)
 #par(first-line-indent: 0pt)[
-  *Keywords:*
+  *Keywords:* job scheduling, cloud computing, green clouds, bin-packing
 ]
 
 #cleardoublepage()
 
 // ABSTRACT IN SWEDISH
 #front-heading("Sammanfattning")
-#todo[An abstract in Swedish is only needed for "civilingenjör" theses.]
+#par(first-line-indent: 0pt)[
+Många organisationer migrerar från publika moln till privata molnmiljöer, där de måste tillhandahålla en maskinpark som kan stödja en förutspådd arbetsbelastning samtidigt som både kapitalkostnader och energirelaterade driftskostnader hålls låga.
+Denna avhandling studerar ett offline-schemaläggningsproblem med flera resurser där jobbbehov är känt för en begränsad planeringshorisont.
+Vi formulerar problemet som ett offline-problem med variabelstorlek, flerdimensionellt bin-packing, med maskininköpskostnader och driftskostnader per tidslucka, och vi utvärderar en uppsättning heuristiska schemaläggningsalgoritmer.
+På grund av avsaknaden av en befintlig realistisk datauppsättning för denna miljö beskriver vi hur man genererar slumpmässiga probleminstanser och konstruerar tre datauppsättningar med balanserade, jobbtunga och maskintunga belastningsprofiler.
+Utvärderingsresultaten visar att de föreslagna kostnadsmedvetna heuristikerna (_BFD_ och _FFDNew_) konsekvent överträffar standardmässiga minskande baslinjer med första anpassning, medan deras kostnadsskillnader är statistiskt oskiljbara under parade Wilcoxon signed-rank-tester.
+]
 
 #v(1cm)
 #par(first-line-indent: 0pt)[
