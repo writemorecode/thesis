@@ -184,7 +184,7 @@ This could be done by, for example, dropping all data points further than $2$ or
 Since the sample size ($n = 100$) is greater than $30-40$, the _Central Limit Theorem_ does generally allow using $t$-tests on data that is not from a normal distribution.
 Nevertheless, we prefer the Wilcoxon signed-rank test here to avoid reliance on distributional assumptions for the paired comparisons.
 
-=== Threats to internal validity
+== Threats to internal validity
 
 It is possible that the random problem instance generation algorithms are generating problem instances which systematically favor the _BFD_ and _FFDNew_ packing algorithms to other algorithms which performed poorer.
 This is a reasonable concern, since the problem instances are designed to have job and machine types with some above average resource demands and capacities, respectively.
@@ -211,4 +211,16 @@ In order to mitigate this threat, we review the code for new algorithms before t
 Further, each time a packing algorithm produces a solution for a problem instance, the solution is validated.
 This validation step ensures that, for each time slot, the total resource demand for any machine instance does not exceed its resource capacity.
 
-=== Threats to external validity
+== Threats to external validity
+
+It is likely that the problem instances generated and used to evaluate our algorithms do not accurately represent the workloads seen in real-world cloud computing environments.
+These workloads may have a different structure, including bursts, seasonality, and correlations.
+
+Our chosen simple cost model of a purchase cost and a running cost may be an invalid model of how real cloud providers charge for their services.
+Our model assumes fixed running costs per machine types, and fixed purchase costs per machine type regardless of how many machines are purchased.
+A more complex model may also want to model hardware depreciation, which can be an important factor for GPUs.
+
+Our algorithms do not model operational constraints, such as machine startup delays, maintenance windows, etc.
+
+Our results hold for the case of private clouds, in which a full hardware fleet is purchased and used for a longer time period.
+These results may not hold for public and/or hybrid clouds, which may have different constraints and cost models.

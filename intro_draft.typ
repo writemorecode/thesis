@@ -1,4 +1,4 @@
-= Introduction <chp-introduction-codex-draft>
+= Introduction <chp-introduction-draft>
 
 == Background and motivation
 
@@ -22,7 +22,7 @@ This creates a planning problem that is not only about placing jobs on an alread
 Energy consumption in cloud environments is strongly influenced by how work is distributed across machines over time.
 If jobs are spread thinly across many physical machines, then a large fraction of the fleet must remain powered on, which increases the running cost.
 Conversely, if jobs can be consolidated onto fewer machines without violating resource constraints, then the remaining machines can be powered down during low-demand periods.
-Server consolidation and VM placement have therefore been studied as central mechanisms for reducing data center energy use @speitkamp_bichler_2010; @beloglazov_energy-aware_2012.
+Server consolidation and VM placement have therefore been studied as central mechanisms for reducing data center energy use @speitkamp_bichler_2010 @beloglazov_energy-aware_2012.
 
 The central challenge is that real workloads are multi-resource.
 A job may be CPU-intensive, memory-intensive, I/O-bound, or have combinations of these properties.

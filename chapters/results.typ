@@ -8,6 +8,7 @@ For each dataset, we first present a summary table of the evaluation results for
 We then compare the two best algorithms for the dataset, defined as the two schedulers with the lowest average total cost in the summary table.
 This comparison uses a paired Wilcoxon signed-rank test on per-instance raw total_cost differences and reports the $W$ statistic, $p$-value, and summary statistics for the paired differences.
 Because the cost data are not normally distributed, we avoid $t$-tests and use this non-parametric alternative instead; see the normality investigation in the Discussion section @discussion_section.
+However, given the larger sample size of $N=100$ for each dataset, $t$-tests would be a valid choice in this case.
 Next, we present a plot of the performance profiles for each of the algorithms.
 Here, $tau$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for each solver $s$.
 Finally, we present a table of the performance ratio _"win rate"_ for each algorithm.
@@ -64,7 +65,9 @@ Using the paired Wilcoxon signed-rank test on raw total_cost differences, we fai
 
 The table below summarizes the pairwise Wilcoxon signed-rank tests between _BFD_ and the remaining algorithms (excluding _FFDNew_).
 
-#let wilcoxon_pairwise_balanced = csv("../evaluation/results/balanced/eval_raw_cost_wilcoxon_pairwise_balanced.csv").slice(1)
+#let wilcoxon_pairwise_balanced = csv(
+  "../evaluation/results/balanced/eval_raw_cost_wilcoxon_pairwise_balanced.csv",
+).slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -158,7 +161,9 @@ Using the paired Wilcoxon signed-rank test on raw total_cost differences, we fai
 
 The table below summarizes the pairwise Wilcoxon signed-rank tests between _BFD_ and the remaining algorithms (excluding _FFDNew_).
 
-#let wilcoxon_pairwise_job_heavy = csv("../evaluation/results/job_heavy/eval_raw_cost_wilcoxon_pairwise_job_heavy.csv").slice(1)
+#let wilcoxon_pairwise_job_heavy = csv(
+  "../evaluation/results/job_heavy/eval_raw_cost_wilcoxon_pairwise_job_heavy.csv",
+).slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -230,7 +235,9 @@ The table below summarizes the pairwise Wilcoxon signed-rank tests between _BFD_
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
 Using the paired Wilcoxon signed-rank test on raw total_cost differences, we fail to reject the null hypothesis at $alpha=0.05$, and the average differences are small.
 
-#let wilcoxon_machine_heavy = csv("../evaluation/results/machine_heavy/eval_raw_cost_wilcoxon_machine_heavy.csv").slice(1)
+#let wilcoxon_machine_heavy = csv("../evaluation/results/machine_heavy/eval_raw_cost_wilcoxon_machine_heavy.csv").slice(
+  1,
+)
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -252,7 +259,9 @@ Using the paired Wilcoxon signed-rank test on raw total_cost differences, we fai
 
 The table below summarizes the pairwise Wilcoxon signed-rank tests between _BFD_ and the remaining algorithms (excluding _FFDNew_).
 
-#let wilcoxon_pairwise_machine_heavy = csv("../evaluation/results/machine_heavy/eval_raw_cost_wilcoxon_pairwise_machine_heavy.csv").slice(1)
+#let wilcoxon_pairwise_machine_heavy = csv(
+  "../evaluation/results/machine_heavy/eval_raw_cost_wilcoxon_pairwise_machine_heavy.csv",
+).slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
