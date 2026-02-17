@@ -259,7 +259,8 @@ Utvärderingsresultaten visar att de föreslagna kostnadsmedvetna heuristikerna 
 
 // ACKNOWLEDGEMENTS
 #front-heading("Acknowledgments")
-#todo[Add acknowledgments.]
+// #todo[Add acknowledgments.]
+//To my parents.
 
 #cleardoublepage()
 

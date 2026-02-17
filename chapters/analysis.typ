@@ -21,6 +21,8 @@ Across all three datasets, the median differences are negative, the $p$-values a
 
 == Discussion <discussion_section>
 
+== Data normality
+
 We shall now discuss the validity of our experimental methods, and of our results.
 We begin with discussing the paired comparison between the _BFD_ and _FFDNew_ algorithms.
 We use a Wilcoxon signed-rank test on per-instance raw total_cost differences, which does not require normality assumptions.
@@ -181,3 +183,32 @@ This could be done by, for example, dropping all data points further than $2$ or
 
 Since the sample size ($n = 100$) is greater than $30-40$, the _Central Limit Theorem_ does generally allow using $t$-tests on data that is not from a normal distribution.
 Nevertheless, we prefer the Wilcoxon signed-rank test here to avoid reliance on distributional assumptions for the paired comparisons.
+
+=== Threats to internal validity
+
+It is possible that the random problem instance generation algorithms are generating problem instances which systematically favor the _BFD_ and _FFDNew_ packing algorithms to other algorithms which performed poorer.
+This is a reasonable concern, since the problem instances are designed to have job and machine types with some above average resource demands and capacities, respectively.
+The question is if the packing algorithms were designed with the problem instances in mind, or vice versa.
+The former would be valid, while the latter would not.
+
+We have generated each problem instance of each dataset using a single fixed seed value.
+This makes the results reproducible, but it is possible that using a different seed would yield different results.
+However, the conclusion we have drawn from our results are consistent across all three datasets.
+Each dataset consists of $100$ problem instances.
+Therefore, we do not believe this to be a serious threat to validity.
+
+A more likely threat is that there are bugs in the scripts used for algorithm evaluation, data analysis, chart rendering, etc.
+This is an error-prone process consisting of multiple steps.
+First, each algorithm must be evaluated on each of the three datasets.
+The solution data of each algorithm for each problem instance of each dataset must be recorded.
+We use this data to compute statistical tests, and performance profiles.
+Next, from this raw data we generate per-dataset summary data for each algorithm.
+In order to improve reproducibility of our results, we have automated this full process with another script.
+The source code for the simulator and the utility scripts can be found on GitHub @python_simulator_repo_github @python_thesis_repo_github.
+
+It is possible that one or more of the evaluated packing algorithms were implemented incorrectly.
+In order to mitigate this threat, we review the code for new algorithms before they are evaluated.
+Further, each time a packing algorithm produces a solution for a problem instance, the solution is validated.
+This validation step ensures that, for each time slot, the total resource demand for any machine instance does not exceed its resource capacity.
+
+=== Threats to external validity
