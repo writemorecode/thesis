@@ -297,6 +297,7 @@ Faculty of #faculty, Blekinge Institute of Technology, 371 79 Karlskrona, Sweden
 #include "chapters/results.typ"
 #include "chapters/analysis.typ"
 #include "chapters/conclusion.typ"
+#include "chapters/appendix.typ"
 
 // Bibliography
 #cleardoublepage()
