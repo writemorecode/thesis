@@ -6,20 +6,7 @@
 
 = Method <method_section>
 
-This chapter summarizes the research questions, the literature review scope, and the scheduling algorithms that are evaluated.
-
-== Literature review
-
-Since the literature on the bin-packing problem is so vast, we needed to reduce the number of search results by using a more precise search query.
-We also decided to further reduce the number of search results by filtering out those articles which only applied existing bin-packing methods to problems, without presenting any new methods.
-
-We used the Scopus search engine, with the search query $sans("( 'variable-sized' OR 'heterogeneous' ) ( 'vector' OR 'multidimensional' ) 'bin-packing'")$.
-Article results were filtered to only return English language published journal and/or conference articles, excluding other kinds of articles such conference reviews and etc.
-This search returned a total of $22$ results.
-We filtered out $1$ duplicate article, and $7$ irrelevant articles.
-We were forced to remove $1$ article due to not being able to access the article with institutional access.
-After filtering, we had a total of $13$ articles.
-From other articles cited by this set of articles, we found another $2$ articles.
+This chapter summarizes our research questions and the scheduling algorithms that are evaluated.
 
 == Research questions
 
