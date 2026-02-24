@@ -50,12 +50,15 @@ Offline job scheduling in a private cloud can be modeled as a bin-packing proble
 Each job has a resource demand vector (e.g. CPU, memory, disk, I/O), and each machine type has a corresponding capacity vector.
 Placing a job on a machine corresponds to packing an item into a bin, and the feasibility constraint is that the sum of packed job demands must not exceed the machine capacity in any resource dimension.
 Since jobs typically require multiple resources simultaneously, this naturally leads to a *multidimensional* bin-packing formulation @book_computers_intractability.
+There is here an implicit connection between the resource demands of a job, and the resource capacities of a machine.
 
 The private-cloud setting further motivates two important generalizations.
 First, the fleet is heterogeneous: there are multiple machine types, so bins have varying capacities.
 Second, there are explicit economic costs: buying a machine incurs a purchase cost, and powering on a machine incurs a running cost per time slot.
 This links the scheduling problem to *variable-sized* and *cost-aware* multidimensional bin-packing, where bin selection is part of the optimization objective rather than a fixed input @MOMMESSIN2025106860.
 Because bin-packing is NP-hard, practical approaches typically rely on approximation algorithms and heuristics, and the design space involves balancing solution quality against execution time.
+Here, we are making the assumption that all jobs are rescheduled between each time slot.
+This means that no job will remain on a machine for longer than a single time slot.
 
 == Problem statement and approach
 
