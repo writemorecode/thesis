@@ -226,10 +226,10 @@ Faculty of #faculty, Blekinge Institute of Technology, 371 79 Karlskrona, Sweden
 // ABSTRACT IN ENGLISH
 #front-heading("Abstract")
 #par(first-line-indent: 0pt)[
-  Many organizations are migrating from public clouds to private cloud environments, where they must provision a fleet of machines that can support a predicted workload while keeping both capital costs and energy-related running costs low.
+  Many organizations are migrating from public clouds to private cloud environments, where they must provision a fleet of machines that can support a reasonably predictable workload while keeping both capital costs and energy-related running costs low.
   This thesis studies an offline multi-resource scheduling problem in which job demands are known for a finite planning horizon.
   We formulate the problem as an offline variable-sized multidimensional bin-packing problem with machine purchase costs and per time-slot running costs, and we evaluate a set of heuristic scheduling algorithms.
-  Due to the lack of an existing realistic dataset for this setting, we describe how to generate random problem instances and construct three datasets with balanced, job-heavy, and machine-heavy load profiles.
+  We describe how to generate random problem instances and construct three datasets with balanced, job-heavy, and machine-heavy load profiles.
   The evaluation results show that the proposed cost-aware heuristics (_BFD_ and _FFDNew_) consistently outperform standard first-fit decreasing baselines, while their cost differences are statistically indistinguishable under paired Wilcoxon signed-rank tests.
 ]
 
@@ -246,7 +246,7 @@ Faculty of #faculty, Blekinge Institute of Technology, 371 79 Karlskrona, Sweden
   Många organisationer migrerar från publika moln till privata molnmiljöer, där de måste tillhandahålla en maskinpark som kan stödja en förutspådd arbetsbelastning samtidigt som både kapitalkostnader och energirelaterade driftskostnader hålls låga.
   Denna avhandling studerar ett offline-schemaläggningsproblem med flera resurser där jobbbehov är känt för en begränsad planeringshorisont.
   Vi formulerar problemet som ett offline-problem med variabelstorlek, flerdimensionellt bin-packing, med maskininköpskostnader och driftskostnader per tidslucka, och vi utvärderar en uppsättning heuristiska schemaläggningsalgoritmer.
-  På grund av avsaknaden av en befintlig realistisk datauppsättning för denna miljö beskriver vi hur man genererar slumpmässiga probleminstanser och konstruerar tre datauppsättningar med balanserade, jobbtunga och maskintunga belastningsprofiler.
+  Vi beskriver hur vi genererar slumpmässiga probleminstanser och konstruerar tre datauppsättningar med balanserade, jobbtunga och maskintunga belastningsprofiler.
   Utvärderingsresultaten visar att de föreslagna kostnadsmedvetna heuristikerna (_BFD_ och _FFDNew_) konsekvent överträffar standardmässiga minskande baslinjer med första anpassning, medan deras kostnadsskillnader är statistiskt oskiljbara under parade Wilcoxon signed-rank-tester.
 ]
 
