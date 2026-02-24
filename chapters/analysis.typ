@@ -21,7 +21,7 @@ Across all three datasets, the median differences are negative, the $p$-values a
 
 == Discussion <discussion_section>
 
-== Threats to internal validity
+=== Threats to internal validity
 
 It is possible that the random problem instance generation algorithms are generating problem instances which systematically favor the _BFD_ and _FFDNew_ packing algorithms to other algorithms which performed poorer.
 This is a reasonable concern, since the problem instances are designed to have job and machine types with some above average resource demands and capacities, respectively.
