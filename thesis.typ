@@ -288,10 +288,7 @@ Faculty of #faculty, Blekinge Institute of Technology, 371 79 Karlskrona, Sweden
 #let chapter-figure-numbering(number) = numbering("1.1", counter(heading).get().first(), number)
 #set figure(numbering: chapter-figure-numbering)
 
-//#include "chapters/introduction.typ"
-
-#include "intro_draft.typ"
-
+#include "chapters/introduction.typ"
 #include "chapters/theory.typ"
 #include "chapters/problem_description.typ"
 #include "chapters/related_work.typ"
