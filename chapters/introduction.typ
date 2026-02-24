@@ -10,7 +10,7 @@ As a consequence, energy efficiency in compute infrastructure is both an environ
 This trend is closely connected to the growth of cloud computing over the last decade.
 Organizations have moved from maintaining bespoke on-premise clusters to consuming elastic compute resources as services.
 A large research body on resource management in cloud data centers has emerged alongside this shift, with particular emphasis on virtualization, consolidation, and VM placement strategies @mann_allocation_2015.
-Energy-aware resource allocation and consolidation heuristics are often motivated by the observation that there is significant potential to reduce energy use by improving utilization of physical machines, thereby allowing unused capacity to be powered down or avoided altogether @beloglazov_energy-aware_2012.
+Energy-aware resource allocation and consolidation heuristics are often motivated by the observation that there is significant potential to reduce energy use and costs by improving utilization of physical machines, thereby allowing unused capacity to be powered down or avoided altogether @beloglazov_energy-aware_2012.
 
 While public cloud platforms provide economies of scale and operational convenience, not all workloads are suitable to outsource.
 Regulatory requirements, privacy concerns, and risk considerations can motivate organizations to operate private clouds, where the machine fleet is owned and controlled by the organization.
@@ -24,7 +24,7 @@ If jobs are spread thinly across many physical machines, then a large fraction o
 Conversely, if jobs can be consolidated onto fewer machines without violating resource constraints, then the remaining machines can be powered down during low-demand periods.
 Server consolidation and VM placement have therefore been studied as central mechanisms for reducing data center energy use @speitkamp_bichler_2010 @beloglazov_energy-aware_2012.
 
-The central challenge is that real workloads are multi-resource.
+A central challenge is that real workloads are multi-resource.
 A job may be CPU-intensive, memory-intensive, I/O-bound, or have combinations of these properties.
 This makes naïve one-dimensional utilization metrics misleading and motivates multidimensional scheduling models and heuristics.
 Moreover, private clouds are often heterogeneous: there are multiple machine types with different capacities and cost profiles, and the choice of which types to purchase has long-term impact on both achievable consolidation and total cost.
@@ -50,7 +50,7 @@ Offline job scheduling in a private cloud can be modeled as a bin-packing proble
 Each job has a resource demand vector (e.g. CPU, memory, disk, I/O), and each machine type has a corresponding capacity vector.
 Placing a job on a machine corresponds to packing an item into a bin, and the feasibility constraint is that the sum of packed job demands must not exceed the machine capacity in any resource dimension.
 Since jobs typically require multiple resources simultaneously, this naturally leads to a *multidimensional* bin-packing formulation @book_computers_intractability.
-There is here an implicit connection between the resource demands of a job, and the resource capacities of a machine.
+Consequently there is a connection between the resource demands of a job, and the resource capacities of a machine.
 
 The private-cloud setting further motivates two important generalizations.
 First, the fleet is heterogeneous: there are multiple machine types, so bins have varying capacities.
@@ -58,13 +58,13 @@ Second, there are explicit economic costs: buying a machine incurs a purchase co
 This links the scheduling problem to *variable-sized* and *cost-aware* multidimensional bin-packing, where bin selection is part of the optimization objective rather than a fixed input @MOMMESSIN2025106860.
 Because bin-packing is NP-hard, practical approaches typically rely on approximation algorithms and heuristics, and the design space involves balancing solution quality against execution time.
 Here, we are making the assumption that all jobs are rescheduled between each time slot.
-This means that no job will remain on a machine for longer than a single time slot.
+This means that a job is not required to remain on a machine for longer than a single time slot.
 
 == Problem statement and approach
 
 In this thesis, we study how to design an energy-efficient scheduler for offline workloads in private clouds.
 We model the problem as an offline job scheduling problem, and approach it as a variable-sized multidimensional bin-packing problem with bin selection and opening costs.
-Due to the lack of an existing realistic dataset for this exact planning problem, we describe how to generate randomized problem instances and datasets.
+We describe how to generate randomized problem instances and datasets.
 Finally, we evaluate multiple scheduling algorithms and discuss their strengths and weaknesses.
 
 == Outline
@@ -75,5 +75,6 @@ In @problem_description_section, we formalize the offline job scheduling problem
 In @method_section, we describe the evaluated scheduling algorithms.
 In @exp_method_section, we describe the experimental methodology and dataset generation.
 In @results_section, we present the evaluation results.
-Finally, in @analysis_section, we analyze and discuss the results.
+In @analysis_section, we analyze and discuss the results.
+Finally, @discussion_section contains our conclusions, a discussion of threats to validity, and our plans for future work.
 
