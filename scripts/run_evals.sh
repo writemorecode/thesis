@@ -107,9 +107,9 @@ mkdir -p "${IMAGE_DIR}"
 
 # name Kmin Kmax Jmin Jmax Mmin Mmax Tmin Tmax
 DATASET_CONFIGS=(
-  "balanced     4 4 12 16 12 16 100 200"
-  "job_heavy    4 4 16 24  8 12 100 200"
-  "machine_heavy 4 4  8 12 16 24 100 200"
+  "balanced         4 4 6 8 6 8 100 200"
+  "job_heavy        4 4 12 16 6 8 100 200"
+  "machine_heavy    4 4 6 8 12 16 100 200"
 )
 
 while read -r name kmin kmax jmin jmax mmin mmax tmin tmax; do

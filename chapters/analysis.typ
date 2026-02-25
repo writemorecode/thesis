@@ -20,17 +20,16 @@ The pairwise Wilcoxon signed-rank tests comparing _BFD_ to the remaining algorit
 Across all three datasets, the median differences are negative, the $p$-values are far below $0.05$, and the results are consistent with _BFD_ yielding lower solution cost than the other evaluated baselines.
 
 We also observe a dataset-level shift in absolute cost scale.
-Using the per-dataset summary tables, the mean of the per-scheduler average costs is lowest for _Machine-heavy_ ($8102.49$), then _Balanced_ ($8136.79$), and highest for _Job-heavy_ ($8311.13$).
-This is consistent with the dataset definitions used in the evaluation script: _Machine-heavy_ has fewer job types and more machine types ($J \in [8, 12], M \in [16, 24]$), while _Job-heavy_ has more job types and fewer machine types ($J \in [16, 24], M \in [8, 12]$).
+This is consistent with the dataset definitions: _Machine-heavy_ has more machine types ($J in [6, 8], M in [12, 16]$), while _Job-heavy_ has more job types and fewer machine types ($J in [12, 16], M in [6, 8]$).
 More available machine types can increase packing flexibility and reduce unused capacity, while a larger and more heterogeneous job-type set can increase matching difficulty and cost.
-
-At the same time, this ordering should be interpreted as a tendency rather than a strict rule.
-For the top algorithms (_BFD_, _FFDNew_), and also _PeakDemand_, we observe _Machine-heavy_ $<$ _Balanced_ $<$ _Job-heavy_.
-For several weaker FFD variants, however, _Machine-heavy_ is slightly more expensive than _Balanced_.
-Therefore, it is not sufficient to compare only per-scheduler averages when making stronger validity claims.
-With $N=100$ instances per dataset, a more rigorous cross-dataset comparison should use per-instance costs with effect sizes and confidence intervals, and optionally non-parametric hypothesis tests across datasets.
+Using paired one-tailed cross-dataset t-tests for the _BFD_ algorithm on per-instance raw total costs, we find mixed support for our hypotheses.
+For _Machine-heavy_ $<$ _Balanced_, the test rejects the null hypothesis at $alpha=0.05$ ($t=-2.279$, $p=0.01242$), with mean costs of $6983$ vs $8134$ and mean paired difference $-1151$.
+This supports the claim that the machine-heavy dataset yields lower _BFD_ cost.
+For _Job-heavy_ $>$ _Balanced_, the test does not reject the null hypothesis ($t=0.5712$, $p=0.2846$), even though the observed means are $8438$ vs $8134$ and the mean paired difference is $303.4$.
+Thus, with the current data, the first directional hypothesis is supported, while the second remains inconclusive.
 
 == Discussion <discussion_section>
+
 
 === Threats to internal validity
 
