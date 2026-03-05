@@ -4,7 +4,7 @@
 
 We shall now discuss the validity of our experimental methods, and of our results.
 We begin with discussing the paired comparison between the _BFD_ and _FFDNew_ algorithms.
-We use a Wilcoxon signed-rank test on per-instance raw total_cost differences, which does not require normality assumptions.
+We use a Wilcoxon signed-rank test on per-instance raw total cost differences, which does not require normality assumptions.
 Nevertheless, it is instructive to examine the distribution of cost ratios to understand why we avoid $t$-tests here.
 
 First of all, all data points must be independent.
