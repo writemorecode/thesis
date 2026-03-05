@@ -21,7 +21,6 @@ RQ2: How can we create a cloud job scheduler which is optimized for both schedul
 
 Here, we shall describe a number of different variations of the first-fit decreasing algorithm, each using a different heuristic.
 Many of these heuristics were first presented by in 2017 by Panigrahy et al. @Panigrahy2011HeuristicsFV.
-Some of these heuristics are also discussed in @size_measures.
 
 All of the algorithms described in this section always select the cheapest feasible bin when opening a new bin.
 The algorithms do differ in how they sort the item types before they are packed.
