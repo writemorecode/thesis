@@ -19,22 +19,23 @@ This means that we can not conclude that _BFD_ outperforms _FFDNew_ on any of th
 The pairwise Wilcoxon signed-rank tests comparing _BFD_ to the remaining algorithms (excluding _FFDNew_) are all decisive.
 Across all three datasets, the median differences are negative, the $p$-values are far below $0.05$, and the results are consistent with _BFD_ yielding lower solution cost than the other evaluated baselines.
 
-To study machine-count behavior without reporting all pairwise comparisons, we test _BFD_ against _FFDMax_ on per-instance raw total machine count values for each dataset.
-All three paired Wilcoxon signed-rank tests reject the null hypothesis at $alpha=0.05$.
-For _Balanced_, the mean and median differences are $7.33$ and $7$ machines (_BFD - FFDMax_), with $W=118.5$ and $p=1.837 dot 10^-16$.
-For _Job-heavy_, the mean and median differences are $8.87$ and $9$, with $W=6$ and $p=6.389 dot 10^-18$.
-For _Machine-heavy_, the mean and median differences are $5.67$ and $7$, with $W=438$ and $p=4.76 dot 10^-12$.
-These results indicate that _BFD_ consistently activates more machines than _FFDMax_, even while achieving lower total solution cost.
+There are notable relationships between the total machine count and the solution cost for different algorithms.
+We find that the two algorithms with the lowest solution costs, _BFD_ and _FFDNew_, have the highest total machine count.
+We have run paired Wilcoxon signed-rank tests ($alpha=0.05$) between the total machine counts for the _BFD_ and _FFDMax_ algorithms.
+The null hypothesis was rejected for all three datasets.
+For the _Balanced_ dataset, the mean and median differences are $7.33$ and $7$ machines (_BFD_ - _FFDMax_), and $p=1.837 dot 10^(-16)$.
+For the _Job-heavy_ dataset, the mean and median differences are $8.87$ and $9$, with and $p=6.389 dot 10^(-18)$.
+For the _Machine-heavy_ dataset, the mean and median differences are $5.67$ and $7$, with and $p=4.76 dot 10^(-12)$.
+These results indicate that the _BFD_ algorithm consistently activates more machines than the _FFDMax_ algorithm, even while achieving lower total solution cost.
 This supports the interpretation that lower cost in our setting does not imply fewer active machines, but instead a more cost-efficient allocation across machine types over time.
 
 We also observe a dataset-level shift in absolute cost scale.
-This is consistent with the dataset definitions: _Machine-heavy_ has more machine types ($J in [6, 8], M in [12, 16]$), while _Job-heavy_ has more job types and fewer machine types ($J in [12, 16], M in [6, 8]$).
-More available machine types can increase packing flexibility and reduce unused capacity, while a larger and more heterogeneous job-type set can increase matching difficulty and cost.
-Using paired one-tailed cross-dataset t-tests for the _BFD_ algorithm on per-instance raw total costs, we find mixed support for our hypotheses.
+This is consistent with the dataset definitions: _Machine-heavy_ has more machine types ($J in [6, 8], M in [12, 16]$).
+More available machine types can, but is not guaranteed to, increase packing flexibility and reduce unused capacity.
+Using paired one-tailed cross-dataset $t$-tests for the _BFD_ algorithm on per-instance raw total costs, we find mixed support for our hypothesis.
 For _Machine-heavy_ $<$ _Balanced_, the test rejects the null hypothesis at $alpha=0.05$ ($t=-2.279$, $p=0.01242$), with mean costs of $6983$ vs $8134$ and mean paired difference $-1151$.
 This supports the claim that the machine-heavy dataset yields lower _BFD_ cost.
-For _Job-heavy_ $>$ _Balanced_, the test does not reject the null hypothesis ($t=0.5712$, $p=0.2846$), even though the observed means are $8438$ vs $8134$ and the mean paired difference is $303.4$.
-Thus, with the current data, the first directional hypothesis is supported, while the second remains inconclusive.
+Thus, with the current data, our directional hypothesis is supported.
 
 == Discussion <discussion_section>
 
