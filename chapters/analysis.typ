@@ -13,11 +13,19 @@ These conclusions hold for all three datasets.
 
 We shall study the evaluation results of the _BFD_ and _FFDNew_ algorithms.
 The two algorithms have nearly identical average costs on each of the datasets.
-For all three datasets, the paired Wilcoxon signed-rank tests on raw total_cost differences fail to reject the null hypothesis at $alpha=0.05$.
+For all three datasets, the paired Wilcoxon signed-rank tests on raw total cost differences fail to reject the null hypothesis at $alpha=0.05$.
 This means that we can not conclude that _BFD_ outperforms _FFDNew_ on any of the datasets based on these tests alone.
 
 The pairwise Wilcoxon signed-rank tests comparing _BFD_ to the remaining algorithms (excluding _FFDNew_) are all decisive.
 Across all three datasets, the median differences are negative, the $p$-values are far below $0.05$, and the results are consistent with _BFD_ yielding lower solution cost than the other evaluated baselines.
+
+To study machine-count behavior without reporting all pairwise comparisons, we test _BFD_ against _FFDMax_ on per-instance raw total machine count values for each dataset.
+All three paired Wilcoxon signed-rank tests reject the null hypothesis at $alpha=0.05$.
+For _Balanced_, the mean and median differences are $7.33$ and $7$ machines (_BFD - FFDMax_), with $W=118.5$ and $p=1.837 dot 10^-16$.
+For _Job-heavy_, the mean and median differences are $8.87$ and $9$, with $W=6$ and $p=6.389 dot 10^-18$.
+For _Machine-heavy_, the mean and median differences are $5.67$ and $7$, with $W=438$ and $p=4.76 dot 10^-12$.
+These results indicate that _BFD_ consistently activates more machines than _FFDMax_, even while achieving lower total solution cost.
+This supports the interpretation that lower cost in our setting does not imply fewer active machines, but instead a more cost-efficient allocation across machine types over time.
 
 We also observe a dataset-level shift in absolute cost scale.
 This is consistent with the dataset definitions: _Machine-heavy_ has more machine types ($J in [6, 8], M in [12, 16]$), while _Job-heavy_ has more job types and fewer machine types ($J in [12, 16], M in [6, 8]$).
