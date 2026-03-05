@@ -45,6 +45,11 @@ Here, the two algorithms are tied on only $43%$ of problem instances.
 
 == Discussion <discussion_section>
 
+=== Introduction to validity
+
+The concept of validity is typically separated into internal and external validity.
+The internal validity of a study is concerned with whether the study's results can actually be used to provide an explanation of its research question, or if there exists some alternative explanation of the results @book_research_methodology_safsten_gustavsson.
+The external validity of a study is concerned with what can be stated regarding the scope and transferability, or generalizability of the results @book_research_methodology_safsten_gustavsson.
 
 === Threats to internal validity
 
