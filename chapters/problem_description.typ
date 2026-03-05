@@ -19,6 +19,8 @@ The customer workloads will run for a total of $T$ equally-sized time slots.
 For the sake of simplicity, time slots will have unit duration.
 Each job must run during its given time slot, and cannot be scheduled for some other future time slot.
 For each time slot $t$, the vector $bold(l)_t in ZZnonneg^J$ gives the number of each job type which must run during the slot.
+The $bold(l)_t$ values should be assumed to be a prediction of future workload demand.
+However, for the sake of simplicity, we shall consider these values to be deterministic.
 We collect these job time slot vectors as column vectors in a $(J , T)$ load profile matrix $bold(L)$.
 
 $

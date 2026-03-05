@@ -1,4 +1,21 @@
-= Conclusions and Future Work <chp-conclusions>
+= Conclusion
+
+== Future Work
+In this report, we have studied an offline job scheduling problem where the given load profile data $bold(L)$ is deterministic.
+In the problem description (@problem_description_section), we make the assumption that $bold(L)$ comes from a prediction.
+However, we also treat these predicted values as deterministic data.
+A future study could remove this unrealistic assumption, and study the problem of efficient job-scheduling in private clouds with future workload demand uncertainty.
+For this problem, higher solution costs would yield a higher probability of having sufficient available resource capacity, and vice versa.
+This presents interesting trade-offs.
+
+We have not presented or evaluated any global search algorithms in this report.
+We have only studied simpler local search algorithms.
+A future study could apply more advanced search methods such as simulated annealing, tabu search, or more modern methods such as variable neighborhood search @hansen_variable_2010.
+
+== Conclusion <chp-conclusions>
 
 In this report, we have studied a job scheduling problem, presenting and evaluating a number of algorithms for solving it.
 Evaluating these algorithms, we found that simpler algorithms can greatly outperform more complex algorithms.
+For our first research question (RQ1), we have found that we can construct efficient scheduling algorithms by adapting traditional packing heuristics such as _FFD_ and _BFD_.
+Regarding our second research question (RQ2), we have not noted any significant differences in the execution times of our evaluated scheduling algorithms.
+This suggests that a trade-off between solution quality and execution time is not required for the algorithms we have evaluated and presented.
