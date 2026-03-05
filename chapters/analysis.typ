@@ -37,6 +37,12 @@ For _Machine-heavy_ $<$ _Balanced_, the test rejects the null hypothesis at $alp
 This supports the claim that the machine-heavy dataset yields lower _BFD_ cost.
 Thus, with the current data, our directional hypothesis is supported.
 
+We note that the Dolan-Moré performance profiles are generally consistent across all datasets.
+The _BFD_ and _FFDNew_ algorithms are dominant over all other algorithms.
+These two algorithms are tied on between $80%$ and $86$ of problem instances, for the _Balanced_ and _Machine-heavy_ datasets.
+For the _Job-heavy_ dataset, there are some notable differences.
+Here, the two algorithms are tied on only $43%$ of problem instances.
+
 == Discussion <discussion_section>
 
 
