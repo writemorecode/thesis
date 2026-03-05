@@ -144,7 +144,7 @@
 )
 
 #v(7.5cm)
-#align(center)[#text(size: 24pt, weight: "bold")[#thesis-title]]
+#align(center)[#text(size: 24pt, weight: "bold", hyphenate: false)[#thesis-title]]
 #if thesis-subtitle != "" [
   #v(0.5cm)
   #align(center)[#text(size: 16pt, weight: "bold")[#thesis-subtitle]]
