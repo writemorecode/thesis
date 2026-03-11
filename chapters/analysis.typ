@@ -30,9 +30,9 @@ These results indicate that the _BFD_ algorithm consistently activates more mach
 This supports the interpretation that lower cost in our setting does not imply fewer active machines, but instead a more cost-efficient allocation across machine types over time.
 
 We also observe a dataset-level shift in absolute cost scale.
-This is consistent with the dataset definitions: _Machine-heavy_ has more machine types ($J in [6, 8], M in [12, 16]$).
-More available machine types can, but is not guaranteed to, increase packing flexibility and reduce unused capacity.
-Using paired one-tailed cross-dataset $t$-tests for the _BFD_ algorithm on per-instance raw total costs, we find mixed support for our hypothesis.
+This is consistent with the dataset definitions: the _Machine-heavy_ dataset has twice as many machine types as the other two datasets.
+A greater number of available machine types can, but is not guaranteed to, increase packing flexibility and reduce unused capacity.
+Using paired one-tailed cross-dataset $t$-tests for the _BFD_ algorithm on per-instance raw total costs, we find support for our hypothesis.
 For _Machine-heavy_ $<$ _Balanced_, the test rejects the null hypothesis at $alpha=0.05$ ($t=-2.279$, $p=0.01242$), with mean costs of $6983$ vs $8134$ and mean paired difference $-1151$.
 This supports the claim that the machine-heavy dataset yields lower _BFD_ cost.
 Thus, with the current data, our directional hypothesis is supported.
