@@ -1,6 +1,6 @@
-= Analysis and Discussion <analysis_section>
+= Analysis and Discussion
 
-== Analysis
+== Analysis <analysis_section>
 
 This chapter interprets the evaluation results and discusses their implications for offline scheduling in private clouds.
 

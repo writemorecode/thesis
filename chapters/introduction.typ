@@ -76,5 +76,6 @@ In @method_section, we describe the evaluated scheduling algorithms.
 In @exp_method_section, we describe the experimental methodology and dataset generation.
 In @results_section, we present the evaluation results.
 In @analysis_section, we analyze and discuss the results.
-Finally, @discussion_section contains our conclusions, a discussion of threats to validity, and our plans for future work.
+In, @discussion_section we discuss threats to validity.
+Finally, @conclusion_future_work_section contains our conclusions and our plans for future work.
 
