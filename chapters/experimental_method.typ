@@ -1,12 +1,12 @@
 #import "@preview/algorithmic:1.0.6"
 #import algorithmic: algorithm-figure, style-algorithm
 
-= Experimental Methodology <exp_method_section>
+== Experimental Methodology <exp_method_section>
 
 This chapter describes how problem instances are generated, and how datasets are generated from these problem instances.
 We also describe how our method for evaluating these algorithms using these datasets.
 
-== Problem instance generation
+=== Problem instance generation
 
 In order to evaluate these algorithms, we use randomly generated problem instances.
 Each problem instance is generated as follows.
@@ -406,7 +406,7 @@ $
   ) quad
 $
 
-== Dataset generation
+=== Dataset generation
 
 With the description of the method for generating a single problem instance completed, we now move on to describing how a dataset of multiple problem instances is generated.
 
@@ -442,7 +442,7 @@ The number of resource types is fixed to $K=4$ (CPU, memory, disk, I/O).
     )
   })])
 
-== Datasets
+=== Datasets
 
 We evaluate the algorithms on three different datasets.
 For evaluation, we developed a simulator in Python using the NumPy library @python_simulator_repo_github.
@@ -462,9 +462,9 @@ The table below presents the parameters used to generate each dataset.
   ..all_datasets_csv_file.flatten(),
 )
 
-== Evaluation method
+=== Evaluation method
 
-=== Paired comparison via cost ratios <cost_ratios>
+==== Paired comparison via cost ratios <cost_ratios>
 
 Each dataset contains the same set of problem instances evaluated by every algorithm.
 Therefore, comparisons between two algorithms are based on *paired* observations.
@@ -489,7 +489,7 @@ Here, $med(d) < 0$ indicates that $A$ has lower cost than $B$ on average, and $m
 
 In addition to the comparison of the two best algorithms, we also run paired Wilcoxon signed-rank tests between _BFD_ and each remaining algorithm (excluding _FFDNew_).
 
-=== Dolan-Moré performance profiles
+==== Dolan-Moré performance profiles
 
 Another method of comparing the performance of different algorithms on a set of problem instances is to use _performance profiles_, presented in 2004 by Elizabeth Dolan and Jorge Moré @dolan_more_performance_profiles_2004.
 This method works as follows.
