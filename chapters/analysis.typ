@@ -71,7 +71,12 @@ If one or more packing algorithms are implemented incorrectly, measured performa
 This is directly relevant to our study because all conclusions depend on the correctness of algorithm implementations.
 We mitigate this threat by code-reviewing new implementations before evaluation and by validating every produced solution so that, for each time slot, total resource demand assigned to any machine instance does not exceed that machine's resource capacity.
 
-// TODO: Discuss use of clear inter-dataset cost relationships as further evidence against pipeline bugs and/or incorrectly implemented algorithms.
+In @analysis_section we identified two empirical patterns that are consistent with the expected scheduler algorithm behavior.
+First, the best-performing algorithms with the lowest average solution costs used more machines on average than weaker algorithms.
+This indicates that lower solution costs are achieved through better job-machine placements rather than using fewer active machines.
+Second, solution costs were lower for datasets with a larger number of available machine types.
+This was consistent with increased packing flexibility.
+These patterns provide support for, but not proof of, the validity of our results.
 
 == Threats to external validity
 
