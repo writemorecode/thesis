@@ -53,41 +53,40 @@ The external validity of a study is concerned with what can be stated regarding 
 
 === Threats to internal validity
 
-It is possible that the random problem instance generation algorithms are generating problem instances which systematically favor the _BFD_ and _FFDNew_ packing algorithms to other algorithms which performed poorer.
-This is a reasonable concern, since the problem instances are designed to have job and machine types with some above average resource demands and capacities, respectively.
-The question is if the packing algorithms were designed with the problem instances in mind, or vice versa.
-The former would be valid, while the latter would not.
+It is possible that the random problem instance generation algorithm produces instances that systematically favor _BFD_ and _FFDNew_ over algorithms that performed worse.
+This is a plausible concern for our work because the datasets are constructed with job types and machine types that include some above-average resource demands and capacities, respectively.
+We mitigate this threat by treating it as a design risk and making the instance generation approach explicit. 
+The key validity condition is that algorithms are evaluated on independently generated problem instances, not instances tailored to specific algorithms.
 
-We have generated each problem instance of each dataset using a single fixed seed value.
-This makes the results reproducible, but it is possible that using a different seed would yield different results.
-However, the conclusion we have drawn from our results are consistent across all three datasets.
-Each dataset consists of $100$ problem instances.
-Therefore, we do not believe this to be a serious threat to validity.
+Each problem instance in each dataset was generated with a single fixed seed value.
+This is relevant because fixed seeds improve reproducibility, but different seeds could still produce different outcomes.
+We mitigate this by evaluating on three separate datasets with $100$ problem instances each.
+We also note that our conclusions are consistent across all three datasets, which reduces, but does not eliminate, seed value sensitivity as a threat.
 
-A more likely threat is that there are bugs in the scripts used for algorithm evaluation, data analysis, chart rendering, etc.
-This is an error-prone process consisting of multiple steps.
-First, each algorithm must be evaluated on each of the three datasets.
-The solution data of each algorithm for each problem instance of each dataset must be recorded.
-We use this data to compute statistical tests, and performance profiles.
-Next, from this raw data we generate per-dataset summary data for each algorithm.
-In order to improve reproducibility of our results, we have automated this full process with another script.
-The source code for the simulator and the utility scripts can be found on GitHub @python_simulator_repo_github @python_thesis_repo_github.
+The algorithm evaluation workflow includes multiple error-prone steps: evaluating each algorithm on each problem instance of each dataset, recording per-instance solution data, computing statistical tests and performance profiles, and generating per-dataset summaries.
+This makes pipeline bugs a valid threat because errors in any step could invalidate results.
+We mitigate this by automating the full workflow to reduce manual data handling errors and by making the simulator and utility scripts publicly available on GitHub @python_simulator_repo_github @python_thesis_repo_github.
 
-It is possible that one or more of the evaluated packing algorithms were implemented incorrectly.
-In order to mitigate this threat, we review the code for new algorithms before they are evaluated.
-Further, each time a packing algorithm produces a solution for a problem instance, the solution is validated.
-This validation step ensures that, for each time slot, the total resource demand for any machine instance does not exceed its resource capacity.
+If one or more packing algorithms are implemented incorrectly, measured performance differences may not reflect true algorithm behavior.
+This is directly relevant to our study because all conclusions depend on the correctness of algorithm implementations.
+We mitigate this threat by code-reviewing new implementations before evaluation and by validating every produced solution so that, for each time slot, total resource demand assigned to any machine instance does not exceed that machine's resource capacity.
+
+// TODO: Discuss use of clear inter-dataset cost relationships as further evidence against pipeline bugs and/or incorrectly implemented algorithms.
 
 == Threats to external validity
 
-It is likely that the problem instances generated and used to evaluate our algorithms do not accurately represent the workloads seen in real-world cloud computing environments.
-These workloads may have a different structure, including bursts, seasonality, and correlations.
+The generated problem instances may not fully capture real-world workload characteristics such as bursts, seasonality, and correlations.
+This is a valid external threat because differences between synthetic and real workloads can limit generalizability.
+We mitigate this by framing conclusions as evidence within the studied workload model rather than as universal claims across all cloud workloads.
 
-Our chosen simple cost model of a purchase cost and a running cost may be an invalid model of how real cloud providers charge for their services.
-Our model assumes fixed running costs per machine types, and fixed purchase costs per machine type regardless of how many machines are purchased.
-A more complex model may also want to model hardware depreciation, which can be an important factor for GPUs.
+The model uses fixed purchase and running costs per machine type.
+This is a relevant threat because real cloud pricing can be more complex and may include volume pricing, non-linear billing rules, and hardware depreciation, especially for GPUs.
+We mitigate this by explicitly scoping claims to the defined cost model and presenting results as comparative insights under that model, not as direct predictions of provider-specific costs.
 
-Our algorithms do not model operational constraints, such as machine startup delays, maintenance windows, etc.
+The algorithms do not model operational factors such as startup delays and maintenance windows.
+This is relevant because such factors can influence both feasible schedules and realized costs in practice.
+We mitigate this by explicitly acknowledging these omitted constraints and limiting interpretation of results to settings where they are negligible or can be approximated externally.
 
-Our results hold for the case of private clouds, in which a full hardware fleet is purchased and used for a longer time period.
-These results may not hold for public and/or hybrid clouds, which may have different constraints and cost models.
+Our conclusions are derived for private cloud settings where a hardware fleet is purchased and used over longer periods.
+This is a clear external validity limitation because public and hybrid clouds can have different constraints and pricing structures.
+We mitigate overgeneralization by not extending the findings to those environments without additional targeted evaluation.
