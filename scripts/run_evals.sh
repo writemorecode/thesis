@@ -115,3 +115,8 @@ DATASET_CONFIGS=(
 while read -r name kmin kmax jmin jmax mmin mmax tmin tmax; do
   evaluate_dataset "${name}" "${kmin}" "${kmax}" "${jmin}" "${jmax}" "${mmin}" "${mmax}" "${tmin}" "${tmax}"
 done < <(printf '%s\n' "${DATASET_CONFIGS[@]}")
+
+echo "Running cost ratio distribution plots..."
+uv run python scripts/plot_cost_ratio_distributions.py \
+  --eval-root "${EVAL_ROOT}/raw" \
+  --out-dir "${IMAGE_DIR}"
