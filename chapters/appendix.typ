@@ -29,10 +29,38 @@ This is shown in the histograms as the large spike at the cost ratio value at $1
       image(
         "../images/eval_cost_ratio_dist_balanced_bfd_vs_ffd_new.svg",
         width: 100%,
-        height: 50%,
+        height: 30%,
         fit: "contain",
       ),
       caption: [Distributions of cost ratios for _BFD_ vs _FFDNew_ on the balanced dataset.],
+    )
+  ])
+]
+
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      image(
+        "../images/eval_cost_ratio_dist_job_heavy_bfd_vs_ffd_new.svg",
+        width: 100%,
+        height: 30%,
+        fit: "contain",
+      ),
+      caption: [Distributions of cost ratios for _BFD_ vs _FFDNew_ on the job-heavy dataset.],
+    )
+  ])
+]
+
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      image(
+        "../images/eval_cost_ratio_dist_machine_heavy_bfd_vs_ffd_new.svg",
+        width: 100%,
+        height: 30%,
+        fit: "contain",
+      ),
+      caption: [Distributions of cost ratios for _BFD_ vs _FFDNew_ on the machine-heavy dataset.],
     )
   ])
 ]
@@ -49,33 +77,7 @@ We see that the balanced dataset fits quite well to a normal distribution, with 
 The machine-heavy dataset has the most extreme outliers.
 Comparing the $R^2$ values, it is the job-heavy dataset that fits a normal distribution best.
 
-#align(center)[
-  #block(breakable: false, [
-    #figure(
-      image(
-        "../images/eval_cost_ratio_dist_job_heavy_bfd_vs_ffd_new.svg",
-        width: 100%,
-        height: 50%,
-        fit: "contain",
-      ),
-      caption: [Distributions of cost ratios for _BFD_ vs _FFDNew_ on the job-heavy dataset.],
-    )
-  ])
-]
 
-#align(center)[
-  #block(breakable: false, [
-    #figure(
-      image(
-        "../images/eval_cost_ratio_dist_machine_heavy_bfd_vs_ffd_new.svg",
-        width: 100%,
-        height: 50%,
-        fit: "contain",
-      ),
-      caption: [Distributions of cost ratios for _BFD_ vs _FFDNew_ on the machine-heavy dataset.],
-    )
-  ])
-]
 
 In order to determine more rigorously if the cost ratio values for each dataset are normally distributed, we will use the _Shapiro-Wilk_ test of normality @shapiro_wilk_article.
 The test tests the null hypothesis $cal(H)_0$ that a sample came from a normally distributed population.

@@ -111,7 +111,7 @@ def _plot(
 
     edges = _hist_edges(ratio)
     ax_hist.hist(
-        ratio, bins=edges.tolist(), color="#4C78A8", edgecolor="white", linewidth=0.5
+        ratio, bins=edges.tolist(), color="#EEEEEE", edgecolor="black", linewidth=0.5
     )
     mean = float(ratio.mean())
     std = float(ratio.std(ddof=1))
@@ -125,7 +125,8 @@ def _plot(
         f"Cost ratio ({display_scheduler_name(label_a)} / {display_scheduler_name(label_b)})"
     )
     ax_hist.set_ylabel("Count")
-    ax_hist.set_title(f"{dataset_label}: raw ratios")
+    dataset_label_title = dataset_label.replace("_", "-")
+    ax_hist.set_title(f"Histogram of BFD/FFDNew cost ratios for {dataset_label_title} dataset")
     ax_hist.grid(True, which="both", linestyle=":", linewidth=0.6, alpha=0.8)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
