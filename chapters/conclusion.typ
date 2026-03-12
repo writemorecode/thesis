@@ -3,7 +3,10 @@
 == Conclusion
 
 In this report, we have studied a job scheduling problem, presenting and evaluating a number of algorithms for solving it.
-Evaluating these algorithms, we found that simpler algorithms can greatly outperform more complex algorithms.
+We found the solution cost difference between the _BFD_ and _FFDNew_ algorithms to be statistically insignificant.
+These two algorithms greatly outperformed the other evaluated algorithms.
+We concluded that these two algorithms used a larger number of machines than the others.
+We also concluded that the best performing algorithm yielded lower cost solutions for problem instances with a greater number of available machine types.
 For our first research question (RQ1), we have found that we can construct efficient scheduling algorithms by adapting traditional packing heuristics such as _FFD_ and _BFD_.
 Regarding our second research question (RQ2), we have not noted any significant differences in the execution times of our evaluated scheduling algorithms.
 This suggests that a trade-off between solution quality and execution time is not required for the algorithms we have evaluated and presented.
