@@ -9,8 +9,7 @@ For each dataset directory (containing eval_*.csv files), this script:
   - computes r_i = cost_a_i / cost_b_i,
   - prints summary stats and the most extreme ratios,
   - writes an SVG figure with:
-      (1) histogram of r_i with a reference line at 1,
-      (2) Q-Q plot of r_i against a normal distribution.
+      (1) histogram of r_i.
 """
 
 from __future__ import annotations
@@ -96,13 +95,6 @@ def _plot(
     import matplotlib as mpl
     import matplotlib.pyplot as plt
 
-    try:
-        from scipy import stats
-    except Exception as exc:  # pragma: no cover
-        raise RuntimeError(
-            "SciPy is required for Q-Q plots (dependency: scipy)."
-        ) from exc
-
     mpl.rcParams.update(
         {
             "font.family": "serif",
@@ -115,12 +107,12 @@ def _plot(
         }
     )
 
-    fig, (ax_hist, ax_qq) = plt.subplots(
-        nrows=2, figsize=(6.4, 5.2), constrained_layout=True
-    )
+    fig, ax_hist = plt.subplots(figsize=(6.4, 3.0), constrained_layout=True)
 
     edges = _hist_edges(ratio)
-    ax_hist.hist(ratio, bins=edges, color="#4C78A8", edgecolor="white", linewidth=0.5)
+    ax_hist.hist(
+        ratio, bins=edges.tolist(), color="#4C78A8", edgecolor="white", linewidth=0.5
+    )
     mean = float(ratio.mean())
     std = float(ratio.std(ddof=1))
     # ax_hist.axvline(1.0, color="black", linestyle="--", linewidth=1.0)
@@ -135,12 +127,6 @@ def _plot(
     ax_hist.set_ylabel("Count")
     ax_hist.set_title(f"{dataset_label}: raw ratios")
     ax_hist.grid(True, which="both", linestyle=":", linewidth=0.6, alpha=0.8)
-
-    stats.probplot(ratio, dist="norm", plot=ax_qq, rvalue=True)
-    ax_qq.set_title(f"{dataset_label}: Q-Q of ratios")
-    ax_qq.set_xlabel("Theoretical quantiles")
-    ax_qq.set_ylabel("Ordered ratios")
-    ax_qq.grid(True, which="both", linestyle=":", linewidth=0.6, alpha=0.8)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output_path)
