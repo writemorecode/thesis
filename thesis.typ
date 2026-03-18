@@ -9,7 +9,7 @@
 #let thesis-year = "2026"
 #let faculty = "DIDA"
 #let thesis-weeks = "30"
-#let thesis-title = "Efficient offline job scheduling in private clouds"
+#let thesis-title = "Cost-efficient procurement planning and offline job scheduling in private clouds"
 #let thesis-subtitle = ""
 #let author-first = "Gustav Karlsson"
 #let author-first-mail = "guka17student.bth.se"
