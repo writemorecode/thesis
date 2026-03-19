@@ -6,7 +6,7 @@
 This chapter describes how problem instances are generated, and how datasets are generated from these problem instances.
 We also describe how our method for evaluating these algorithms using these datasets.
 
-=== Problem instance generation
+=== Problem instance generation <problem_instance_generation>
 
 In order to evaluate these algorithms, we use randomly generated problem instances.
 Each problem instance is generated as follows.

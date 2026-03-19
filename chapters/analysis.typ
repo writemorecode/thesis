@@ -55,7 +55,7 @@ The external validity of a study is concerned with what can be stated regarding 
 
 It is possible that the random problem instance generation algorithm produces instances that systematically favor _BFD_ and _FFDNew_ over algorithms that performed worse.
 This is a plausible concern for our work because the datasets are constructed with job types and machine types that include some above-average resource demands and capacities, respectively.
-We mitigate this threat by treating it as a design risk and making the instance generation approach explicit. 
+We mitigate this threat by treating it as a design risk and making the instance generation approach explicit.
 The key validity condition is that algorithms are evaluated on independently generated problem instances, not instances tailored to specific algorithms.
 
 Each problem instance in each dataset was generated with a single fixed seed value.
@@ -68,6 +68,7 @@ This makes pipeline bugs a valid threat because errors in any step could invalid
 We mitigate this by automating the full workflow to reduce manual data handling errors and by making the simulator and utility scripts publicly available on GitHub @python_simulator_repo_github @python_thesis_repo_github.
 
 If one or more packing algorithms are implemented incorrectly, measured performance differences may not reflect true algorithm behavior.
+This also applies to the problem instance generation algorithms described in @problem_instance_generation.
 This is directly relevant to our study because all conclusions depend on the correctness of algorithm implementations.
 We mitigate this threat by code-reviewing new implementations before evaluation and by validating every produced solution so that, for each time slot, total resource demand assigned to any machine instance does not exceed that machine's resource capacity.
 
@@ -75,6 +76,11 @@ In @analysis_section we identified two empirical patterns that are consistent wi
 First, the best-performing algorithms with the lowest average solution costs used more machines on average than weaker algorithms.
 This indicates that lower solution costs are achieved through better job-machine placements rather than using fewer active machines.
 Second, solution costs were lower for datasets with a larger number of available machine types.
+This is as expected given the problem instance generation algorithms which were described in @problem_instance_generation.
+If there is a higher number of available machine types then for each job type with a primary resource there is a higher probability for there to exist more machine types with a matching primary resource.
+In other words, for datasets with more machine types, there may be a higher maximum number of feasible job-machine placements.
+It is therefore possible for these datasets to have certain less expensive job-machine placements which do not exist in other datasets with fewer machine types.
+
 This was consistent with increased packing flexibility.
 These patterns provide support for, but not proof of, the validity of our results.
 
@@ -95,3 +101,8 @@ We mitigate this by explicitly acknowledging these omitted constraints and limit
 Our conclusions are derived for private cloud settings where a hardware fleet is purchased and used over longer periods.
 This is a clear external validity limitation because public and hybrid clouds can have different constraints and pricing structures.
 We mitigate overgeneralization by not extending the findings to those environments without additional targeted evaluation.
+
+Previously, we assumed a deterministic load profile and the lack of anyan initial hardware fleet.
+However, these assumptions are not load-bearing and could be relaxed.
+This would allow our algorithms to be applied to more general problems which do not involve these assumptions.
+
