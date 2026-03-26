@@ -126,7 +126,9 @@ def _plot(
     )
     ax_hist.set_ylabel("Count")
     dataset_label_title = dataset_label.replace("_", "-")
-    ax_hist.set_title(f"Histogram of BFD/FFDNew cost ratios for {dataset_label_title} dataset")
+    ax_hist.set_title(
+        f"Histogram of BFD/FFDNew cost ratios for {dataset_label_title} dataset"
+    )
     ax_hist.grid(True, which="both", linestyle=":", linewidth=0.6, alpha=0.8)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
