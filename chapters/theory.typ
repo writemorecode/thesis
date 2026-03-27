@@ -12,16 +12,14 @@ This chapter introduces the bin-packing formulations and algorithmic bounds that
 === One-dimensional bin-packing problem
 
 The book _Computers and Intractability_ @book_computers_intractability gives the following definition of the bin-packing problem.
-Given a finite set $U={u_1,dots.h,u_n}$ of _items_ and a rational _size_ $s(u) in [0,1)$ for each item $u in U$, find a partition of $U$ into disjoint subsets $U_1,dots.h,U_k$ such that the sum of the size of the items in each $U_i$ is no more than $1$ and such that $k$ is as small as possible.
-
+Given a finite set $U={u_1,dots.h,u_n}$ of items and a rational item size $s(u) in [0,1)$ for each item $u in U$, find a partition of $U$ into disjoint subsets $U_1,dots.h,U_k$ such that the sum of the size of the items in each $U_i$ is no more than $1$ and such that $k$ is as small as possible.
 The problem can be formulated as an integer LP problem:
 
 $
-  "minimize" quad sum_(i=1)^k y_i \
-  "subject to" quad \
-  sum_(j=1)^k x_(i j) = 1 quad forall 1 <= i <= n \
-  sum_(i=1)^n s(i) x_(i j) <= c y_j quad forall 1 <= j <= k \
-  x_(i j) in {0,1}, quad y_j in {0,1} quad forall i,j \
+    "minimize" & quad sum_(i=1) y_i \
+  "subject to" & quad sum_(j=1) x_(i j) = 1, quad forall i \
+               & quad sum_(i=1)^n s(i) x_(i j) <= c y_j, quad forall j \
+               & x_(i j) in {0,1}, quad y_j in {0,1} quad forall i,j \
 $
 
 Here, $k$ and $n$ are the number of bins and items, respectively.
@@ -42,11 +40,10 @@ The capacity of bin $j$ is given by the vector $bold(c)(j) in ZZnonneg^D$.
 The problem can be formulated as an integer LP problem:
 
 $
-  "minimize" quad sum_(i=1)^k y_k \
-  "subject to" quad \
-  sum_(j=1)^k x_(i j) = 1 quad forall 1 <= i <= n \
-  sum_(i=1)^n bold(s)(i) x_(i j) <= bold(c)(i) y_j quad forall 1 <= j <= k \
-  x_(i j) in {0,1}, quad y_j in {0,1} quad forall i,j \
+    "minimize" & quad sum_(i=1) y_i \
+  "subject to" & quad sum_(j=1) x_(i j) = 1, quad forall i \
+               & quad sum_(i=1)^n bold(s)(i) x_(i j) <= bold(c)(i) y_j, quad forall j \
+               & x_(i j) in {0,1}, quad y_j in {0,1} quad forall i,j \
 $
 
 == Online bin-packing algorithms
