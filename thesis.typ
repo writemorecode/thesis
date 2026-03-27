@@ -9,10 +9,10 @@
 #let thesis-year = "2026"
 #let faculty = "DIDA"
 #let thesis-weeks = "30"
-#let thesis-title = "Cost-efficient procurement planning and offline job scheduling in private clouds"
+#let thesis-title = "Procurement planning and offline job scheduling in private clouds"
 #let thesis-subtitle = ""
 #let author-first = "Gustav Karlsson"
-#let author-first-mail = "guka17student.bth.se"
+#let author-first-mail = "guka17@student.bth.se"
 #let author-second = ""
 #let author-second-mail = "...@student.bth.se"
 #let supervisor = "Professor Lars Lundberg"
@@ -226,11 +226,13 @@ Faculty of #faculty, Blekinge Institute of Technology, 371 79 Karlskrona, Sweden
 // ABSTRACT IN ENGLISH
 #front-heading("Abstract")
 #par(first-line-indent: 0pt)[
-  Many organizations are migrating from public clouds to private cloud environments, where they must provision a fleet of machines that can support a reasonably predictable workload while keeping both capital costs and energy-related running costs low.
-  This thesis studies an offline multi-resource scheduling problem in which job demands are known for a finite planning horizon.
-  We formulate the problem as an offline variable-sized multidimensional bin-packing problem with machine purchase costs and per time-slot running costs, and we evaluate a set of heuristic scheduling algorithms.
-  We describe how to generate random problem instances and construct three datasets with balanced, job-heavy, and machine-heavy load profiles.
-  The evaluation results show that the proposed cost-aware heuristics (_BFD_ and _FFDNew_) consistently outperform standard first-fit decreasing baselines, while their cost differences are statistically indistinguishable under paired Wilcoxon signed-rank tests.
+  Many organizations are migrating from public clouds to private cloud environments.
+  In these private cloud environments they must provision a fleet of machines that can support a reasonably predictable workload while managing both capital expenditures and energy costs.
+  This thesis studies how to both provision the required hardware fleet, and schedule the predicted workloads onto the machines in this fleet.
+  We formulate this problem as an offline multi-resource scheduling problem in which job demands are known for a finite planning horizon.
+  We present a number of algorithms for solving this problem.
+  We describe how we generate random instances of this problem and construct a number of purpose-made datasets with varying characteristics.
+  Finally, we present and discuss the results of evaluating our solutions using these datasets.
 ]
 
 #v(1cm)
@@ -243,11 +245,13 @@ Faculty of #faculty, Blekinge Institute of Technology, 371 79 Karlskrona, Sweden
 // ABSTRACT IN SWEDISH
 #front-heading("Sammanfattning")
 #par(first-line-indent: 0pt)[
-  Många organisationer migrerar från publika moln till privata molnmiljöer, där de måste tillhandahålla en maskinpark som kan stödja en förutspådd arbetsbelastning samtidigt som både kapitalkostnader och energirelaterade driftskostnader hålls låga.
-  Denna avhandling studerar ett offline-schemaläggningsproblem med flera resurser där jobbbehov är känt för en begränsad planeringshorisont.
-  Vi formulerar problemet som ett offline-problem med variabelstorlek, flerdimensionellt bin-packing, med maskininköpskostnader och driftskostnader per tidslucka, och vi utvärderar en uppsättning heuristiska schemaläggningsalgoritmer.
-  Vi beskriver hur vi genererar slumpmässiga probleminstanser och konstruerar tre datauppsättningar med balanserade, jobbtunga och maskintunga belastningsprofiler.
-  Utvärderingsresultaten visar att de föreslagna kostnadsmedvetna heuristikerna (_BFD_ och _FFDNew_) konsekvent överträffar standardmässiga minskande baslinjer med första anpassning, medan deras kostnadsskillnader är statistiskt oskiljbara under parade Wilcoxon signed-rank-tester.
+  Många organisationer migrerar från publika moln till privata molnmiljöer.
+  I dessa privata molnmiljöer måste de tillhandahålla en maskinpark som kan stödja en rimligt förutsägbar arbetsbelastning samtidigt som de hanterar både kapitalutgifter och energikostnader.
+  Denna avhandling studerar hur man både tillhandahåller den erforderliga hårdvaruflottan och schemalägger de förutspådda arbetsbelastningarna på maskinerna i denna flotta.
+  Vi formulerar detta problem som ett offline-schemaläggningsproblem med flera resurser där jobbbehov är känt för en begränsad planeringshorisont.
+  Vi presenterar ett antal algoritmer för att lösa detta problem.
+  Vi beskriver hur vi genererar slumpmässiga instanser av detta problem och konstruerar ett antal specialanpassade datamängder med varierande egenskaper.
+  Slutligen presenterar och diskuterar vi resultaten av att utvärdera våra lösningar med hjälp av dessa datamängder.
 ]
 
 #v(1cm)
