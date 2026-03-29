@@ -45,38 +45,46 @@ The table below describes each of these parameters.
 ])
 
 We fix the set of resource types to CPU, memory, disk, and I/O, so $K=4$ throughout.
+The goal of the generator is not only to produce random instances, but to produce instances with enough structure to make the placement decisions non-trivial.
+If machine types, job types, and time slots were sampled almost uniformly and independently, then most instances would consist only of small perturbations of the same workload.
+Such instances would understate the heterogeneity that motivates the algorithms studied in this thesis.
+We therefore generate each problem instance in several stages, introducing randomness at every step while also allowing specialization and correlations between supply and demand.
+
+==== Step 1: Initialize baseline capacities and demands
+
 Each resource type $k$ has its own base machine capacity $c_(0,k)$ and base job demand $d_(0,k)$, collected in the vectors
 $bold(c)_0=(c_0^"cpu", c_0^"memory", c_0^"disk", c_0^"io")$ and
 $bold(d)_0=(d_0^"cpu", d_0^"memory", d_0^"disk", d_0^"io")$.
 Each machine type resource capacity value $C_(i,k)$ is initialized according to the corresponding base capacity $c_(0,k)$.
 Each job type resource demand value $R_(j,k)$ is initialized according to the corresponding base demand $d_(0,k)$.
-Next, some variation is introduced to each element $C_(i,k)$ and $R_(j,k)$ with multiplicative jitter values sampled uniformly from the configurable ranges $[c_"min",c_"max"]$ and $[d_"min",d_"max"]$, respectively.
+Next, a moderate amount of variation is introduced to each element $C_(i,k)$ and $R_(j,k)$ with multiplicative jitter values sampled uniformly from the configurable ranges $[c_"min",c_"max"]$ and $[d_"min",d_"max"]$, respectively.
+This gives every machine type and job type a common baseline while still allowing them to differ slightly already before any specialization is introduced.
 
 $
   C_(i,k) arrow.l ceil(c_(0,k) U([c_"min", c_"max"])), quad
   R_(j,k) arrow.l ceil(d_(0,k) U([d_"min", d_"max"])), quad forall i,j,k.
 $
 
-In order to generate more realistic problem instances, we want to avoid having nearly uniform machine types, job types, and time slots.
-Instead, we want a fraction of all machine types, job types, and time slots to have a greater number of certain resource capacities, resource demands, and job types, respectively.
-For example, certain machine types may be optimized, or specialized, for certain kinds of workloads.
-These special machine types will have a larger amount of a certain resource type, such as memory, disk, etc.
-This will make these machine types better suited to running job types with above average demands for these resource types.
-This is also true for job time slots.
-Above average numbers of certain job types may be scheduled to run during certain time slots.
+At this stage, however, the resulting matrices are still relatively close to uniform.
+The next stages introduce the stronger heterogeneity which is needed to obtain more realistic and informative instances.
 
-Each machine type, job type, and time slot may be assigned a primary resource or job type.
-The number of them which are assigned a primary resource is controlled by a configurable parameter $rho in [0,1]$.
-This means that, for example, given $M$ different machine types, $ceil(rho M)$ machine types will be assigned a primary resource.
+==== Step 2: Assign primary resources
 
-The primary resources of a machine type, job type, or time slot are computed using @alg_choose_primary_resources, described below.
-The function takes as arguments the number $n$ of primary resources to compute, the number of resources $K$,
-the fraction $rho$ of resources to assign a primary resource to, and a probability vector $bold(q) in (0,1)^K$.
-For each of the machine types, job types, or time slots assigned a primary resource, the resource index $k$ will be chosen with probability $q_k$, for $1<=k<=K$.
-By setting each element $q_k$ of $bold(q)$ to $1\/K$, each primary resource index $k$ will be chosen with equal probability.
-The values $q_k$ can instead be adjusted to increase or decrease the probability of resource $k$ being assigned to primary resources.
-This will be used later in order to make the machine types have similar primary resources as the job types.
-This means that, for example, if there are many job types with memory as a primary resource, then there should also be many machine types with memory as a primary resource.
+To avoid nearly uniform machine types, job types, and time slots, we introduce the notion of a _primary resource_.
+A primary resource indicates that a machine type or job type is specialized with respect to one resource dimension.
+For time slots, the same mechanism is used to indicate which class of job types should be more common in that slot.
+This is the main mechanism by which the generator creates concentrated supply, concentrated demand, and temporal shifts in the workload.
+
+Only a fraction of all machine types, job types, and time slots are assigned a primary resource.
+This fraction is controlled by a configurable parameter $rho in [0,1]$.
+Thus, for example, given $M$ different machine types, $ceil(rho M)$ machine types will be assigned a primary resource, while the remaining machine types retain no explicit specialization.
+
+The primary resources of machine types, job types, and time slots are computed using @alg_choose_primary_resources, described below.
+The function takes as arguments the number $n$ of elements to consider, the fraction $rho$ of elements to assign a primary resource to, and a probability vector $bold(q) in (0,1)^K$.
+For each selected element, the resource index $k$ is chosen with probability $q_k$, for $1<=k<=K$.
+If $bold(q)=bold(1)\/K$, then all resource indices are chosen with equal probability.
+By adjusting the entries of $bold(q)$, we can instead make some resource types more likely than others.
+Elements not selected for specialization keep the value $-1$ in the output vector, meaning that no primary resource was assigned.
 
 #block(
   breakable: false,
@@ -111,33 +119,44 @@ This means that, for example, if there are many job types with memory as a prima
     ) <alg_choose_primary_resources> ],
 )
 
-Now that we have described how the primary resources are computed, we move on to describing how they are used in practice.
+==== Step 3: Correlate machine specialization with job specialization
+
+We first use @alg_choose_primary_resources to assign primary resources to the job types.
+At this stage, the probability vector is taken to be uniform, so no resource type is preferred a priori.
+This yields a random workload profile for the current instance.
+
+Next, we use the resulting job-type assignments to construct the probability vector used for the machine types.
+Let $bold(u)$ be the $K$-dimensional uniform probability vector $bold(1)\/K$, and let $bold(h)$ be the histogram vector of the elements of $bold(p)^"job"$.
+The element $h_k$ is the number of job types assigned resource $k$ as their primary resource.
+If no job types were assigned a primary resource, then we fall back to the uniform vector $bold(u)$.
+The machine-type probability vector is then defined as the weighted vector sum
+
+$
+  bold(q)^"machine" = eta^"machine" bold(h)/norm(bold(h)) + (1-eta^"machine") 1/K bold(1).
+$
+
+Here, $eta^"machine" in (0,1)$ is a configurable correlation parameter.
+For larger values of $eta^"machine"$, the machine-type primary resources become more similar to the sampled job-type primary resources, while smaller values keep the machine types closer to a uniform mix.
+We choose this construction because it introduces a controlled correlation between supply and demand.
+If many job types are, for example, memory-heavy, then it is reasonable that memory-oriented machine types should also be more common, but not necessarily dominate completely.
+The blend with the uniform vector preserves randomness and prevents the generated instances from becoming overly deterministic.
+
+==== Step 4: Generate machine and job type matrices
+
+Once the primary resources have been assigned, they are converted into concrete capacities and demands.
 Let $u ~ sans("UniformInteger")([u_"min", u_"max"])$.
 For each machine type $i$, if the machine type has been assigned primary resource $k^*$, then we set $C_(i,k^*)$ to $u dot max(1, ceil(C_(i,k^*)))$.
 For each job type $j$, if the job type has been assigned primary resource $k^*$, then we set $R_(j,k^*)$ to $u dot max(1, ceil(R_(j,k^*)))$.
-Note that $u$ is re-sampled for each element $C_(i,k)$ and $R_(j,k)$.
-Here, it is the configurable interval $[u_"min", u_"max"]$ which controls how much primary resource values shall be increased.
+Note that $u$ is re-sampled for each amplified entry.
+The configurable interval $[u_"min", u_"max"]$ therefore controls how strongly specialization affects the generated capacities and demands.
 
-Next, we want to use the vector $bold(p)^"machine"$ returned by @alg_choose_primary_resources for
-computing a probability vector $bold(q)^"job"$ to use for computing the primary resources for the job types.
-To do this, we begin by letting the vector $bold(u)$ be the $K$-dimensional uniform probability vector $bold(1)\/K$, where $bold(1)$ is the all-ones vector.
-Next, we compute a histogram vector $bold(h)$ of the elements of $bold(p)^"machine"$.
-The histogram vector $bold(h)$ will have dimension $k$, and each element $h_k$ will be equal to the number of machine types which were assigned resource $k$ as a primary resource.
-If no primary resources were assigned, then we set $bold(h)$ equal to $bold(u)$.
-Finally, we can compute the probability vector $bold(q)^"job"$ as a weighted vector sum between the normalized histogram vector $bold(h)$ and the vector $bold(u)$.
+This amplification step is important because it turns the abstract notion of a primary resource into an actual numerical imbalance in $bold(C)$ and $bold(R)$.
+Without it, the primary-resource assignments would have only a limited effect on the final instance.
+After amplification, all entries are clamped to be at least $1$.
+Finally, if some job type cannot be packed on any machine type, we add the missing capacity to one selected machine type, preferring a machine type with a matching primary resource whenever such a machine type exists.
+This last correction ensures that the resulting instance is feasible while retaining the intended structure of specialized machine and job types.
 
-$
-  bold(q)^"job" = eta bold(h)/norm(bold(h)) + (1-eta) 1/K bold(1)
-$
-
-Here, $eta in (0,1)$ is a configurable correlation parameter.
-For larger values of $eta$, $bold(q)^"job"$ will be more similar to the histogram vector $bold(h)$, and vice versa.
-In other words, larger values of $eta$ increase the correlation between the primary resources of the machine and job types.
-This means that, for example, if many job types were assigned CPU as a primary resource, then $eta$ will control how many machine types are assigned CPU as a primary resource.
-With the vector $bold(q)^"job"$ computed, we can now compute the primary resources for the machine types.
-
-The next step is to compute the machine capacity matrix $bold(C)$.
-This is handled by @alg_machine_job_types.
+The generation of $bold(C)$ and $bold(R)$ is handled by @alg_machine_job_types.
 
 #block(
   breakable: false,
@@ -219,31 +238,35 @@ This is handled by @alg_machine_job_types.
 
 #pagebreak()
 
-desc here
+==== Step 5: Generate time-slot job counts
 
-With the description of the generation of the machine capacity matrix $bold(C)$ and job demand matrix $bold(R)$ completed, we now move on to description of the job time slot matrix $bold(L)$.
-The $bold(L)$ matrix generation is handled by the $sans("GenerateJobCounts")$ function.
-The function works as follows.
+With the generation of the machine capacity matrix $bold(C)$ and the job demand matrix $bold(R)$ completed, we now move on to the job time slot matrix $bold(L)$.
+The matrix $bold(L)$ determines how many jobs of each type are present in each time slot.
+If these counts were generated independently from an almost uniform distribution, then the workload would exhibit little temporal structure.
+We instead want some time slots to be dominated by related job types, in the same way that real workloads often contain bursts of similar activity.
 
-For each time slot, the job count matrix generation aims to select job types which have been assigned some primary resource.
-Previously, the primary resource capacities of the machine types were selected with respect to the primary resource demands of the job types.
-If some subset of the job types were each assigned some primary resource demand, then the machine types must be assigned matching resource capacities.
-For example, memory-intensive job types are best assigned to memory-optimized machine types.
-In this function, for a subset of all time slots, we select a primary resource $k^*$, where $0<=k^*<K$.
-For each time slot in this subset, we increase the number of jobs which also have primary resource $k^*$.
+The generation of $bold(L)$ is handled by the $sans("GenerateTimeSlots")$ function.
+As for machine types, we first compute a probability vector from the histogram of job-type primary resources.
+Let $bold(h)$ be the histogram of $bold(p)^"job"$ and let $bold(u)=bold(1)\/K$.
+We then define
 
-For each time slot $t$, $N_t$ is the total time slot job count, across all job types.
-$N_t$ is initialized with a base load value $lambda_0$.
-Next, some jitter is applied to $N_t$ by multiplying it by a jitter value $u$ sampled uniformly from a configurable interval $[lambda_"min", lambda_"max")$, after which $N_t$ is clamped to an integer $>=1$.
-After this, we uniformly sample a $J$-dimensional job type weight vector $bold(w)$ from the interval $[0.5,1)$.
-This vector will later be used to decide the number of each job type to select for time slot $t$.
-Next, we compute a set $M$ of each job type $j$ assigned the same primary resource $k^*$ as time slot $t$.
-For each of these matching job types, we sample a positive integer $v$ from the configurable interval $[v_"min", v_"max"]$.
-Then, the weight vector element $w_j$ is multiplied by $v$.
+$
+  bold(q)^"slot" = eta^"slot" bold(h)/norm(bold(h)) + (1-eta^"slot") bold(u).
+$
 
-Once we have completed this step for all time slots, we let $bold(pi)$ be the normalized $bold(w)$ vector.
-Finally, we compute the job count vector $bold(l)_t$ for time slot $t$.
-This is done by sampling the vector from the $sans("Multinomial")(N_t,bold(pi))$ distribution.
+Here, $eta^"slot"$ controls how strongly the time-slot specializations follow the sampled job-type specializations.
+The primary resources for the time slots are then sampled from this distribution.
+Thus, if a particular resource type is common among the job types, then some time slots also become more likely to emphasize jobs associated with that resource type.
+
+For each time slot $t$, let $N_t$ be the total number of jobs in the slot.
+The value $N_t$ is initialized from the base load $lambda_0$ and then multiplied by a jitter value $u$ sampled uniformly from the configurable interval $[lambda_"min", lambda_"max")$, after which it is clamped to an integer $>=1$.
+Next, we sample a $J$-dimensional job-type weight vector $bold(w)$ from the interval $[0.5,1)$.
+If time slot $t$ has primary resource $k^*$, then we compute the set $M$ of job types whose primary resource is also $k^*$.
+For these matching job types, we sample a positive integer $v$ from the configurable interval $[v_"min", v_"max"]$ and multiply the corresponding weights $w_j$ by $v$.
+After normalizing $bold(w)$ to obtain a probability vector $bold(pi)$, the job count vector $bold(l)_t$ is sampled from the distribution $sans("Multinomial")(N_t,bold(pi))$.
+
+This two-stage construction allows the total load and the composition of that load to vary separately across time slots.
+It therefore creates temporal concentration without removing the stochastic variation between instances.
 
 #block(breakable: false, [
   #show: style-algorithm
@@ -299,8 +322,12 @@ This is done by sampling the vector from the $sans("Multinomial")(N_t,bold(pi))$
     )
   })])
 
-Lastly, we will again describe the algorithm used for computing the machine type purchase and running cost vectors $bold(c^p)$ and $bold(c^r)$.
+==== Step 6: Compute machine costs
+
+Lastly, we describe the algorithm used for computing the machine type purchase and running cost vectors $bold(c^p)$ and $bold(c^r)$.
 This is handled by the $"COMPUTECOSTS"$ function.
+The purpose of this step is to tie the cost model directly to the machine capacities rather than sampling costs independently.
+In this way, larger or more capable machine types also become more expensive to purchase and to run, which gives the evaluation a consistent cost trade-off.
 
 #block(breakable: false, [
   #show: style-algorithm
@@ -313,8 +340,13 @@ This is handled by the $"COMPUTECOSTS"$ function.
     })
   })])
 
-Finally, we can describe the full algorithm for generating a single problem instance.
+==== Step 7: Generate a complete problem instance
+
+We can now describe the full algorithm for generating a single problem instance.
 This is handled by the $"GENERATEPROBLEMINSTANCE"$ function.
+Presented in this order, the dependency structure becomes explicit.
+The sampled job-type specializations influence the machine-type specializations, and together they influence the temporal distribution of jobs.
+The final output is therefore random, but not unstructured.
 
 #block(breakable: false, [
   #show: style-algorithm
@@ -359,9 +391,9 @@ This is handled by the $"GENERATEPROBLEMINSTANCE"$ function.
     )
   })])
 
-We will now show two $bold(C)$ and $bold(R)$ matrices generated with the same seed value, with and without the primary resource logic.
-The two matrices below were generated using the primary resource logic.
-The primary resource values are in bold.
+To illustrate the effect of the primary-resource mechanism, we show two pairs of $bold(C)$ and $bold(R)$ matrices generated with the same seed value, with and without the primary-resource logic.
+The two matrices below were generated using the primary-resource logic.
+The primary-resource values are shown in bold.
 
 $
   C=mat(
@@ -376,7 +408,9 @@ $
   )
 $
 
-The two matrices here below were generated from the same seed value, but without the primary resource logic.
+The two matrices below were generated from the same seed value, but without the primary-resource logic.
+Compared with the first pair, they are visibly more uniform.
+This is precisely the effect that the primary-resource mechanism is intended to avoid.
 
 $
   C=mat(
