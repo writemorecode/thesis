@@ -1,6 +1,8 @@
 #import "@preview/algorithmic:1.0.6"
 #import algorithmic: algorithm-figure, style-algorithm
 
+#pagebreak()
+
 == Experimental Methodology <exp_method_section>
 
 This chapter describes how problem instances are generated, and how datasets are generated from these problem instances.
@@ -10,7 +12,6 @@ We also describe how our method for evaluating these algorithms using these data
 
 In order to evaluate these algorithms, we use randomly generated problem instances.
 Each problem instance is generated as follows.
-
 The generation of problem instances is controlled by a set of configurable parameters.
 The table below describes each of these parameters.
 
@@ -40,10 +41,8 @@ The table below describes each of these parameters.
       [$eta^"slot"$], [Time slot-job primary resource correlation factor], [$0.7$],
     ),
     caption: [Table of parameters used for problem instance generation],
-  )
+  ) <dataset_parameter_table>
 ])
-
-// TODO: Justify and motivate, explain, why these values were selected?
 
 We fix the set of resource types to CPU, memory, disk, and I/O, so $K=4$ throughout.
 Each resource type $k$ has its own base machine capacity $c_(0,k)$ and base job demand $d_(0,k)$, collected in the vectors
@@ -70,7 +69,7 @@ Each machine type, job type, and time slot may be assigned a primary resource or
 The number of them which are assigned a primary resource is controlled by a configurable parameter $rho in [0,1]$.
 This means that, for example, given $M$ different machine types, $ceil(rho M)$ machine types will be assigned a primary resource.
 
-The primary resources of a machine type, job type, or time slot are computed using the $sans("ChoosePrimaryResources")$ function, described below.
+The primary resources of a machine type, job type, or time slot are computed using @alg_choose_primary_resources, described below.
 The function takes as arguments the number $n$ of primary resources to compute, the number of resources $K$,
 the fraction $rho$ of resources to assign a primary resource to, and a probability vector $bold(q) in (0,1)^K$.
 For each of the machine types, job types, or time slots assigned a primary resource, the resource index $k$ will be chosen with probability $q_k$, for $1<=k<=K$.
@@ -92,26 +91,24 @@ This means that, for example, if there are many job types with memory as a prima
           "ChoosePrimaryResources",
           (
             $n$,
-            $K$,
             $rho$,
             $bold(q)$,
-            $G$,
           ),
           {
             Assign($s$, $ceil(n rho)$)
-            Comment[Sample set $S$ of size $s$ from set ${1,dots.h,n}$ without replacement, with RNG G]
+            Comment[Sample set $S$ of size $s$ from set ${1,dots.h,n}$ without replacement]
             Assign($S$, $"UniformWithoutReplacement"({1,dots.h,n}, s ; G)$)
             Comment[Let $bold(p)$ be $n$-dimensional vector initialized to value $-1$]
             Assign($bold(p)$, $mat(-1, dots.h, -1)$)
             For($i in S$, {
-              Comment[Sample $p_i$ from set ${1,dots.h,K}$ with probabilities ${q_1,dots.h,q_K}$, with RNG G]
+              Comment[Sample $p_i$ from set ${1,dots.h,K}$ with probabilities ${q_1,dots.h,q_K}$]
               Assign($p_i$, $"Categorical"({1,dots.h,K}, bold(q) ; G)$)
             })
             Return($bold(p)$)
           },
         )
       },
-    )],
+    ) <alg_choose_primary_resources> ],
 )
 
 Now that we have described how the primary resources are computed, we move on to describing how they are used in practice.
@@ -121,8 +118,8 @@ For each job type $j$, if the job type has been assigned primary resource $k^*$,
 Note that $u$ is re-sampled for each element $C_(i,k)$ and $R_(j,k)$.
 Here, it is the configurable interval $[u_"min", u_"max"]$ which controls how much primary resource values shall be increased.
 
-Next, we want to use the vector $bold(p)^"machine"$ returned by the $sans("ChoosePrimaryResources")$ function for
-computing a probability vector $bold(q)^"job"$ to use for computing the primary resources for the job types matrix $bold(R)$.
+Next, we want to use the vector $bold(p)^"machine"$ returned by @alg_choose_primary_resources for
+computing a probability vector $bold(q)^"job"$ to use for computing the primary resources for the job types.
 To do this, we begin by letting the vector $bold(u)$ be the $K$-dimensional uniform probability vector $bold(1)\/K$, where $bold(1)$ is the all-ones vector.
 Next, we compute a histogram vector $bold(h)$ of the elements of $bold(p)^"machine"$.
 The histogram vector $bold(h)$ will have dimension $k$, and each element $h_k$ will be equal to the number of machine types which were assigned resource $k$ as a primary resource.
@@ -140,31 +137,21 @@ This means that, for example, if many job types were assigned CPU as a primary r
 With the vector $bold(q)^"job"$ computed, we can now compute the primary resources for the machine types.
 
 The next step is to compute the machine capacity matrix $bold(C)$.
-This is handled by the function $sans("GenerateCapacitiesAndRequirements")$.
+This is handled by @alg_machine_job_types.
 
 #block(
   breakable: false,
   [
     #show: style-algorithm
     #algorithm-figure(
-      "Generate capacities and requirements",
+      "Generate job and machine types",
       vstroke: .5pt + luma(200),
       inset: 0.3em,
       {
         import algorithmic: *
         Procedure(
-          "GenerateCapacitiesAndRequirements",
-          (
-            $K$,
-            $M$,
-            $J$,
-            $bold(c)_0$,
-            $bold(d)_0$,
-            $bold(p)^"machine"$,
-            $bold(p)^"job"$,
-            $"hyperparameters"$,
-            $"RNG" G$,
-          ),
+          "GenerateJobAndMachineTypes",
+          (),
           {
             LineComment(
               Assign($C_(i,k)$, $ceil(c_(0,k) dot U(c_"min", c_"max"))$),
@@ -227,8 +214,12 @@ This is handled by the function $sans("GenerateCapacitiesAndRequirements")$.
           },
         )
       },
-    )],
+    ) <alg_machine_job_types>],
 )
+
+#pagebreak()
+
+desc here
 
 With the description of the generation of the machine capacity matrix $bold(C)$ and job demand matrix $bold(R)$ completed, we now move on to description of the job time slot matrix $bold(L)$.
 The $bold(L)$ matrix generation is handled by the $sans("GenerateJobCounts")$ function.
@@ -256,10 +247,10 @@ This is done by sampling the vector from the $sans("Multinomial")(N_t,bold(pi))$
 
 #block(breakable: false, [
   #show: style-algorithm
-  #algorithm-figure("Generate job counts", vstroke: .5pt + luma(200), {
+  #algorithm-figure("Generate time slots", vstroke: .5pt + luma(200), {
     import algorithmic: *
     Procedure(
-      "GenerateJobCounts",
+      "GenerateTimeSlots",
       (
         $K$,
         $J$,
@@ -323,52 +314,46 @@ This is handled by the $"COMPUTECOSTS"$ function.
   })])
 
 Finally, we can describe the full algorithm for generating a single problem instance.
-This is handled by the $"GENERATERANDOMINSTANCE"$ function.
+This is handled by the $"GENERATEPROBLEMINSTANCE"$ function.
 
 #block(breakable: false, [
   #show: style-algorithm
-  #algorithm-figure("Generate random instance", vstroke: .5pt + luma(200), {
+  #algorithm-figure("Generate problem instance", vstroke: .5pt + luma(200), {
     import algorithmic: *
     Procedure(
-      "GENERATERANDOMINSTANCE",
-      ($K$, $J$, $M$, $T$, "hyperparameters", $G$),
+      "GenerateProblemInstance",
+      (),
       {
         Assign($bold(u)$, $bold(1)\/K$)
-        Assign($bold(p)^"job"$, $"ChoosePrimaryResources"(J,K,rho^"job",bold(u),G)$)
+        Assign(
+          $bold(p)^"job"$,
+          $"ChoosePrimaryResources"(J,
+            rho^"job",bold(u),G)$,
+        )
         Assign($bold(h)$, $"Histogram"(bold(p)^"job")$)
         Assign($bold(q)^"machine"$, $zeta bold(h)\/norm(bold(h)) + (1-zeta) u$)
-        Assign($bold(p)^"machine"$, $"ChoosePrimaryResources"(M,K,rho^"machine",bold(q)^"machine",G)$)
+        Assign(
+          $bold(p)^"machine"$,
+          $"ChoosePrimaryResources"(M,rho^"machine",bold(q)^"machine",G)$,
+        )
         Assign(
           $(C,R)$,
-          $"GenerateCapacitiesAndRequirements"(
-            K,
-            M,
-            J,
-            bold(c)_0,
-            bold(d)_0,
-            bold(p)^"machine",
-            bold(p)^"job",
-            G
-          )$,
+          $"GenerateCapacitiesAndRequirements"()$,
         )
 
         Assign(
           $L$,
-          $"GenerateJobCounts"(
-            K,
-            J,
-            T,
-            lambda_0,
-            (lambda_"min",lambda_"max"),
-            rho^"slot",
-            eta,
-            (v_"min", v_"max"),
-            bold(p)^"job",
-            G,
-          )$,
+          $"GenerateTimeSlots"()$,
         )
 
-        Assign($(bold(c^p),bold(c^r))$, $"ComputeCosts"(C, bold(alpha), gamma)$)
+        Assign(
+          $(bold(c^p),bold(c^r))$,
+          $"ComputeCosts"(
+             // C,
+            // bold(alpha),
+            // gamma
+          )$,
+        )
         Return($C, R, L, bold(c^p), bold(c^r)$)
       },
     )

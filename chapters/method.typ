@@ -12,7 +12,7 @@ This chapter summarizes our research questions and the scheduling algorithms tha
 
 With this research, we aim to answer the following research questions:
 
-RQ1: How can we create an energy-efficient offline multi-resource cloud job scheduler? \
+RQ1: How can we create a cost-efficient offline multi-resource cloud job scheduler? \
 RQ2: How can we create a cloud job scheduler which is optimized for both scheduling quality and execution time?
 
 == Algorithms
@@ -35,7 +35,6 @@ The _FFDL2_ algorithm orders item types in decreasing order of the Euclidean (L2
 === Resource-weighted cost-aware best-fit algorithm <bfd_algo>
 
 Finally, we will now describe a packing algorithm based on the best-fit heuristic.
-This is a simpler algorithm, which does not make use of any of the previous _"ruin-and-recreate"_ or _"neighborhood search"_ methods used by the previously described algorithm.
 As we shall later see in the coming Results section (@results_section), this algorithm yields excellent solutions, dominating all other packing algorithms previously described in this report.
 The strength of this algorithm comes from how it selects the type of bin to open for a new item.
 Previous algorithm have used naïve methods for this, such as simply selecting the cheapest feasible bin type.
@@ -43,6 +42,27 @@ This algorithm takes a more intelligent approach to the problem, instead attempt
 Because of this, the algorithm could also be viewed as a best-fit-next-fit hybrid algorithm.
 This new method encourages the selection of bin types which are neither too large or too small.
 A similar slack-based method is used to select which of the already open bins should store a given item.
+Below, we present a table of symbols used by this algorithm.
+
+#block(breakable: false, [
+  #figure(
+    table(
+      columns: 2,
+      [*Symbol*], [*Description*],
+      [$B$], [Set of open bins],
+      [$X_(i,t)$], [Number of bins of type $i$ open for time slot $t$],
+      [$eta$], [Number of remaining unpacked items],
+      [$tau_(t,b)$], [Bin type of bin $b$ for time slot $t$],
+      [$bold(lambda)$], [Total resource load of a bin],
+      [$bold(rho)$], [Remaining resource capacity of a bin],
+      [$Phi_b$], [Slack score for bin $b$],
+      [$y_(t,j,b)$], [Number of items of type $j$ in bin $b$ in time slot $t$],
+      [$Psi_i$], [Slack score for bin type $i$],
+    ),
+    caption: [Symbol table for BFD and FFDNew algorithms.],
+  )
+])
+
 
 We begin by presenting a pseudocode description of the algorithm.
 Thereafter, we describe each step of the algorithm in greater detail.

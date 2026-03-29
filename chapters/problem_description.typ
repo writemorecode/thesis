@@ -6,36 +6,46 @@ This chapter formalizes the offline job scheduling problem and introduces the no
 #let ZZpos = $ZZ_(>0)$
 
 There are $J$ different types of jobs.
-Each job type has a certain hardware resource requirement.
-There are $K$ different types of hardware resources, e.g. CPU, memory, disk, GPU.
-The hardware requirements of job type $j$, for $1<=j<=J$, is described with a vector $bold(r)_j in ZZnonneg^K$.
-We collect these job resource requirements as column vectors in a requirements matrix $bold(R)$ with dimensions $(K,J)$.
+Each job type has certain hardware resource requirements.
+There are $K$ different types of hardware resources, e.g. CPU, memory, disk, I/O, etc.
+The resource demands of job type $j$, for $1<=j<=J$, is described with a $K$-dimensional vector $bold(r)_j in ZZnonneg^K$ with non-negative integer elements.
+We collect these job resource requirements as column vectors in a job resource demand matrix $bold(R)$ with dimensions $(K,J)$.
 
 $
   bold(R) = mat(|, |, , |; bold(r)_1, bold(r)_2, dots.c, bold(r)_J; |, |, , |)
 $
 
-The customer workloads will run for a total of $T$ equally-sized time slots.
-For the sake of simplicity, time slots will have unit duration.
-Each job must run during its given time slot, and cannot be scheduled for some other future time slot.
-For each time slot $t$, the vector $bold(l)_t in ZZnonneg^J$ gives the number of each job type which must run during the slot.
+There are $M$ different kinds of machines available to buy.
+Each machine type has a certain hardware resource capacity.
+The resource capacity of machine type $i$, for $1<=i<=M$, is described with a $K$-dimensional vector $bold(m)_i in ZZnonneg^K$ with non-negative integer elements.
+We collect these machine types as column vectors in a machine resource capacity matrix $bold(C)$ with dimensions $(K , M)$.
+// Suppose a machine type $i$ has the following hardware capacity values: 2 CPU, 4 memory, 3 disk, 0 GPU.
+// Then machine type $i$ would be described as $bold(m)_i=mat(2, 4, 3, 0)^T$.
+// We assume here that there exists some method for mapping machine hardware resource capacities to non-negative integers.
+
+$
+  bold(C) = mat(|, |, , |; bold(m)_1, bold(m)_2, dots.c, bold(m)_M; |, |, , |)
+$
+
+The predicted workload will be divided into $T$ time slots of equal duration.
+For each time slot $t$, the $J$-dimensional vector $bold(l)_t in ZZnonneg^J$ gives the number of jobs of each type which must be scheduled during the slot.
+All jobs will run for the entirety of their assigned time slot.
+Each job must run during its given time slot, and cannot be scheduled for some other time slot.
 The $bold(l)_t$ values should be assumed to be a prediction of future workload demand.
-However, for the sake of simplicity, we shall consider these values to be deterministic.
-We collect these job time slot vectors as column vectors in a $(J , T)$ load profile matrix $bold(L)$.
+However, we shall consider these values to be deterministic.
+We collect these job time slot vectors as column vectors in a $(J , T)$ workload matrix $bold(L)$.
 
 $
   bold(L) = mat(|, |, , |; bold(l)_1, bold(l)_2, dots.c, bold(l)_T; |, |, , |)
 $
 
-There are $M$ different kinds of machines available to buy.
-The initial purchase cost of each machine type is given by the vector $bold(c^p) in ZZnonneg^M$.
+The initial purchase cost of each machine type is given by the $M$-dimensional vector $bold(c^p) in ZZnonneg^M$ of non-negative integers.
 A machine instance of type $i$ costs $c_i^p$ to buy.
 We will not be considering constraints on the maximum number of instances of a given machine type.
 For each time slot, a machine instance can either be running or powered off.
-The per time-slot running cost of each machine type is given by the vector $bold(c^r) in ZZnonneg^M$.
+The per time-slot running cost of each machine type is given by the $M$-dimensional vector $bold(c^r) in ZZnonneg^M$ of non-negative integers.
 A running machine instance of type $i$ has a running cost of $c_i^r$ per time slot.
 We will be assuming a constant running cost for running instances, regardless of the jobs running on the instances.
-
 The purchase and running costs of the machines types are a function of their respective capacity vectors.
 The purchase and running cost vectors are given by:
 
@@ -44,32 +54,18 @@ $
 $
 
 where $bold(alpha)$ is a vector where the element $alpha_k$ represents the weight of resource $k$.
-
 We will not allow a single job to be split across multiple machines.
 Machines incur no running cost while powered off.
-Each machine type has a different hardware configuration, e.g. CPU, memory, disk, GPU, etc.
-We assume here that there exists some method for mapping machine hardware resource capacities to non-negative integers.
-The hardware configuration of machine type $i$, for $1<=i<=M$, is described with a vector $bold(m)_i in ZZnonneg^K$.
-Suppose a machine type $i$ has the following hardware capacity values: 2 CPU, 4 memory, 3 disk, 0 GPU.
-Then machine type $i$ would be described as $bold(m)_i=mat(2, 4, 3, 0)^T$.
-We collect these machine types as column vectors in a $(K , M)$ capacity matrix $bold(C)$.
-
-$
-  bold(C) = mat(|, |, , |; bold(m)_1, bold(m)_2, dots.c, bold(m)_M; |, |, , |)
-$
-
-
-Let the vector $bold(x) in ZZnonneg^M$ be the decision variable representing our selection of machine types.
+Let the $M$-dimensional vector $bold(x) in ZZnonneg^M$ be the decision variable representing our selection of machine types.
 The vector element $x_i$ equals the number of machines of type $i$ we choose to buy.
-The total initial cost of buying our selected machines will then be given by $bold(x)^(T)bold(c^p)$.
-
+The total initial cost of buying our selected machines will then be given by the scalar product $bold(x)^(T)bold(c^p)$.
 To calculate our total running cost, we introduce the variables $z_(t) in ZZnonneg^M$, where $z_(t,m)$ denotes the number of instances of machine type $m$ which are powered on during time slot $t$.
-
 Since the number of powered on instances of any machine type can not exceed the number of purchased instances of the given type, we must add the constraints $bold(z)_t<=bold(x) ,forall t$.
-
-The cost of running our machine instances will be given by i.e. $sum_(t=1)^T bold(z)_t^T bold(c^r)$.
+The cost of running our selected machine instances will be given by the following expression.
+$
+  sum_(t=1)^T bold(z)_t^T bold(c^r)
+$
 This is the sum over all time slots of the scalar product of the vector of machine type running costs and the vector of the number of each machine type running during the time slot.
-
 The total hardware resource capacity available for time slot $t$ is then given by $bold(C) bold(z)_t$.
 In order to be able to schedule and run all pending jobs, the following constraints must be satisfied.
 
@@ -80,12 +76,10 @@ $
 Finally, we can state an optimization problem.
 
 $
-  "minimize" \ bold(x)^(T)bold(c^p) + sum_(t=1)^T bold(z)_t^T bold(c^r)\
-  "subject to" \
-  bold(C z)_t >= bold(R l)_t , forall t \
-  bold(z)_t <= bold(x) ,forall t \
-  bold(x) in ZZnonneg^M quad
-  bold(z)_t in ZZnonneg^M ,forall t
+    "minimize" & quad bold(x)^(T)bold(c^p) + sum_(t=1)^T bold(z)_t^T bold(c^r) \
+  "subject to" & quad bold(C z)_t >= bold(R l)_t , forall t \
+               & quad bold(z)_t <= bold(x) ,forall t \
+               & quad bold(x) in ZZnonneg^M quad bold(z)_t in ZZnonneg^M ,forall t
 $
 
 However, this is not an accurate model of the problem.
@@ -101,17 +95,12 @@ Because the stated problem does not have these packing constraints, it can only 
 
 Let us now describe the variables and constraints required to state an optimization problem which will guarantee valid allocations of jobs to machines.
 We introduce the vectors $bold(y)_t^((i)) in ZZnonneg^J$ to denote the number of each job type allocated per powered-on instance of machine type $i$ to time slot $t$.
-
 Using these new variables, we define two new constraints.
 First, the constraint
 $
   sum_(i=1)^M z_(i,t) bold(y)_t^((i)) >= bold(l)_t , forall 1<=t<=T
 $
 ensures that all jobs scheduled for each time slot will be run.
-
-// The vector $bold(y)_t^((i))$ gives the number of each job type which will run per powered-on instance of machine type $i$ during time slot $t$.
-// For time slot $t$, there are $z_t^i$ instances of machine type $i$ powered on.
-
 Second, the constraint
 
 $
@@ -124,19 +113,17 @@ Therefore, the row vector for row $k$ of $bold(R)$, call it $bold(q^((k)))$, giv
 The scalar product of $bold(q^((k)))$ and $bold(y)_t^((i))$ is then the sum of the resource requirement of resource $k$ of each job type, scaled by the number of jobs of type $j$ allocated to machine type $i$ in time slot $t$.
 This must hold for each resource type $k$, and machine type $i$.
 Thus, we must have $bold(R) bold(y)_t^((i)) <= bold(m)_i ,forall i,t$.
-
 Now we may state a more realistic optimization problem.
 
-$
-  "minimize" \ bold(x)^(T)bold(c^p) + sum_(t=1)^T bold(z)_t^T bold(c^r) \
-  "subject to" \
-  sum_(i=1)^M z_(i,t) bold(y)_t^((i)) >= bold(l)_t quad forall 1<=t<=T \
-  bold(R) bold(y)_t^((i)) <= bold(m)_i quad forall 1<=i<=M ,quad 1<=t<=T \
-  bold(x) in ZZnonneg^M, quad
-  bold(z)_t in ZZnonneg^M forall t, quad
-  bold(y)_t^((i)) in ZZnonneg^J forall t,i
-$
+// The vector $bold(y)_t^((i))$ gives the number of each job type which will run per powered-on instance of machine type $i$ during time slot $t$.
+// For time slot $t$, there are $z_t^i$ instances of machine type $i$ powered on.
 
+$
+  "minimize" & quad bold(x)^(T)bold(c^p) + sum_(t=1)^T bold(z)_t^T bold(c^r) \
+  "subject to" & quad sum_(i=1)^M z_(i,t) bold(y)_t^((i)) >= bold(l)_t, quad forall t \
+  & quad bold(R) bold(y)_t^((i)) <= bold(m)_i, quad forall i,t \
+  & quad bold(x) in ZZnonneg^M, quad bold(z)_t in ZZnonneg^M forall t, quad bold(y)_t^((i)) in ZZnonneg^J, quad forall i,t
+$
 
 However, this formulation only allows for a single job packing configuration per machine type.
 In reality, there will exist a large set of valid job packing configurations per machine type.
@@ -170,18 +157,16 @@ The vector $bold(n)_(i,t)$ gives the number of machine instances of type $i$ run
 Therefore, row $j$ of $bold(Y)_i bold(n)_(i,t)$ gives the total number of jobs of type $j$ running on machine instances of type $i$ during time slot $t$.
 
 Note that:
-$ sum_(k=1)^(abs(S_i)) n_(i,t,k) = z_(i,t) quad forall i,t $
+$ sum_(k=1)^(abs(S_i)) n_(i,t,k) = z_(i,t), quad forall i,t $
 We can now state our new optimization problem.
 
 $
-  "minimize" \
-  bold(x)^T bold(c^p) + sum_(i=1)^(M) c^r_i sum_(t=1)^(T) sum_(k=1)^(abs(S_i)) n_(i,t,k) =
-  bold(x)^T bold(c^p) + sum_(t=1)^(T) bold(z_t^T) bold(c^r) \
-  "subject to" \
-  bold(y)_(i,j) in S_i quad forall i, j \
-  bold(Y)_i = mat(bold(y)_(i,1), ..., bold(y)_(i,abs(S_i))) \
-  S_i = {bold(y) in ZZnonneg^J | bold(R y) <= bold(m)_i} quad forall i \
-  sum_(i=1)^M bold(Y)_i bold(n)_(i,t) >= bold(l)_t quad forall t \
+    "minimize" & quad bold(x)^T bold(c^p) + sum_(i=1)^(M) c^r_i sum_(t=1)^(T) sum_(k=1)^(abs(S_i)) n_(i,t,k) \
+  //=bold(x)^T bold(c^p) + sum_(t=1)^(T) bold(z_t^T) bold(c^r) \
+  "subject to" & quad bold(y)_(i,j) in S_i quad forall i, j \
+               & quad bold(Y)_i = mat(bold(y)_(i,1), ..., bold(y)_(i,abs(S_i))) \
+               & quad S_i = {bold(y) in ZZnonneg^J | bold(R y) <= bold(m)_i}, quad forall i \
+               & quad sum_(i=1)^M bold(Y)_i bold(n)_(i,t) >= bold(l)_t quad forall t
 $
 
 How shall we approach this problem?
