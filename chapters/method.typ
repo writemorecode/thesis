@@ -53,8 +53,6 @@ Below, we present a table of symbols used by this algorithm.
       [$X_(i,t)$], [Number of bins of type $i$ open for time slot $t$],
       [$eta$], [Number of remaining unpacked items of current type],
       [$tau_(t,b)$], [Bin type of bin $b$ for time slot $t$],
-      [$bold(lambda)$], [Total resource load of a bin],
-      [$bold(rho)$], [Remaining resource capacity of a bin],
       [$Phi_b$], [Slack score for bin $b$],
       [$y_(t,j,b)$], [Number of items of type $j$ in bin $b$ in time slot $t$],
       [$Psi_i$], [Slack score for bin type $i$],
@@ -89,42 +87,11 @@ Thereafter, we describe each step of the algorithm in greater detail.
           For($1<=j<=J$, {
             LineComment(Assign($eta$, $hat(l)_(j,t)$), "Initialize remaining jobs counter")
             While($eta > 0$, {
-              For($b in B$, {
-                LineComment(Assign($i$, $tau_(t,b)$), $"Bin type of bin "b$)
-                LineComment(
-                  Assign($bold(lambda)$, $sum_(bold(nu) in b) bold(nu)$),
-                  "Compute total load of items in current bin",
-                )
-                LineComment(
-                  Assign($bold(rho)$, $bold(m)_i-bold(lambda)$),
-                  "Compute remaining capacity of current bin",
-                )
-                LineComment(
-                  Assign($q_b$, $min_(k: hat(r)_(j,k)>0) floor(rho_k\/hat(r)_(j,k))$),
-                  "Num. of items which fit in bin",
-                )
-                If($q_b >= 1$, {
-                  LineComment(Assign($n_b$, $min(q_b, eta)$), $"Number of type "j "items to place in bin" b$)
-
-                  LineComment(
-                    Assign($bold(u)$, $bold(rho) - n_b bold(hat(r))_j$),
-                    $"Slack of bin " b "with" n_b "type" j "items"$,
-                  )
-
-                  LineComment(
-                    Assign($Phi_b$, $sum_(k=1)^K alpha_k u_k^2$),
-                    $"Compute weighted slack score for bin" b$,
-                  )
-                  LineComment(Assign($k_b$, $(Phi_b, c^r_i, b)$), "Use running cost and bin index for tie-break")
-                })
-              })
+              LineComment(Assign($p$, $"SelectOpenBin"(t, j, eta, B)$), "Try feasible open bins first")
               IfElseChain(
-                $exists b in B: q_b >= 1$,
+                $p != "none"$,
                 {
-                  LineComment(
-                    Assign($b^*$, $arg min_(b in B: q_b >= 1) k_b$),
-                    "Select feasible open bin with minimum slack score",
-                  )
+                  LineComment(Assign($(b^*, n^*)$, $p$), "Unpack helper result")
                   LineComment(Assign($eta$, $eta - n_(b^*)$), "Update packed jobs counter")
                   LineComment(
                     Assign($y_(t,j,b^*)$, $y_(t,j,b^*) + n_(b^*)$),
@@ -132,36 +99,11 @@ Thereafter, we describe each step of the algorithm in greater detail.
                   )
                 },
                 {
-                  For($1<=i<=M$, {
-                    LineComment(
-                      Assign($q_i$, $min_(k: hat(r)_(j,k)>0) floor(m_(i,k)\/hat(r)_(j,k))$),
-                      "Num. of items which fit in empty bin of type i",
-                    )
-                    If($q_i >= 1$, {
-                      LineComment(Assign($n_i$, $min(eta, q_i)$), $"Number of type "j "items to place in new bin"$)
-
-                      LineComment(
-                        Assign($bold(u)$, $bold(m)_i - n_i bold(hat(r))_j$),
-                        $"Slack of bin type" i "with" n_i "type" j "items"$,
-                      )
-
-                      LineComment(
-                        Assign($Psi_i$, $sum_(k=1)^K alpha_k u_k^2 \/c^p_i$),
-                        $"Compute slack score for bin type "i$,
-                      )
-                      LineComment(
-                        Assign($k_i$, $(Psi_i, c^p_i + c^r_i, i)$),
-                        "Use marginal cost and type index for tie-break",
-                      )
-                    })
-                  })
+                  LineComment(Assign($p$, $"SelectNewBinType"(j, eta)$), "No feasible open bin found")
                   IfElseChain(
-                    $exists i: q_i >= 1$,
+                    $p != "none"$,
                     {
-                      LineComment(
-                        Assign($i^*$, $arg min_(i: q_i >= 1) k_i$),
-                        "Select feasible bin type with minimum cost-slack score",
-                      )
+                      LineComment(Assign($(i^*, n^*)$, $p$), "Unpack helper result")
                       LineComment(Assign($eta$, $eta - n_(i^*)$), "Update packed jobs counter")
                       LineComment(Assign($X_(i^*,t)$, $X_(i^*,t) + 1$), $"Open new bin of type" i^*$)
                       LineComment(Assign($b$, $abs(B) + 1$), "Assign new bin index")
@@ -187,78 +129,140 @@ Thereafter, we describe each step of the algorithm in greater detail.
     )
   })])
 
+#block(breakable: true, [
+  #show: style-algorithm
+  #algorithm-figure("Select feasible open bin", vstroke: .5pt + luma(200), inset: 0.3em, {
+    import algorithmic: *
+    Procedure("SelectOpenBin", ($t, j, eta, B$), {
+      For($b in B$, {
+        LineComment(Assign($i$, $tau_(t,b)$), $"Bin type of bin "b$)
+        LineComment(
+          Assign($bold(rho)_b$, $bold(m)_i - sum_(j'=1)^J y_(t,j',b) bold(hat(r))_(j')$),
+          "Compute remaining capacity of current bin",
+        )
+        LineComment(
+          Assign($q_b$, $min_(k: hat(r)_(j,k)>0) floor(rho_(b,k)\/hat(r)_(j,k))$),
+          "Num. of items which fit in bin",
+        )
+        If($q_b >= 1$, {
+          LineComment(Assign($n_b$, $min(q_b, eta)$), $"Number of type "j "items to place in bin" b$)
+          LineComment(
+            Assign($Phi_b$, $sum_(k=1)^K alpha_k (rho_(b,k) - n_b hat(r)_(j,k))^2$),
+            $"Compute weighted slack score for bin" b$,
+          )
+          LineComment(Assign($k_b$, $(Phi_b, c^r_i, b)$), "Use running cost and bin index for tie-break")
+        })
+      })
+      IfElseChain(
+        $exists b in B: q_b >= 1$,
+        {
+          LineComment(
+            Assign($b^*$, $arg min_(b in B: q_b >= 1) k_b$),
+            "Select feasible open bin with minimum slack score",
+          )
+          Return[$(b^*, n_(b^*))$]
+        },
+        {
+          Return[$"none"$]
+        },
+      )
+    })
+  })])
+
+#block(breakable: true, [
+  #show: style-algorithm
+  #algorithm-figure("Select new bin type", vstroke: .5pt + luma(200), inset: 0.3em, {
+    import algorithmic: *
+    Procedure("SelectNewBinType", ($j, eta$), {
+      For($1<=i<=M$, {
+        LineComment(
+          Assign($q_i$, $min_(k: hat(r)_(j,k)>0) floor(m_(i,k)\/hat(r)_(j,k))$),
+          "Num. of items which fit in empty bin of type i",
+        )
+        If($q_i >= 1$, {
+          LineComment(Assign($n_i$, $min(eta, q_i)$), $"Number of type "j "items to place in new bin"$)
+          LineComment(
+            Assign($Psi_i$, $sum_(k=1)^K alpha_k (m_(i,k) - n_i hat(r)_(j,k))^2 \/c^p_i$),
+            $"Compute normalized slack score for bin type "i$,
+          )
+          LineComment(
+            Assign($k_i$, $(Psi_i, c^p_i + c^r_i, i)$),
+            "Use marginal cost and type index for tie-break",
+          )
+        })
+      })
+      IfElseChain(
+        $exists i: q_i >= 1$,
+        {
+          LineComment(
+            Assign($i^*$, $arg min_(i: q_i >= 1) k_i$),
+            "Select feasible bin type with minimum cost-slack score",
+          )
+          Return[$(i^*, n_(i^*))$]
+        },
+        {
+          Return[$"none"$]
+        },
+      )
+    })
+  })])
+
 The algorithm uses a weighted best-fit heuristic, with resource demand-aware job type ordering and cost-aware bin type selection.
 For each time slot $t$, the Python implementation starts with an empty set of open bins and packs the jobs of that time slot independently.
 The algorithm uses the resource weight vector $bold(alpha)$ to compute the item size vector $bold(v)=bold(R)^T bold(alpha)$, where each item type $j$ has scalar size $v_j$.
 This ordering gives higher priority to item types with a greater demand for scarce resources.
 Item types are packed in non-increasing order of their priorities.
 
-For each unpacked item type $j$ with remaining count $eta$ and demand vector $bold(r)_j$, we first evaluate the currently open bins.
-For each open bin $b$, let $bold(rho)$ be the bin's remaining capacity vector.
-We compute the maximum number $q_b$ of items of type $j$ which can be added to the bin.
+The main loop is intentionally short because the repeated scoring logic has been extracted into two helper procedures.
+Both helpers follow the same pattern.
+Given an available capacity vector $bold(zeta)$, we compute
 
 $
-  q_b = min_(k: hat(r)_(j,k)>0) floor(rho_(k)/hat(r)_(j,k))
+  q = min_(k: hat(r)_(j,k)>0) floor(zeta_k / hat(r)_(j,k)), quad
+  n = min(q, eta), quad
+  bold(u) = bold(zeta) - n bold(hat(r))_j
 $
 
+Only candidates with $q >= 1$ are feasible.
 Note here that each $hat(r)_(j,k)$ is an element of the job-demand matrix $bold(hat(R))$ formed by permuting the columns of $bold(R)$.
-Only bins with $q_b >= 1$ are feasible.
-If at least one feasible open bin exists, then for each such bin $b$ we compute $n_b=min(q_b, eta)$.
-Next, we compute the remaining capacity (slack) $bold(u)=bold(rho) - n_b bold(hat(r))_j$ of bin $b$ after storing $n_b$ items of type $j$.
-This is inspired by the L2 Norm-based Greedy heuristic, described in @Panigrahy2011HeuristicsFV.
-Next, we compute a score $Phi_b$ representing the quality of the fit of the current item in bin $b$.
+The slack vector $bold(u)$ is the remaining capacity after placing as many items of type $j$ as possible, up to the current remaining count $eta$.
+This scoring method is inspired by the L2 Norm-based Greedy heuristic described in @Panigrahy2011HeuristicsFV.
+
+For open bins, the available capacity vector is the remaining capacity
 
 $
-  Phi_b = sum_(k=1)^K alpha_k u_k^2
+  bold(zeta) = bold(rho)_b = bold(m)_(tau_(t,b)) - sum_(j'=1)^J y_(t,j',b) bold(hat(r))_(j')
 $
 
-The implementation then compares feasible open bins using the lexicographic key
+and the helper procedure evaluates the key
 
 $
+  Phi_b = sum_(k=1)^K alpha_k u_k^2, quad
   k_b = (Phi_b, c^r_(tau_(t,b)), b)
 $
 
-that is, weighted squared slack first, then running cost of the bin type, and finally the bin index.
-We select the feasible open bin $b^*$ with minimum key $k_(b^*)$.
-Finally, we pack $n_(b^*)$ items of type $j$ into bin $b^*$, by incrementing $y_(t,j,b^*)$ by $n_(b^*)$.
-We decrement the number of remaining unpacked items by $n_(b^*)$.
+Thus, feasible open bins are ranked first by weighted squared slack, then by the running cost of their type, and finally by bin index.
+The helper $"SelectOpenBin"$ returns the feasible open bin $b^*$ with minimum key, together with the corresponding placement count $n_(b^*)$.
 
 If no open bin is feasible, we must open a new bin.
-As before, we use a score-based method for selecting the bin type.
-For each bin type $i$ with sufficient capacity, we compute the maximum number $q_i$ of items of type $j$ which can be stored in an empty bin of type $i$.
+For new bin types, the available capacity vector is simply $bold(zeta) = bold(m)_i$, and the helper procedure evaluates
 
 $
-  q_i = min_(k: hat(r)_(j,k)>0) floor(m_(i,k)/hat(r)_(j,k))
-$
-
-Only machine types with $q_i >= 1$ are feasible.
-For each feasible machine type $i$, we compute $n_i=min(eta, q_i)$.
-Next, we compute the remaining capacity (slack) vector $bold(u) = bold(m)_i - n_i bold(hat(r))_j$ of bin type $i$ after storing $n_i$ items of type $j$.
-Next, we compute a bin selection score $Psi_i$ to use for selecting the optimal bin type to open.
-
-$
-  Psi_i = sum_(k=1)^K alpha_k u_(k)^2 /c^p_i
-$
-
-The Python implementation compares feasible new bin types using the lexicographic key
-
-$
+  Psi_i = sum_(k=1)^K alpha_k u_k^2 /c^p_i, quad
   k_i = (Psi_i, c^p_i + c^r_i, i)
 $
 
-that is, normalized slack first, then the marginal cost of opening that bin type in the current slot, and finally the type index.
-Thus we select the feasible bin type $i^*$ with minimum key $k_(i^*)$.
-The score $Psi_i$ is nearly identical to the previous $Phi_b$, except for the normalization factor $c^p_i$.
-Recall that $c^p_i = bold(alpha)^T bold(m)_i$, so the implementation is normalizing by the weighted capacity of bin type $i$.
-By dividing $u_k^2$, the squared slack in dimension $k$, by $c^p_i$, we are normalizing the slack by the bin size.
+That is, feasible new bin types are ranked by normalized slack, then by the marginal cost of opening the bin in the current slot, and finally by type index.
+The helper $"SelectNewBinType"$ returns the feasible type $i^*$ with minimum key, together with the corresponding placement count $n_(i^*)$.
+Here $c^p_i = bold(alpha)^T bold(m)_i$, so the normalization divides weighted squared slack by the weighted capacity of the bin type.
 This gives us a measure of _"slack per unit of bin capacity"_, which favors bins which fit the required demand proportionally well, rather than simply selecting the bins with smaller overall remaining capacity.
 Without this normalization, larger bins with greater raw capacity will be unfairly penalized, pushing the heuristic to instead selecting smaller-capacity bins.
 This can in turn lead to item fragmentation and a overall inferior packing.
 
-We then open one new bin of type $i^*$, increment $X_(i^*,t)$, assign a new bin index $b$, store $tau_(t,b)=i^*$, and add $b$ to the set $B$ of open bins for the current time slot.
-Finally, we pack $n_(i^*)$ items of type $j$ into this new bin, by incrementing $y_(t,j,b)$ by $n_(i^*)$.
-We decrement the number of remaining unpacked items by $n_(i^*)$.
-If no feasible machine type exists, the Python implementation raises an error.
+The main algorithm first calls $"SelectOpenBin"$.
+If that returns $"none"$, then it calls $"SelectNewBinType"$.
+If the second helper also returns $"none"$, the input is infeasible.
+Otherwise, the algorithm opens one new bin of type $i^*$, increments $X_(i^*,t)$, assigns a new bin index $b$, stores $tau_(t,b)=i^*$, adds $b$ to the set $B$ of open bins for the current time slot, and packs $n_(i^*)$ items of type $j$ into this new bin.
 For the generated datasets used in this thesis, this case does not occur because instance generation guarantees that every job type fits on at least one machine type.
 
 The implementation also contains a degenerate guard for the case in which a job type has zero demand in every resource dimension.
@@ -273,4 +277,3 @@ We can create a new FFD-based packing algorithm based on this algorithm.
 We will call this algorithm _"FFDNew"_.
 The algorithm will use the same job-ordering and new bin selection methods as this algorithm.
 However, like first fit, it will place items in the first bin which accommodate it.
-
