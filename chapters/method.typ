@@ -17,6 +17,9 @@ RQ2: How can we create a cloud job scheduler which is optimized for both schedul
 
 == Algorithms
 
+In this chapter, we will use the terms item and job interchangeably.
+The same goes for the terms bin and machine.
+
 === Heuristics for FFD
 
 Here, we shall describe a number of different variations of the first-fit decreasing algorithm, each using a different heuristic.
@@ -34,7 +37,7 @@ The _FFDL2_ algorithm orders item types in decreasing order of the Euclidean (L2
 
 === Resource-weighted cost-aware best-fit algorithm <bfd_algo>
 
-Finally, we will now describe a packing algorithm based on the best-fit heuristic.
+Nexn, we will describe a new packing algorithm based on the best-fit heuristic.
 As we shall later see in the coming Results section (@results_section), this algorithm yields excellent solutions, dominating all other packing algorithms previously described in this report.
 The strength of this algorithm comes from how it selects the type of bin to open for a new item.
 Previous algorithm have used naïve methods for this, such as simply selecting the cheapest feasible bin type.
@@ -67,7 +70,7 @@ Thereafter, we describe each step of the algorithm in greater detail.
 
 #pagebreak()
 
-#block(breakable: true, [
+#block(breakable: false, [
   #show: style-algorithm
   #algorithm-figure("BestFit packing algorithm", vstroke: .5pt + luma(200), inset: 0.3em, {
     import algorithmic: *
@@ -129,7 +132,21 @@ Thereafter, we describe each step of the algorithm in greater detail.
     )
   })])
 
-#block(breakable: true, [
+#block(breakable: false, [
+  #show: style-algorithm
+  #algorithm-figure("Resource weight sort", vstroke: .5pt + luma(200), inset: 0.3em, {
+    import algorithmic: *
+    Procedure("ResourceWeightSort", ($bold(R)$, $bold(L)$, $bold(alpha)$), {
+      LineComment(Assign($bold(v)$, $bold(R)^T bold(alpha)$), "")
+      LineComment(Assign($pi$, $"ArgSort"(bold(v))$), "")
+      LineComment(Assign($bold(hat(R))$, $bold(R) bold(P)$), "")
+      LineComment(Assign($bold(hat(L))$, $bold(P)^T bold(L)$), "")
+      Return(($bold(hat(R)), bold(hat(L))$))
+    })
+  })
+])
+
+#block(breakable: false, [
   #show: style-algorithm
   #algorithm-figure("Select feasible open bin", vstroke: .5pt + luma(200), inset: 0.3em, {
     import algorithmic: *
@@ -169,7 +186,7 @@ Thereafter, we describe each step of the algorithm in greater detail.
     })
   })])
 
-#block(breakable: true, [
+#block(breakable: false, [
   #show: style-algorithm
   #algorithm-figure("Select new bin type", vstroke: .5pt + luma(200), inset: 0.3em, {
     import algorithmic: *
@@ -208,8 +225,41 @@ Thereafter, we describe each step of the algorithm in greater detail.
   })])
 
 The algorithm uses a weighted best-fit heuristic, with resource demand-aware job type ordering and cost-aware bin type selection.
-For each time slot $t$, the Python implementation starts with an empty set of open bins and packs the jobs of that time slot independently.
-The algorithm uses the resource weight vector $bold(alpha)$ to compute the item size vector $bold(v)=bold(R)^T bold(alpha)$, where each item type $j$ has scalar size $v_j$.
+For each time slot $t$, the algorithm starts with an empty set of open bins and packs the jobs of that time slot independently.
+The algorithm uses the $K$-dimensional resource weight vector $bold(alpha)$ to compute the $J$-dimensional item size vector $bold(v)=bold(R)^T bold(alpha)$, where each item type $j$ has scalar size $v_j$.
+Let
+$
+  bold(I)_J = mat(|, |, , |; bold(e)_1, bold(e)_2, dots.c, bold(e)_J; |, |, , |)
+$
+be the identity matrix of dimension $J$.
+Let $pi$ be a permutation function on the set ${1,dots.h,J}$ where the following holds:
+$
+  v_(pi(1)) > v_(pi(2)) > v_(pi(3)) > dots.h > v_(pi(J)).
+$
+
+The permutation $pi$ permutes the indices ${1,dots.h,J}$ of the $bold(v)$ vector to be in decreasing order of their respective vector elements ${v_1,dots.h,v_J}$.
+In other words, we are sorting the elements of the $bold(v)$ vector in decreasing order.
+Using this permutation, we form the permutation matrix:
+
+$
+  bold(P) = mat(|, |, , |; bold(e)_(pi(1)), bold(e)_(pi(2)), dots.c, bold(e)_(pi(J)); |, |, , |).
+$
+
+Using this permutation matrix, we can re-order the columns $bold(r)_j$ of the matrix $bold(R)$, forming the new permuted matrix $bold(hat(R)) = bold(R) bold(P)$.
+
+$
+  bold(hat(R)) = mat(|, |, , |; bold(r)_(pi(1)), bold(r)_(pi(2)), dots.c, bold(r)_(pi(J)); |, |, , |)
+  = mat(|, |, , |; bold(hat(r))_(1), bold(hat(r))_(2), dots.c, bold(hat(r))_(J); |, |, , |)
+$
+
+Likewise, we can re-order the time slots in decreasing order of their total resource demand.
+This gives us the permuted time slot matrix $bold(hat(L)) = bold(P)^T bold(L)$.
+
+$
+  bold(hat(L)) = mat(|, |, , |; bold(l)_(pi(1)), bold(l)_(pi(2)), dots.c, bold(l)_(pi(T)); |, |, , |)
+  = mat(|, |, , |; bold(hat(l))_(1), bold(hat(l))_(2), dots.c, bold(hat(l))_(T); |, |, , |)
+$
+
 This ordering gives higher priority to item types with a greater demand for scarce resources.
 Item types are packed in non-increasing order of their priorities.
 
@@ -275,7 +325,7 @@ Finally, we return the bin-type vector $bold(x)$ and the item-bin-time slot pack
 
 === Resource-weighted cost-aware first-fit algorithm
 
-#block(breakable: true, [
+#block(breakable: false, [
   #show: style-algorithm
   #algorithm-figure("FFDNew packing algorithm", vstroke: .5pt + luma(200), inset: 0.3em, {
     import algorithmic: *
@@ -340,7 +390,7 @@ Finally, we return the bin-type vector $bold(x)$ and the item-bin-time slot pack
     )
   })])
 
-#block(breakable: true, [
+#block(breakable: false, [
   #show: style-algorithm
   #algorithm-figure("Select first feasible open bin", vstroke: .5pt + luma(200), inset: 0.3em, {
     import algorithmic: *
@@ -373,7 +423,7 @@ The only difference lies in how already open bins are selected.
 For a current item type $j$ and time slot $t$, let the set of open bins again be denoted by $B$.
 For each $b in B$, we compute the remaining capacity vector $bold(rho)_b$ and the feasible placement count $q_b$ exactly as in the _BFD_ algorithm.
 However, rather than computing the slack score $Phi_b$ for every feasible open bin and selecting the one with minimum score, _FFDNew_ follows the first-fit rule.
-That is, it scans the open bins in their current order, which in the Python implementation is the order in which the bins were opened, and selects the first bin which satisfies $q_b >= 1$.
+That is, it scans the open bins in their current order, which in the algorithm is the order in which the bins were opened, and selects the first bin which satisfies $q_b >= 1$.
 Equivalently, if the feasible set is non-empty, the selected bin is
 
 $
@@ -393,6 +443,6 @@ This means that _FFDNew_ may be viewed as a hybrid algorithm.
 It combines the more sophisticated ordering and new-bin selection logic of _BFD_ with the simpler first-fit rule for already open bins.
 In this sense, it keeps the cost-aware mechanism for deciding _which kind_ of bin to open, while replacing the best-fit scoring of open bins with a deterministic left-to-right scan through the bins that are already open.
 
-The Python implementation applies this rule in a vectorized way when several jobs of the same type remain to be packed.
+The algorithm applies this rule in a vectorized way when several jobs of the same type remain to be packed.
 In effect, it fills earlier feasible bins before later ones, which is equivalent to repeatedly applying first fit to identical items of the current type.
 As before, the algorithm is run independently for each time slot, and the final machine vector is obtained by taking $x_i = max_t X_(i,t)$ for each machine type $i$.
