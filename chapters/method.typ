@@ -185,12 +185,12 @@ Item types are packed in non-increasing order of their priorities.
 
 The main loop is intentionally short because the repeated scoring logic has been extracted into two helper procedures.
 Both helpers follow the same pattern.
-Given an available capacity vector $bold(zeta)$, we compute
+Given an available capacity vector $bold(z)$, we compute
 
 $
-  q = min_(k: hat(r)_(j,k)>0) floor(zeta_k / hat(r)_(j,k)), quad
+  q = min_(k: hat(r)_(j,k)>0) floor(z_k / hat(r)_(j,k)), quad
   n = min(q, eta), quad
-  bold(u) = bold(zeta) - n bold(hat(r))_j
+  bold(u) = bold(z) - n bold(hat(r))_j
 $
 
 Only candidates with $q >= 1$ are feasible.
@@ -198,10 +198,11 @@ Note here that each $hat(r)_(j,k)$ is an element of the job-demand matrix $bold(
 The slack vector $bold(u)$ is the remaining capacity after placing as many items of type $j$ as possible, up to the current remaining count $eta$.
 This scoring method is inspired by the L2 Norm-based Greedy heuristic described in @Panigrahy2011HeuristicsFV.
 
-For open bins, the available capacity vector is the remaining capacity
+Let $i = tau_(t,b)$ be the bin type for each open bin $b$ and time slot $t$.
+The available capacity vector $bold(z)$ is the remaining capacity
 
 $
-  bold(zeta) = bold(rho)_b = bold(m)_(tau_(t,b)) - sum_(j'=1)^J y_(t,j',b) bold(hat(r))_(j')
+  bold(z) = bold(rho)_b = bold(m)_i - sum_(j'=1)^J y_(t,j',b) bold(hat(r))_(j')
 $
 
 and the helper procedure evaluates the key
@@ -255,7 +256,7 @@ The helper $"SelectOpenBin"$ returns the feasible open bin $b^*$ with minimum ke
   })])
 
 If no open bin is feasible, we must open a new bin.
-For new bin types, the available capacity vector is simply $bold(zeta) = bold(m)_i$, and the helper procedure evaluates
+For new bin types, the available capacity vector is simply $bold(z) = bold(m)_i$, and the helper procedure evaluates
 
 $
   Psi_i = sum_(k=1)^K alpha_k u_k^2 /c^p_i, quad
