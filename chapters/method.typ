@@ -68,8 +68,6 @@ Below, we present a table of symbols used by this algorithm.
 We begin by presenting a pseudocode description of the algorithm.
 Thereafter, we describe each step of the algorithm in greater detail.
 
-#pagebreak()
-
 #block(breakable: false, [
   #show: style-algorithm
   #algorithm-figure("BestFit packing algorithm", vstroke: .5pt + luma(200), inset: 0.3em, {
@@ -132,6 +130,45 @@ Thereafter, we describe each step of the algorithm in greater detail.
     )
   })])
 
+The algorithm uses a weighted best-fit heuristic, with resource demand-aware job type ordering and cost-aware bin type selection.
+For each time slot $t$, the algorithm starts with an empty set of open bins and packs the jobs of that time slot independently.
+The algorithm uses the $K$-dimensional resource weight vector $bold(alpha)$ to compute the $J$-dimensional item size vector $bold(v)=bold(R)^T bold(alpha)$, where each item type $j$ has scalar size $v_j$.
+Let
+$
+  bold(I)_J = mat(|, |, , |; bold(e)_1, bold(e)_2, dots.c, bold(e)_J; |, |, , |)
+$
+be the identity matrix of dimension $J$.
+Let $pi$ be a permutation function on the set ${1,dots.h,J}$ where the following holds:
+$
+  v_(pi(1)) > v_(pi(2)) > v_(pi(3)) > dots.h > v_(pi(J)).
+$
+
+The permutation $pi$ permutes the indices ${1,dots.h,J}$ of the $bold(v)$ vector to be in decreasing order of their respective vector elements ${v_1,dots.h,v_J}$.
+In other words, we are sorting the elements of the $bold(v)$ vector in decreasing order.
+Using this permutation, we form the permutation matrix:
+
+$
+  bold(P) = mat(|, |, , |; bold(e)_(pi(1)), bold(e)_(pi(2)), dots.c, bold(e)_(pi(J)); |, |, , |).
+$
+
+Using this permutation matrix, we can re-order the columns $bold(r)_j$ of the matrix $bold(R)$, forming the new permuted matrix $bold(hat(R)) = bold(R) bold(P)$.
+
+$
+  bold(hat(R)) = mat(|, |, , |; bold(r)_(pi(1)), bold(r)_(pi(2)), dots.c, bold(r)_(pi(J)); |, |, , |)
+  = mat(|, |, , |; bold(hat(r))_(1), bold(hat(r))_(2), dots.c, bold(hat(r))_(J); |, |, , |)
+$
+
+Likewise, we can re-order the time slots in decreasing order of their total resource demand.
+This gives us the permuted time slot matrix $bold(hat(L)) = bold(P)^T bold(L)$.
+
+$
+  bold(hat(L)) = mat(|, |, , |; bold(l)_(pi(1)), bold(l)_(pi(2)), dots.c, bold(l)_(pi(T)); |, |, , |)
+  = mat(|, |, , |; bold(hat(l))_(1), bold(hat(l))_(2), dots.c, bold(hat(l))_(T); |, |, , |)
+$
+
+This ordering gives higher priority to item types with a greater demand for scarce resources.
+Item types are packed in non-increasing order of their priorities.
+
 #block(breakable: false, [
   #show: style-algorithm
   #algorithm-figure("Resource weight sort", vstroke: .5pt + luma(200), inset: 0.3em, {
@@ -145,6 +182,37 @@ Thereafter, we describe each step of the algorithm in greater detail.
     })
   })
 ])
+
+The main loop is intentionally short because the repeated scoring logic has been extracted into two helper procedures.
+Both helpers follow the same pattern.
+Given an available capacity vector $bold(zeta)$, we compute
+
+$
+  q = min_(k: hat(r)_(j,k)>0) floor(zeta_k / hat(r)_(j,k)), quad
+  n = min(q, eta), quad
+  bold(u) = bold(zeta) - n bold(hat(r))_j
+$
+
+Only candidates with $q >= 1$ are feasible.
+Note here that each $hat(r)_(j,k)$ is an element of the job-demand matrix $bold(hat(R))$ formed by permuting the columns of $bold(R)$.
+The slack vector $bold(u)$ is the remaining capacity after placing as many items of type $j$ as possible, up to the current remaining count $eta$.
+This scoring method is inspired by the L2 Norm-based Greedy heuristic described in @Panigrahy2011HeuristicsFV.
+
+For open bins, the available capacity vector is the remaining capacity
+
+$
+  bold(zeta) = bold(rho)_b = bold(m)_(tau_(t,b)) - sum_(j'=1)^J y_(t,j',b) bold(hat(r))_(j')
+$
+
+and the helper procedure evaluates the key
+
+$
+  Phi_b = sum_(k=1)^K alpha_k u_k^2, quad
+  k_b = (Phi_b, c^r_(tau_(t,b)), b)
+$
+
+Thus, feasible open bins are ranked first by weighted squared slack, then by the running cost of their type, and finally by bin index.
+The helper $"SelectOpenBin"$ returns the feasible open bin $b^*$ with minimum key, together with the corresponding placement count $n_(b^*)$.
 
 #block(breakable: false, [
   #show: style-algorithm
@@ -186,6 +254,21 @@ Thereafter, we describe each step of the algorithm in greater detail.
     })
   })])
 
+If no open bin is feasible, we must open a new bin.
+For new bin types, the available capacity vector is simply $bold(zeta) = bold(m)_i$, and the helper procedure evaluates
+
+$
+  Psi_i = sum_(k=1)^K alpha_k u_k^2 /c^p_i, quad
+  k_i = (Psi_i, c^p_i + c^r_i, i)
+$
+
+That is, feasible new bin types are ranked by normalized slack, then by the marginal cost of opening the bin in the current slot, and finally by type index.
+The helper $"SelectNewBinType"$ returns the feasible type $i^*$ with minimum key, together with the corresponding placement count $n_(i^*)$.
+Here $c^p_i = bold(alpha)^T bold(m)_i$, so the normalization divides weighted squared slack by the weighted capacity of the bin type.
+This gives us a measure of _"slack per unit of bin capacity"_, which favors bins which fit the required demand proportionally well, rather than simply selecting the bins with smaller overall remaining capacity.
+Without this normalization, larger bins with greater raw capacity will be unfairly penalized, pushing the heuristic to instead selecting smaller-capacity bins.
+This can in turn lead to item fragmentation and a overall inferior packing.
+
 #block(breakable: false, [
   #show: style-algorithm
   #algorithm-figure("Select new bin type", vstroke: .5pt + luma(200), inset: 0.3em, {
@@ -224,91 +307,6 @@ Thereafter, we describe each step of the algorithm in greater detail.
     })
   })])
 
-The algorithm uses a weighted best-fit heuristic, with resource demand-aware job type ordering and cost-aware bin type selection.
-For each time slot $t$, the algorithm starts with an empty set of open bins and packs the jobs of that time slot independently.
-The algorithm uses the $K$-dimensional resource weight vector $bold(alpha)$ to compute the $J$-dimensional item size vector $bold(v)=bold(R)^T bold(alpha)$, where each item type $j$ has scalar size $v_j$.
-Let
-$
-  bold(I)_J = mat(|, |, , |; bold(e)_1, bold(e)_2, dots.c, bold(e)_J; |, |, , |)
-$
-be the identity matrix of dimension $J$.
-Let $pi$ be a permutation function on the set ${1,dots.h,J}$ where the following holds:
-$
-  v_(pi(1)) > v_(pi(2)) > v_(pi(3)) > dots.h > v_(pi(J)).
-$
-
-The permutation $pi$ permutes the indices ${1,dots.h,J}$ of the $bold(v)$ vector to be in decreasing order of their respective vector elements ${v_1,dots.h,v_J}$.
-In other words, we are sorting the elements of the $bold(v)$ vector in decreasing order.
-Using this permutation, we form the permutation matrix:
-
-$
-  bold(P) = mat(|, |, , |; bold(e)_(pi(1)), bold(e)_(pi(2)), dots.c, bold(e)_(pi(J)); |, |, , |).
-$
-
-Using this permutation matrix, we can re-order the columns $bold(r)_j$ of the matrix $bold(R)$, forming the new permuted matrix $bold(hat(R)) = bold(R) bold(P)$.
-
-$
-  bold(hat(R)) = mat(|, |, , |; bold(r)_(pi(1)), bold(r)_(pi(2)), dots.c, bold(r)_(pi(J)); |, |, , |)
-  = mat(|, |, , |; bold(hat(r))_(1), bold(hat(r))_(2), dots.c, bold(hat(r))_(J); |, |, , |)
-$
-
-Likewise, we can re-order the time slots in decreasing order of their total resource demand.
-This gives us the permuted time slot matrix $bold(hat(L)) = bold(P)^T bold(L)$.
-
-$
-  bold(hat(L)) = mat(|, |, , |; bold(l)_(pi(1)), bold(l)_(pi(2)), dots.c, bold(l)_(pi(T)); |, |, , |)
-  = mat(|, |, , |; bold(hat(l))_(1), bold(hat(l))_(2), dots.c, bold(hat(l))_(T); |, |, , |)
-$
-
-This ordering gives higher priority to item types with a greater demand for scarce resources.
-Item types are packed in non-increasing order of their priorities.
-
-The main loop is intentionally short because the repeated scoring logic has been extracted into two helper procedures.
-Both helpers follow the same pattern.
-Given an available capacity vector $bold(zeta)$, we compute
-
-$
-  q = min_(k: hat(r)_(j,k)>0) floor(zeta_k / hat(r)_(j,k)), quad
-  n = min(q, eta), quad
-  bold(u) = bold(zeta) - n bold(hat(r))_j
-$
-
-Only candidates with $q >= 1$ are feasible.
-Note here that each $hat(r)_(j,k)$ is an element of the job-demand matrix $bold(hat(R))$ formed by permuting the columns of $bold(R)$.
-The slack vector $bold(u)$ is the remaining capacity after placing as many items of type $j$ as possible, up to the current remaining count $eta$.
-This scoring method is inspired by the L2 Norm-based Greedy heuristic described in @Panigrahy2011HeuristicsFV.
-
-For open bins, the available capacity vector is the remaining capacity
-
-$
-  bold(zeta) = bold(rho)_b = bold(m)_(tau_(t,b)) - sum_(j'=1)^J y_(t,j',b) bold(hat(r))_(j')
-$
-
-and the helper procedure evaluates the key
-
-$
-  Phi_b = sum_(k=1)^K alpha_k u_k^2, quad
-  k_b = (Phi_b, c^r_(tau_(t,b)), b)
-$
-
-Thus, feasible open bins are ranked first by weighted squared slack, then by the running cost of their type, and finally by bin index.
-The helper $"SelectOpenBin"$ returns the feasible open bin $b^*$ with minimum key, together with the corresponding placement count $n_(b^*)$.
-
-If no open bin is feasible, we must open a new bin.
-For new bin types, the available capacity vector is simply $bold(zeta) = bold(m)_i$, and the helper procedure evaluates
-
-$
-  Psi_i = sum_(k=1)^K alpha_k u_k^2 /c^p_i, quad
-  k_i = (Psi_i, c^p_i + c^r_i, i)
-$
-
-That is, feasible new bin types are ranked by normalized slack, then by the marginal cost of opening the bin in the current slot, and finally by type index.
-The helper $"SelectNewBinType"$ returns the feasible type $i^*$ with minimum key, together with the corresponding placement count $n_(i^*)$.
-Here $c^p_i = bold(alpha)^T bold(m)_i$, so the normalization divides weighted squared slack by the weighted capacity of the bin type.
-This gives us a measure of _"slack per unit of bin capacity"_, which favors bins which fit the required demand proportionally well, rather than simply selecting the bins with smaller overall remaining capacity.
-Without this normalization, larger bins with greater raw capacity will be unfairly penalized, pushing the heuristic to instead selecting smaller-capacity bins.
-This can in turn lead to item fragmentation and a overall inferior packing.
-
 The main algorithm first calls $"SelectOpenBin"$.
 If that returns $"none"$, then it calls $"SelectNewBinType"$.
 If the second helper also returns $"none"$, the input is infeasible.
@@ -324,6 +322,12 @@ For each bin type $i$, we let $x_i = max_t X_(i,t)$ be the maximum number of bin
 Finally, we return the bin-type vector $bold(x)$ and the item-bin-time slot packing variable $y$.
 
 === Resource-weighted cost-aware first-fit algorithm
+
+We can now construct a new FFD-based packing algorithm by modifying the open-bin selection rule of the previous algorithm.
+We will call this algorithm _"FFDNew"_.
+This algorithm uses exactly the same resource-weighted job ordering and the same cost-aware $"SelectNewBinType"$ helper as _BFD_.
+Thus, both algorithms open new bins according to the same normalized weighted slack score.
+The only difference lies in how already open bins are selected.
 
 #block(breakable: false, [
   #show: style-algorithm
@@ -390,6 +394,25 @@ Finally, we return the bin-type vector $bold(x)$ and the item-bin-time slot pack
     )
   })])
 
+For a current item type $j$ and time slot $t$, let the set of open bins again be denoted by $B$.
+For each $b in B$, we compute the remaining capacity vector $bold(rho)_b$ and the feasible placement count $q_b$ exactly as in the _BFD_ algorithm.
+However, rather than computing the slack score $Phi_b$ for every feasible open bin and selecting the one with minimum score, _FFDNew_ follows the first-fit rule.
+That is, it scans the open bins in their current order, which in the algorithm is the order in which the bins were opened, and selects the first bin which satisfies $q_b >= 1$.
+Equivalently, if the feasible set is non-empty, the selected bin is
+
+$
+  b^* = arg min_(b in B: q_b >= 1) b
+$
+
+and the algorithm places
+
+$
+  n_(b^*) = min(q_(b^*), eta)
+$
+
+items of type $j$ into that bin.
+If no open bin is feasible, then _FFDNew_ behaves exactly like _BFD_ and calls $"SelectNewBinType"$ to open a new bin type.
+
 #block(breakable: false, [
   #show: style-algorithm
   #algorithm-figure("Select first feasible open bin", vstroke: .5pt + luma(200), inset: 0.3em, {
@@ -413,31 +436,6 @@ Finally, we return the bin-type vector $bold(x)$ and the item-bin-time slot pack
       Return[$"none"$]
     })
   })])
-
-We can now construct a new FFD-based packing algorithm by modifying the open-bin selection rule of the previous algorithm.
-We will call this algorithm _"FFDNew"_.
-This algorithm uses exactly the same resource-weighted job ordering and the same cost-aware $"SelectNewBinType"$ helper as _BFD_.
-Thus, both algorithms open new bins according to the same normalized weighted slack score.
-The only difference lies in how already open bins are selected.
-
-For a current item type $j$ and time slot $t$, let the set of open bins again be denoted by $B$.
-For each $b in B$, we compute the remaining capacity vector $bold(rho)_b$ and the feasible placement count $q_b$ exactly as in the _BFD_ algorithm.
-However, rather than computing the slack score $Phi_b$ for every feasible open bin and selecting the one with minimum score, _FFDNew_ follows the first-fit rule.
-That is, it scans the open bins in their current order, which in the algorithm is the order in which the bins were opened, and selects the first bin which satisfies $q_b >= 1$.
-Equivalently, if the feasible set is non-empty, the selected bin is
-
-$
-  b^* = arg min_(b in B: q_b >= 1) b
-$
-
-and the algorithm places
-
-$
-  n_(b^*) = min(q_(b^*), eta)
-$
-
-items of type $j$ into that bin.
-If no open bin is feasible, then _FFDNew_ behaves exactly like _BFD_ and calls $"SelectNewBinType"$ to open a new bin type.
 
 This means that _FFDNew_ may be viewed as a hybrid algorithm.
 It combines the more sophisticated ordering and new-bin selection logic of _BFD_ with the simpler first-fit rule for already open bins.
