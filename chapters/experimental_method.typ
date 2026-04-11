@@ -10,8 +10,7 @@ We also describe how our method for evaluating these algorithms using these data
 
 === Problem instance generation <problem_instance_generation>
 
-In order to evaluate these algorithms, we use randomly generated problem instances.
-Each problem instance is generated as follows.
+The number of resources $K$, machine types $M$, job types $J$, and time slots $T$ the problem instance shall have are given.
 The generation of problem instances is controlled by a set of configurable parameters.
 The table below describes each of these parameters.
 
@@ -23,11 +22,11 @@ The table below describes each of these parameters.
       [$c_0^"cpu"$], [Base CPU capacity value], [$20$],
       [$c_0^"memory"$], [Base memory capacity value], [$40$],
       [$c_0^"disk"$], [Base disk capacity value], [$100$],
-      [$c_0^"io"$], [Base I/O capacity value], [$30$],
+      [$c_0^"io"$], [Base GPU capacity value], [$30$],
       [$d_0^"cpu"$], [Base CPU demand value], [$8$],
       [$d_0^"memory"$], [Base memory demand value], [$16$],
       [$d_0^"disk"$], [Base disk demand value], [$40$],
-      [$d_0^"io"$], [Base I/O demand value], [$12$],
+      [$d_0^"io"$], [Base GPU demand value], [$12$],
       [$lambda_0$], [Base job type count value], [$12$],
       [$[c_"min",c_"max"]$], [Random machine capacity jitter interval], [$(0.8,1.3)$],
       [$[d_"min",d_"max"]$], [Random job demand jitter interval], [$(0.8,1.3)$],
@@ -44,11 +43,16 @@ The table below describes each of these parameters.
   ) <dataset_parameter_table>
 ])
 
-We fix the set of resource types to CPU, memory, disk, and I/O, so $K=4$ throughout.
-The goal of the generator is not only to produce random instances, but to produce instances with enough structure to make the placement decisions non-trivial.
-If machine types, job types, and time slots were sampled almost uniformly and independently, then most instances would consist only of small perturbations of the same workload.
-Such instances would understate the heterogeneity that motivates the algorithms studied in this thesis.
-We therefore generate each problem instance in several stages, introducing randomness at every step while also allowing specialization and correlations between supply and demand.
+We fix the set of resource types to CPU, memory, disk, and GPU, so we set $K=4$ throughout.
+The goal of the generator is not only to produce random instances, but to produce instances with enough structure to make the placement decisions more realistic.
+If machine types, job types, and time slots were sampled almost uniformly and independently, then most instances would consist only of small variations of the same workload.
+In real-world scenarios, certain workloads have a tendency to be bounded by some resource.
+This means that these workloads have a higher demand for this resource, requiring machines with a higher capacity for the resource.
+For example. a database system has high demands for disk space and disk I/O.
+A physics simulation has high demands for CPUs.
+A machine learning training run would have high demands for GPUs.
+Because of this, we choose to generate problem instances in which some job and machine types have a greater demand and capacity, respectively, for a certain resource.
+These kinds of specialized machine types are commonly found in major public cloud computing providers such as Amazon Web Services @aws_ec2_instance_types.
 
 ==== Step 1: Initialize baseline capacities and demands
 
@@ -66,25 +70,27 @@ $
 $
 
 At this stage, however, the resulting matrices are still relatively close to uniform.
-The next stages introduce the stronger heterogeneity which is needed to obtain more realistic and informative instances.
+The next stages introduce the stronger heterogeneity which is needed to obtain instances which more accurately represent the instances available in real-world cloud computing environments.
 
 ==== Step 2: Assign primary resources
 
 To avoid nearly uniform machine types, job types, and time slots, we introduce the notion of a _primary resource_.
 A primary resource indicates that a machine type or job type is specialized with respect to one resource dimension.
+A machine type, job type, or time slot can have at most one primary resource.
+Each resource can be selected as a primary resource multiple times.
+
 For time slots, the same mechanism is used to indicate which class of job types should be more common in that slot.
 This is the main mechanism by which the generator creates concentrated supply, concentrated demand, and temporal shifts in the workload.
 
 Only a fraction of all machine types, job types, and time slots are assigned a primary resource.
 This fraction is controlled by a configurable parameter $rho in [0,1]$.
-Thus, for example, given $M$ different machine types, $ceil(rho M)$ machine types will be assigned a primary resource, while the remaining machine types retain no explicit specialization.
+Thus, for example, given $M$ different machine types, $ceil(rho M)$ machine types will be assigned a primary resource, while the remaining machine types are not assigned a specialization.
 
 The primary resources of machine types, job types, and time slots are computed using @alg_choose_primary_resources, described below.
 The function takes as arguments the number $n$ of elements to consider, the fraction $rho$ of elements to assign a primary resource to, and a probability vector $bold(q) in (0,1)^K$.
-For each selected element, the resource index $k$ is chosen with probability $q_k$, for $1<=k<=K$.
-If $bold(q)=bold(1)\/K$, then all resource indices are chosen with equal probability.
-By adjusting the entries of $bold(q)$, we can instead make some resource types more likely than others.
-Elements not selected for specialization keep the value $-1$ in the output vector, meaning that no primary resource was assigned.
+For each selected element, the resource $k$ is selected with probability $q_k$, for $1<=k<=K$.
+If we set $bold(q)=bold(1)\/K$, then each of the $K$ resources can be selected with equal probability.
+By adjusting the probabilities of $bold(q)$, we can instead make some resource types more likely to be selected than others.
 
 #block(
   breakable: false,
@@ -128,11 +134,14 @@ This yields a random workload profile for the current instance.
 Next, we use the resulting job-type assignments to construct the probability vector used for the machine types.
 Let $bold(u)$ be the $K$-dimensional uniform probability vector $bold(1)\/K$, and let $bold(h)$ be the histogram vector of the elements of $bold(p)^"job"$.
 The element $h_k$ is the number of job types assigned resource $k$ as their primary resource.
+Let $overline(h) = sum_k h_k$.
 If no job types were assigned a primary resource, then we fall back to the uniform vector $bold(u)$.
 The machine-type probability vector is then defined as the weighted vector sum
 
+// TODO: Fix vector normalization problem here
+
 $
-  bold(q)^"machine" = eta^"machine" bold(h)/norm(bold(h)) + (1-eta^"machine") 1/K bold(1).
+  bold(q)^"machine" = eta^"machine" bold(h)/overline(h) + (1-eta^"machine") 1/K bold(1).
 $
 
 Here, $eta^"machine" in (0,1)$ is a configurable correlation parameter.
@@ -156,30 +165,66 @@ After amplification, all entries are clamped to be at least $1$.
 Finally, if some job type cannot be packed on any machine type, we add the missing capacity to one selected machine type, preferring a machine type with a matching primary resource whenever such a machine type exists.
 This last correction ensures that the resulting instance is feasible while retaining the intended structure of specialized machine and job types.
 
-The generation of $bold(C)$ and $bold(R)$ is handled by @alg_machine_job_types.
+The generation of the job types is handled by @alg_job_types.
 
 #block(
   breakable: false,
   [
     #show: style-algorithm
     #algorithm-figure(
-      "Generate job and machine types",
+      "Generate job types",
       vstroke: .5pt + luma(200),
       inset: 0.3em,
       {
         import algorithmic: *
         Procedure(
-          "GenerateJobAndMachineTypes",
+          "GenerateJobTypes",
+          (),
+          {
+            LineComment(
+              Assign($R_(j,k)$, $ceil(d_(0,k) dot U(d_"min", d_"max"))$),
+              $"Initialize" bold(R) "with base demand and jitter"$,
+            )
+
+            Comment[Amplify assigned primary resources for job types]
+            For($1<=j<=J$, {
+              Comment[Check if job type $j$ was assigned a primary resource]
+              If($p^"job"_j >= 0$, {
+                LineComment(Assign($k^*$, $p^"job"_j$), $"Let" k^* "be primary resource of job type "j$)
+                LineComment(Assign($u$, $cal(U)([u_"min", u_"max"])$), "Sample demand amplification factor")
+                LineComment(Assign($R_(j,k^*)$, $u dot R_(j,k^*)$), "Scale the demand of primary resource")
+              })
+            })
+
+            LineComment(Assign($R_(j,k)$, $max(1, R_(j,k))$), $"Ensure all demand values" >=1$)
+
+
+            Return($bold(R)$)
+          },
+        )
+      },
+    ) <alg_job_types>],
+)
+
+The generation of the machine types is handled by @alg_machine_types.
+
+#block(
+  breakable: false,
+  [
+    #show: style-algorithm
+    #algorithm-figure(
+      "Generate machine types",
+      vstroke: .5pt + luma(200),
+      inset: 0.3em,
+      {
+        import algorithmic: *
+        Procedure(
+          "GenerateMachineTypes",
           (),
           {
             LineComment(
               Assign($C_(i,k)$, $ceil(c_(0,k) dot U(c_"min", c_"max"))$),
               $"Initialize" bold(C) "with base capacity and jitter"$,
-            )
-
-            LineComment(
-              Assign($R_(j,k)$, $ceil(d_(0,k) dot U(d_"min", d_"max"))$),
-              $"Initialize" bold(R) "with base demand and jitter"$,
             )
 
             Comment[Amplify assigned primary resources for machine types]
@@ -192,18 +237,7 @@ The generation of $bold(C)$ and $bold(R)$ is handled by @alg_machine_job_types.
               })
             })
 
-            Comment[Amplify assigned primary resources for job types]
-            For($1<=j<=J$, {
-              Comment[Check if job type $j$ was assigned a primary resource]
-              If($p^"job"_j >= 0$, {
-                LineComment(Assign($k^*$, $p^"job"_j$), $"Let" k^* "be primary resource of job type "j$)
-                LineComment(Assign($u$, $cal(U)([u_"min", u_"max"])$), "Sample demand amplification factor")
-                LineComment(Assign($R_(j,k^*)$, $u dot R_(j,k^*)$), "Scale the demand of primary resource")
-              })
-            })
-
             LineComment(Assign($C_(i,k)$, $max(1, C_(i,k))$), $"Ensure all capacity values" >=1$)
-            LineComment(Assign($R_(j,k)$, $max(1, R_(j,k))$), $"Ensure all demand values" >=1$)
 
             Comment[Ensure all job types can be packed]
             For($1<=j<=J$, {
@@ -233,10 +267,9 @@ The generation of $bold(C)$ and $bold(R)$ is handled by @alg_machine_job_types.
           },
         )
       },
-    ) <alg_machine_job_types>],
+    ) <alg_machine_types>],
 )
 
-#pagebreak()
 
 ==== Step 5: Generate time-slot job counts
 
@@ -369,8 +402,12 @@ The final output is therefore random, but not unstructured.
           $"ChoosePrimaryResources"(M,rho^"machine",bold(q)^"machine",G)$,
         )
         Assign(
-          $(C,R)$,
-          $"GenerateCapacitiesAndRequirements"()$,
+          $(C)$,
+          $"GenerateMachineTypes"()$,
+        )
+        Assign(
+          $(R)$,
+          $"GenerateJobTypes"(bold(C))$,
         )
 
         Assign(
@@ -430,7 +467,7 @@ $
 With the description of the method for generating a single problem instance completed, we now move on to describing how a dataset of multiple problem instances is generated.
 
 Each generated problem instance samples its dimensions $J$, $M$, and $T$ uniformly from configurable intervals $I_J$, $I_M$, $I_T$, respectively.
-The number of resource types is fixed to $K=4$ (CPU, memory, disk, I/O).
+The number of resource types is fixed to $K=4$ (CPU, memory, disk, GPU).
 
 #block(breakable: false, [
   #show: style-algorithm

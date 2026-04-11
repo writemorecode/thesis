@@ -7,7 +7,7 @@ This chapter formalizes the offline job scheduling problem and introduces the no
 
 There are $J$ different types of jobs.
 Each job type has certain hardware resource requirements.
-There are $K$ different types of hardware resources, e.g. CPU, memory, disk, I/O, etc.
+There are $K$ different types of hardware resources, e.g. CPU, memory, disk, GPU, etc.
 The resource demands of job type $j$, for $1<=j<=J$, is described with a $K$-dimensional vector $bold(r)_j in ZZnonneg^K$ with non-negative integer elements.
 We collect these job resource requirements as column vectors in a job resource demand matrix $bold(R)$ with dimensions $(K,J)$.
 

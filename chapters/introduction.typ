@@ -54,7 +54,7 @@ The goal is to minimize total cost while ensuring that all jobs can be scheduled
 Offline job scheduling in a private cloud can be modeled as a bin-packing problem by representing machines as bins and jobs as items.
 Each job type has a multi-resource demand.
 Each machine type has a multi-resource capacity.
-These resources represent machine hardware resources such as CPU, memory, disk, I/O etc.
+These resources represent machine hardware resources such as CPU, memory, disk, GPU etc.
 Placing a job on a machine corresponds to packing an item into a bin.
 The feasibility constraint here is that the sum of the resource demands of all jobs packed into any machine must not exceed the machine's capacity for any resource.
 Since jobs typically require multiple resources simultaneously, this naturally leads to a multidimensional bin-packing formulation @book_computers_intractability.

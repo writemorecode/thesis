@@ -273,7 +273,126 @@ As with other previously discussed packing algorithms, this process is repeated 
 For each bin type $i$, we let $x_i = max_t X_(i,t)$ be the maximum number of bins of type $i$ used across all time slots.
 Finally, we return the bin-type vector $bold(x)$ and the item-bin-time slot packing variable $y$.
 
-We can create a new FFD-based packing algorithm based on this algorithm.
+=== Resource-weighted cost-aware first-fit algorithm
+
+#block(breakable: true, [
+  #show: style-algorithm
+  #algorithm-figure("FFDNew packing algorithm", vstroke: .5pt + luma(200), inset: 0.3em, {
+    import algorithmic: *
+    Procedure(
+      "FFDNewPackingAlgorithm",
+      ($bold(C), bold(R), bold(L), bold(c^p), bold(c^r), bold(alpha)$),
+      {
+        LineComment(
+          Assign($(bold(hat(R)),bold(hat(L)))$, $"ResourceWeightSort"(bold(R),bold(L),bold(alpha))$),
+          "Sort items",
+        )
+
+        LineComment(Assign($X_(i,t)$, $0, quad forall i,t$), "Initialize bin-type matrix to zero")
+
+        For($1<=t<=T$, {
+          LineComment(Assign($B$, $emptyset$), "Initialize empty set of bins for time slot")
+          For($1<=j<=J$, {
+            LineComment(Assign($eta$, $hat(l)_(j,t)$), "Initialize remaining jobs counter")
+            While($eta > 0$, {
+              LineComment(
+                Assign($p$, $"SelectFirstOpenBin"(t, j, eta, B)$),
+                "Try feasible open bins in first-fit order",
+              )
+              IfElseChain(
+                $p != "none"$,
+                {
+                  LineComment(Assign($(b^*, n^*)$, $p$), "Unpack helper result")
+                  LineComment(Assign($eta$, $eta - n_(b^*)$), "Update packed jobs counter")
+                  LineComment(
+                    Assign($y_(t,j,b^*)$, $y_(t,j,b^*) + n_(b^*)$),
+                    $"Pack" n_(b^*) "type" j "items into bin" b^*$,
+                  )
+                },
+                {
+                  LineComment(Assign($p$, $"SelectNewBinType"(j, eta)$), "No feasible open bin found")
+                  IfElseChain(
+                    $p != "none"$,
+                    {
+                      LineComment(Assign($(i^*, n^*)$, $p$), "Unpack helper result")
+                      LineComment(Assign($eta$, $eta - n_(i^*)$), "Update packed jobs counter")
+                      LineComment(Assign($X_(i^*,t)$, $X_(i^*,t) + 1$), $"Open new bin of type" i^*$)
+                      LineComment(Assign($b$, $abs(B) + 1$), "Assign new bin index")
+                      LineComment(Assign($tau_(t,b)$, $i^*$), $"Store type of new bin " b$)
+                      LineComment(Assign($B$, $B union {b}$), "Add new bin to set of open bins")
+                      LineComment(
+                        Assign($y_(t,j,b)$, $y_(t,j,b) + n_(i^*)$),
+                        $"Pack" n_(i^*) "type" j "items into bin" b$,
+                      )
+                    },
+                    {
+                      Return[$"infeasible input"$]
+                    },
+                  )
+                },
+              )
+            })
+          })
+        })
+        LineComment(Assign($bold(x)$, $max_t X_(i,t)$), "Take max machine type counts over time slots")
+        Return[$bold(x)$, $y$]
+      },
+    )
+  })])
+
+#block(breakable: true, [
+  #show: style-algorithm
+  #algorithm-figure("Select first feasible open bin", vstroke: .5pt + luma(200), inset: 0.3em, {
+    import algorithmic: *
+    Procedure("SelectFirstOpenBin", ($t, j, eta, B$), {
+      For($b in B$, {
+        LineComment(Assign($i$, $tau_(t,b)$), $"Bin type of bin "b$)
+        LineComment(
+          Assign($bold(rho)_b$, $bold(m)_i - sum_(j'=1)^J y_(t,j',b) bold(hat(r))_(j')$),
+          "Compute remaining capacity of current bin",
+        )
+        LineComment(
+          Assign($q_b$, $min_(k: hat(r)_(j,k)>0) floor(rho_(b,k)\/hat(r)_(j,k))$),
+          "Num. of items which fit in bin",
+        )
+        If($q_b >= 1$, {
+          LineComment(Assign($n_b$, $min(q_b, eta)$), $"Number of type "j "items to place in bin" b$)
+          Return[$(b, n_b)$]
+        })
+      })
+      Return[$"none"$]
+    })
+  })])
+
+We can now construct a new FFD-based packing algorithm by modifying the open-bin selection rule of the previous algorithm.
 We will call this algorithm _"FFDNew"_.
-The algorithm will use the same job-ordering and new bin selection methods as this algorithm.
-However, like first fit, it will place items in the first bin which accommodate it.
+This algorithm uses exactly the same resource-weighted job ordering and the same cost-aware $"SelectNewBinType"$ helper as _BFD_.
+Thus, both algorithms open new bins according to the same normalized weighted slack score.
+The only difference lies in how already open bins are selected.
+
+For a current item type $j$ and time slot $t$, let the set of open bins again be denoted by $B$.
+For each $b in B$, we compute the remaining capacity vector $bold(rho)_b$ and the feasible placement count $q_b$ exactly as in the _BFD_ algorithm.
+However, rather than computing the slack score $Phi_b$ for every feasible open bin and selecting the one with minimum score, _FFDNew_ follows the first-fit rule.
+That is, it scans the open bins in their current order, which in the Python implementation is the order in which the bins were opened, and selects the first bin which satisfies $q_b >= 1$.
+Equivalently, if the feasible set is non-empty, the selected bin is
+
+$
+  b^* = arg min_(b in B: q_b >= 1) b
+$
+
+and the algorithm places
+
+$
+  n_(b^*) = min(q_(b^*), eta)
+$
+
+items of type $j$ into that bin.
+If no open bin is feasible, then _FFDNew_ behaves exactly like _BFD_ and calls $"SelectNewBinType"$ to open a new bin type.
+
+This means that _FFDNew_ may be viewed as a hybrid algorithm.
+It combines the more sophisticated ordering and new-bin selection logic of _BFD_ with the simpler first-fit rule for already open bins.
+In this sense, it keeps the cost-aware mechanism for deciding _which kind_ of bin to open, while replacing the best-fit scoring of open bins with a deterministic left-to-right scan through the bins that are already open.
+
+The Python implementation applies this rule in a vectorized way when several jobs of the same type remain to be packed.
+In effect, it fills earlier feasible bins before later ones, which is equivalent to repeatedly applying first fit to identical items of the current type.
+As before, the algorithm is run independently for each time slot, and the final machine vector is obtained by taking $x_i = max_t X_(i,t)$ for each machine type $i$.
