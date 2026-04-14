@@ -1,0 +1,25 @@
+comparison,algorithm,n,mean_left_runtime_sec,mean_right_runtime_sec,mean_diff_left_minus_right_sec,ci_low_diff_sec,ci_high_diff_sec,std_diff_sec,t_statistic,p_value,alpha,decision
+balanced vs job_heavy,bfd,100,0.07693,0.07987,-0.002942,-0.007681,0.001798,0.02388,-1.232,0.221,0.05,FAIL TO REJECT H0
+balanced vs machine_heavy,bfd,100,0.07693,0.09552,-0.0186,-0.02449,-0.01271,0.02969,-6.264,9.756e-09,0.05,REJECT H0
+job_heavy vs machine_heavy,bfd,100,0.07987,0.09552,-0.01565,-0.02126,-0.01005,0.02824,-5.543,2.462e-07,0.05,REJECT H0
+balanced vs job_heavy,ffd,100,0.04954,0.05544,-0.005908,-0.008903,-0.002914,0.01509,-3.915,0.0001663,0.05,REJECT H0
+balanced vs machine_heavy,ffd,100,0.04954,0.05318,-0.003648,-0.006579,-0.0007159,0.01477,-2.469,0.01527,0.05,REJECT H0
+job_heavy vs machine_heavy,ffd,100,0.05544,0.05318,0.002261,-0.0007049,0.005227,0.01495,1.513,0.1336,0.05,FAIL TO REJECT H0
+balanced vs job_heavy,ffd_l2,100,0.05198,0.05849,-0.006514,-0.009673,-0.003355,0.01592,-4.091,8.747e-05,0.05,REJECT H0
+balanced vs machine_heavy,ffd_l2,100,0.05198,0.05641,-0.004433,-0.007444,-0.001422,0.01517,-2.922,0.004314,0.05,REJECT H0
+job_heavy vs machine_heavy,ffd_l2,100,0.05849,0.05641,0.002081,-0.0009762,0.005138,0.01541,1.351,0.1799,0.05,FAIL TO REJECT H0
+balanced vs job_heavy,ffd_max,100,0.04943,0.05533,-0.005901,-0.008869,-0.002933,0.01496,-3.945,0.0001493,0.05,REJECT H0
+balanced vs machine_heavy,ffd_max,100,0.04943,0.05319,-0.003753,-0.006646,-0.0008599,0.01458,-2.574,0.01154,0.05,REJECT H0
+job_heavy vs machine_heavy,ffd_max,100,0.05533,0.05319,0.002148,-0.0008412,0.005138,0.01507,1.426,0.157,0.05,FAIL TO REJECT H0
+balanced vs job_heavy,ffd_new,100,0.0749,0.08211,-0.00721,-0.01192,-0.002502,0.02373,-3.038,0.003042,0.05,REJECT H0
+balanced vs machine_heavy,ffd_new,100,0.0749,0.09561,-0.02071,-0.02663,-0.01478,0.02985,-6.937,4.171e-10,0.05,REJECT H0
+job_heavy vs machine_heavy,ffd_new,100,0.08211,0.09561,-0.0135,-0.0192,-0.007791,0.02875,-4.694,8.625e-06,0.05,REJECT H0
+balanced vs job_heavy,ffd_prod,100,0.04891,0.05447,-0.005567,-0.008485,-0.002649,0.01471,-3.785,0.0002631,0.05,REJECT H0
+balanced vs machine_heavy,ffd_prod,100,0.04891,0.05244,-0.003537,-0.00643,-0.0006431,0.01458,-2.425,0.01711,0.05,REJECT H0
+job_heavy vs machine_heavy,ffd_prod,100,0.05447,0.05244,0.00203,-0.0008796,0.00494,0.01466,1.384,0.1693,0.05,FAIL TO REJECT H0
+balanced vs job_heavy,ffd_sum,100,0.04895,0.05448,-0.005531,-0.008447,-0.002616,0.01469,-3.764,0.0002832,0.05,REJECT H0
+balanced vs machine_heavy,ffd_sum,100,0.04895,0.0525,-0.003547,-0.006468,-0.0006267,0.01472,-2.41,0.0178,0.05,REJECT H0
+job_heavy vs machine_heavy,ffd_sum,100,0.05448,0.0525,0.001984,-0.0009467,0.004915,0.01477,1.343,0.1823,0.05,FAIL TO REJECT H0
+balanced vs job_heavy,peak_demand,100,0.04138,0.04721,-0.005831,-0.008586,-0.003076,0.01389,-4.199,5.858e-05,0.05,REJECT H0
+balanced vs machine_heavy,peak_demand,100,0.04138,0.04086,0.0005248,-0.0018,0.00285,0.01172,0.4479,0.6552,0.05,FAIL TO REJECT H0
+job_heavy vs machine_heavy,peak_demand,100,0.04721,0.04086,0.006356,0.003946,0.008765,0.01214,5.234,9.33e-07,0.05,REJECT H0
