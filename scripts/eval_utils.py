@@ -50,43 +50,63 @@ def resolve_results_csv(results_dir: Path, scheduler_name: str) -> tuple[str, Pa
     return canonical, csv_path
 
 
-def load_total_costs(
-    csv_path: Path, *, duplicate_policy: Literal["min", "error"] = "min"
+def load_metric_values(
+    csv_path: Path,
+    *,
+    column: str,
+    duplicate_policy: Literal["min", "error"] = "min",
 ) -> dict[str, float]:
-    costs: dict[str, float] = {}
+    values: dict[str, float] = {}
     with csv_path.open(newline="") as handle:
         reader = csv.DictReader(handle)
         if not reader.fieldnames:
             raise ValueError(f"{csv_path} has no header row.")
-        required = {"filename", "total_cost"}
+        required = {"filename", column}
         missing = required - set(reader.fieldnames)
         if missing:
             raise ValueError(f"{csv_path} missing required columns: {sorted(missing)}.")
 
         for row in reader:
             filename = row["filename"]
+            raw_value = row[column]
             try:
-                total_cost = float(row["total_cost"])
+                value = float(raw_value)
             except ValueError as exc:
                 raise ValueError(
-                    f"{csv_path} has invalid total_cost for {filename}: {row['total_cost']}"
+                    f"{csv_path} has invalid {column} for {filename}: {raw_value}"
                 ) from exc
 
-            if filename in costs:
+            if filename in values:
                 if duplicate_policy == "error":
                     raise ValueError(
                         f"{csv_path} has duplicate filename entry: {filename}."
                     )
                 if duplicate_policy == "min":
-                    costs[filename] = min(costs[filename], total_cost)
+                    values[filename] = min(values[filename], value)
                 else:
                     raise ValueError(f"Unknown duplicate policy: {duplicate_policy}")
             else:
-                costs[filename] = total_cost
+                values[filename] = value
 
-    if not costs:
+    if not values:
         raise ValueError(f"{csv_path} has no rows to evaluate.")
-    return costs
+    return values
+
+
+def load_total_costs(
+    csv_path: Path, *, duplicate_policy: Literal["min", "error"] = "min"
+) -> dict[str, float]:
+    return load_metric_values(
+        csv_path, column="total_cost", duplicate_policy=duplicate_policy
+    )
+
+
+def load_runtime_seconds(
+    csv_path: Path, *, duplicate_policy: Literal["min", "error"] = "min"
+) -> dict[str, float]:
+    return load_metric_values(
+        csv_path, column="runtime_sec", duplicate_policy=duplicate_policy
+    )
 
 
 def ensure_matching_filenames(
