@@ -174,10 +174,15 @@ Item types are packed in non-increasing order of their priorities.
   #algorithm-figure("Resource weight sort", vstroke: .5pt + luma(200), inset: 0.3em, {
     import algorithmic: *
     Procedure("ResourceWeightSort", ($bold(R)$, $bold(L)$, $bold(alpha)$), {
-      LineComment(Assign($bold(v)$, $bold(R)^T bold(alpha)$), "")
-      LineComment(Assign($pi$, $"ArgSort"(bold(v))$), "")
-      LineComment(Assign($bold(hat(R))$, $bold(R) bold(P)$), "")
-      LineComment(Assign($bold(hat(L))$, $bold(P)^T bold(L)$), "")
+      LineComment(Assign($bold(v)$, $bold(R)^T bold(alpha)$), "Compute weighted size of each item type")
+      Comment($pi(q)" is index of "q"-th largest entry of "bold(v)$)
+      Assign($pi$, $"SortIndicesDescending"(bold(v))$)
+      LineComment(Assign($bold(P)$, $0$), $"Initialize a "(J,J)" zero matrix"$)
+      For($1 <= q <= J$, {
+        LineComment(Assign($bold(P)_(pi(q), q)$, $1$), $"Put "1" at row "pi(q)", column "q$)
+      })
+      LineComment(Assign($bold(hat(R))$, $bold(R) bold(P)$), $"Reorder item-type columns using "pi$)
+      LineComment(Assign($bold(hat(L))$, $bold(P)^T bold(L)$), $"Apply the same permutation to "L$)
       Return(($bold(hat(R)), bold(hat(L))$))
     })
   })
