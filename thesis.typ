@@ -299,6 +299,7 @@ Faculty of #faculty, Blekinge Institute of Technology, 371 79 Karlskrona, Sweden
 #include "chapters/method.typ"
 #include "chapters/experimental_method.typ"
 #include "chapters/results.typ"
+#include "chapters/runtime_analysis.typ"
 #include "chapters/analysis.typ"
 #include "chapters/conclusion.typ"
 #include "chapters/appendix.typ"

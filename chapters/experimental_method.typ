@@ -308,7 +308,7 @@ With the generation of the machine capacity matrix $bold(C)$ and the job demand 
 Mathematically, we write $bold(L)$ as a $(J,T)$ matrix with non-negative integer entries, and denote the slot-$t$ job-count vector by $bold(l)_t = bold(L)_(dot,t)$.
 In the Python implementation, the same data are stored as a $(T,J)$ array with one row per time slot.
 The matrix $bold(L)$ determines how many jobs of each type are present in each time slot.
-If these counts were generated independently from an almost uniform distribution, then the workload would exhibit little temporal structure.
+If these counts were generated independently from an almost uniform distribution, then the workload would have little structure across time slots.
 We instead want some time slots to be dominated by related job types, in the same way that real workloads often contain bursts of similar activity.
 
 The generation of $bold(L)$ is handled by the GenerateTimeSlots function.
@@ -337,7 +337,7 @@ For these matching job types, we sample a positive integer $v$ from the configur
 After normalizing $bold(w)$ to obtain a probability vector $bold(phi)$, the job count vector $bold(l)_t$ is sampled from the distribution $"Multinomial"(N_t, bold(phi); G)$.
 
 This two-stage construction allows the total load and the composition of that load to vary separately across time slots.
-It therefore creates temporal concentration without removing the stochastic variation between instances.
+It therefore creates job-type concentration in time slots without removing the random variation between instances.
 
 #block(breakable: false, [
   #show: style-algorithm
@@ -633,7 +633,7 @@ The table below presents the parameters used to generate each dataset.
 ==== Paired comparison via cost ratios <cost_ratios>
 
 Each dataset contains the same set of problem instances evaluated by every algorithm.
-Therefore, comparisons between two algorithms are based on *paired* observations.
+Therefore, comparisons between two algorithms are based on paired observations.
 
 Let $c_(A,i)$ and $c_(B,i)$ be the total costs of algorithms $A$ and $B$ on instance $i$, and define the per-instance cost ratio
 
@@ -643,7 +643,7 @@ $
 
 If $r_i < 1$, then $c_(A,i) < c_(B,i)$ and $A$ is better on instance $i$ (lower cost).
 
-We use the ratios $r_i$ to describe relative performance, but for statistical testing we compare paired *differences* in raw total cost:
+We use the ratios $r_i$ to describe relative performance, but for statistical testing we compare paired differences in raw total cost:
 $
   d_i = c_(A,i) - c_(B,i).
 $

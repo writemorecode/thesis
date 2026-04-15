@@ -11,6 +11,17 @@ The performance of the naive algorithms are all comparable, with exception of on
 Any difference in performance between _BFD_ and _FFDNew_ is statistically indistinguishable.
 These conclusions hold for all three datasets.
 
+Next, we consider the execution times of the algorithms.
+Our null hypothesis was that there was no statistically significant difference in execution times between any of the algorithms across all of the datasets.
+The null hypothesis is rejected in $17$ of the $24$ paired tests.
+The clearest pattern is that the _Machine-heavy_ dataset increases runtime for the two strongest cost-oriented algorithms, _BFD_ and _FFDNew_, whose mean runtimes rise to about $95.5$ milliseconds per instance.
+For the faster _FFD_ variants, _Balanced_ is consistently faster than both _Job-heavy_ and _Machine-heavy_, while _PeakDemand_ remains the fastest overall algorithm.
+
+For RQ2, these results suggest that optimizing for both scheduling quality and execution time does not require choosing the absolutely fastest heuristic.
+The earlier cost analysis identified _BFD_ and _FFDNew_ as the strongest quality-oriented choices, and the present runtime results show that their overhead is still small in absolute terms: all average runtimes remain below 100 milliseconds per instance.
+It shall be noted that the algorithms were not implemented with performance in mind.
+It is possible that more efficient implementations would have yielded in different results.
+
 We shall study the evaluation results of the _BFD_ and _FFDNew_ algorithms.
 The two algorithms have nearly identical average costs on each of the datasets.
 For all three datasets, the paired Wilcoxon signed-rank tests on raw total cost differences fail to reject the null hypothesis at $alpha=0.05$.
@@ -102,7 +113,7 @@ Our conclusions are derived for private cloud settings where a hardware fleet is
 This is a clear external validity limitation because public and hybrid clouds can have different constraints and pricing structures.
 We mitigate overgeneralization by not extending the findings to those environments without additional targeted evaluation.
 
-Previously, we assumed a deterministic load profile and the lack of anyan initial hardware fleet.
+Previously, we assumed a deterministic load profile and the lack of an initial hardware fleet.
 However, these assumptions are not load-bearing and could be relaxed.
 This would allow our algorithms to be applied to more general problems which do not involve these assumptions.
 
