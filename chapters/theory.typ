@@ -16,7 +16,7 @@ Given a finite set $U={u_1,dots.h,u_n}$ of items and a rational item size $s(u) 
 The problem can be formulated as an integer LP problem:
 
 $
-    "minimize" & quad sum_(i=1) y_i \
+    "minimize" & quad sum_(j=1) y_j \
   "subject to" & quad sum_(j=1) x_(i j) = 1, quad forall i \
                & quad sum_(i=1)^n s(i) x_(i j) <= c y_j, quad forall j \
                & x_(i j) in {0,1}, quad y_j in {0,1} quad forall i,j \
@@ -33,14 +33,14 @@ The second constraint ensures that no bin capacity is exceeded by the items plac
 === Multidimensional heterogeneous bin-packing problem
 
 We now consider a more general case, where both items and bins have different sizes and capacities in multiple dimensions.
-Items and bins have $D$ dimensions.
+Items and bins have $K$ dimensions.
 The size of item $i$ is given by the vector $bold(s)(i) in ZZnonneg^D$.
 The capacity of bin $j$ is given by the vector $bold(c)(j) in ZZnonneg^D$.
 
 The problem can be formulated as an integer LP problem:
 
 $
-    "minimize" & quad sum_(i=1) y_i \
+    "minimize" & quad sum_(j=1) y_j \
   "subject to" & quad sum_(j=1) x_(i j) = 1, quad forall i \
                & quad sum_(i=1)^n bold(s)(i) x_(i j) <= bold(c)(i) y_j, quad forall j \
                & x_(i j) in {0,1}, quad y_j in {0,1} quad forall i,j \
@@ -61,13 +61,13 @@ If an item does not fit in any open bin, a new bin is opened, and the item is pl
     {
       For($"object" i = 1,2,...,n$, {
         For($"bin" j = 1,2,...,m$, {
-          If($"object i fits in bin j"$, {
-            Comment[Place object i in bin j]
+          If($"object "i" fits in bin" j$, {
+            Comment[Place object $i$ in bin $j$]
             Break
           })
         })
-        If($"object i did not fit in any open bin"$, {
-          Comment[Open and place object i in a new bin]
+        If($"object "i" did not fit in any open bin"$, {
+          Comment[Open and place object $i$ in a new bin]
         })
       })
     },
@@ -75,41 +75,43 @@ If an item does not fit in any open bin, a new bin is opened, and the item is pl
 })
 
 In the worst case, a new bin must be opened for each of the $n$ items.
-This means that placing the $k$:th item will require $k$ bin size checks.
-This gives the algorithm the time complexity $Omicron (m n)$.
+This means that placing the $k$-th item will require $k$ bin size checks.
+This gives the algorithm the time complexity $Omicron (n^2)$.
 
 === (BF) Best fit
 Place each item into the bin with the smallest remaining capacity which is at least as large as the size of item.
 If an item does not fit in any open bin, a new bin is opened, and the item is placed in it @garey_graham_ullman_1972.
 
 #show: style-algorithm
-#algorithm-figure("Best fit", vstroke: .5pt + luma(200), {
-  import algorithmic: *
-  Procedure(
-    "BestFit",
-    ("bins", "items"),
-    {
-      For($"object" i = 1,2,...,n$, {
-        Comment($"Let S be the set of capacities of all bins which fit object i"$)
-        Assign($S$, ${c(b) | b in "bins" , c(b) >= s(i)}$)
-        IfElseChain(
-          $S = nothing$,
-          {
-            Comment[Open and place object i in a new bin]
-          },
-          {
-            Comment($"Let bin j be the bin which fits object i with minimum remaining capacity"$)
-            Assign($j$, FnInline([min], [S]))
-            Comment[Place object i in bin j]
-          },
-        )
-      })
-    },
-  )
+#block(breakable: false, {
+  algorithm-figure("Best fit", vstroke: .5pt + luma(200), {
+    import algorithmic: *
+    Procedure(
+      "BestFit",
+      ("bins", "items"),
+      {
+        For($"object" i = 1,2,...,n$, {
+          Comment($"Let S be the set of capacities of all bins which fit object" i$)
+          Assign($S$, ${c(b) | b in "bins" , c(b) >= s(i)}$)
+          IfElseChain(
+            $S = nothing$,
+            {
+              Comment[Open and place object $i$ in a new bin]
+            },
+            {
+              Comment($"Let bin "j" be the bin which fits object "i" with minimum remaining capacity"$)
+              Assign($j$, FnInline([min], [S]))
+              Comment[Place object $i$ in bin $j$]
+            },
+          )
+        })
+      },
+    )
+  })
 })
 
 For the worst case, we must check each of the $m$ bins for each of the $n$ items.
-This gives the algorithm the time complexity $Omicron (m n)$.
+This gives the algorithm the time complexity $Omicron (n^2)$.
 
 === (WF) Worst fit
 A variation of best-fit, where we instead select the bin with the largest remaining capacity @garey_graham_ullman_1972.
@@ -122,17 +124,17 @@ A variation of best-fit, where we instead select the bin with the largest remain
     ("bins", "items"),
     {
       For($"object" i = 1,2,...,n$, {
-        Comment($"Let S be the set of capacities of all bins which fit object i"$)
+        Comment($"Let "S" be the set of capacities of all bins which fit object "i$)
         Assign($S$, ${c(b) | b in "bins" , c(b) >= s(i)}$)
         IfElseChain(
           $S = nothing$,
           {
-            Comment[Open and place object i in a new bin]
+            Comment[Open and place object $i$ in a new bin]
           },
           {
-            Comment($"Let bin j be the bin which fits object i with maximum remaining capacity"$)
+            Comment($"Let bin "j" be the bin which fits object "i" with maximum remaining capacity"$)
             Assign($j$, FnInline([max], [S]))
-            Comment[Place object i in bin j]
+            Comment[Place object $i$ in bin $j$]
           },
         )
       })
@@ -140,7 +142,7 @@ A variation of best-fit, where we instead select the bin with the largest remain
   )
 })
 
-Same time complexity as best fit.
+Worst-fit has the same worst-case time complexity as best fit.
 
 === (NF) Next-fit
 First, open a single bin.
@@ -149,27 +151,30 @@ Place items into this bin until an item does not fit into the bin.
 When this happens, close this bin, open a new bin, and make the new bin the current bin @garey_graham_ullman_1972.
 
 #show: style-algorithm
-#algorithm-figure("Next fit", vstroke: .5pt + luma(200), {
-  import algorithmic: *
-  Procedure(
-    "NextFit",
-    ("bins", "items"),
-    {
-      Assign([Current bin], [First bin])
-      For($"object" i = 1,2,...,n$, {
-        IfElseChain(
-          $"object i fits in current bin"$,
-          {
-            Comment[Place object i in current bin]
-          },
-          {
-            Comment[Open and place object i in a new bin, make this the current bin]
-          },
-        )
-      })
-    },
-  )
+#block(breakable: false, {
+  algorithm-figure("Next fit", vstroke: .5pt + luma(200), {
+    import algorithmic: *
+    Procedure(
+      "NextFit",
+      ("bins", "items"),
+      {
+        Assign([Current bin], [First bin])
+        For($"object" i = 1,2,...,n$, {
+          IfElseChain(
+            $"object "i" fits in current bin"$,
+            {
+              Comment[Place object $i$ in current bin]
+            },
+            {
+              Comment[Open and place object $i$ in a new bin, make this the current bin]
+            },
+          )
+        })
+      },
+    )
+  })
 })
+
 
 Each item only checks the current bin, opening a new bin if needed.
 This gives the algorithm the time complexity $Theta (n)$.
