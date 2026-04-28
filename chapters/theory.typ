@@ -12,17 +12,18 @@ This chapter introduces the bin-packing formulations and algorithmic bounds that
 === One-dimensional bin-packing problem
 
 The book _Computers and Intractability_ @book_computers_intractability gives the following definition of the bin-packing problem.
-Given a finite set $U={u_1,dots.h,u_n}$ of items and a rational item size $s(u) in [0,1)$ for each item $u in U$, find a partition of $U$ into disjoint subsets $U_1,dots.h,U_k$ such that the sum of the size of the items in each $U_i$ is no more than $1$ and such that $k$ is as small as possible.
+Given a finite set $U={u_1,dots.h,u_n}$ of items and a rational item size $s(u)$, where $0 < s(u) <= 1$, for each item $u in U$, find a partition of $U$ into disjoint subsets $U_1,dots.h,U_k$ such that the sum of the size of the items in each $U_i$ is no more than $1$ and such that $k$ is as small as possible.
 The problem can be formulated as an integer LP problem:
 
 $
-    "minimize" & quad sum_(j=1) y_j \
-  "subject to" & quad sum_(j=1) x_(i j) = 1, quad forall i \
-               & quad sum_(i=1)^n s(i) x_(i j) <= c y_j, quad forall j \
-               & x_(i j) in {0,1}, quad y_j in {0,1} quad forall i,j \
+    "minimize" & quad sum_(j=1)^n y_j \
+  "subject to" & quad sum_(j=1)^n x_(i j) = 1, quad forall 1 <= i <= n \
+               & quad sum_(i=1)^n s(i) x_(i j) <= c y_j, quad forall 1 <= j <= n \
+               & x_(i j) in {0,1}, quad y_j in {0,1} quad forall 1 <= i,j <= n \
 $
 
-Here, $k$ and $n$ are the number of bins and items, respectively.
+Here, $n$ is the number of items.
+The model uses $n$ candidate bins, since no feasible solution requires more bins than there are items.
 The capacity of all bins is $c$.
 The variable $y_j$ is equal to 1 if bin $j$ is used, and $0$ otherwise.
 The variable $x_(i j)$ is equal to 1 if item $i$ is placed in bin $j$, and $0$ otherwise.
@@ -34,17 +35,19 @@ The second constraint ensures that no bin capacity is exceeded by the items plac
 
 We now consider a more general case, where both items and bins have different sizes and capacities in multiple dimensions.
 Items and bins have $K$ dimensions.
-The size of item $i$ is given by the vector $bold(s)(i) in ZZnonneg^D$.
-The capacity of bin $j$ is given by the vector $bold(c)(j) in ZZnonneg^D$.
+The size of item $i$ is given by the vector $bold(s)(i) in ZZnonneg^K$.
+The capacity of bin $j$ is given by the vector $bold(c)(j) in ZZnonneg^K$.
 
 The problem can be formulated as an integer LP problem:
 
 $
-    "minimize" & quad sum_(j=1) y_j \
-  "subject to" & quad sum_(j=1) x_(i j) = 1, quad forall i \
-               & quad sum_(i=1)^n bold(s)(i) x_(i j) <= bold(c)(i) y_j, quad forall j \
-               & x_(i j) in {0,1}, quad y_j in {0,1} quad forall i,j \
+    "minimize" & quad sum_(j=1)^m y_j \
+  "subject to" & quad sum_(j=1)^m x_(i j) = 1, quad forall 1 <= i <= n \
+               & quad sum_(i=1)^n bold(s)(i) x_(i j) <= bold(c)(j) y_j, quad forall 1 <= j <= m \
+               & x_(i j) in {0,1}, quad y_j in {0,1} quad forall 1 <= i <= n, 1 <= j <= m \
 $
+
+Here, $n$ is the number of items and $m$ is the number of candidate bins.
 
 == Online bin-packing algorithms
 
@@ -60,7 +63,7 @@ If an item does not fit in any open bin, a new bin is opened, and the item is pl
     ("bins", "items"),
     {
       For($"object" i = 1,2,...,n$, {
-        For($"bin" j = 1,2,...,m$, {
+        For($"open bin" j = 1,2,...,m$, {
           If($"object "i" fits in bin" j$, {
             Comment[Place object $i$ in bin $j$]
             Break
@@ -74,6 +77,7 @@ If an item does not fit in any open bin, a new bin is opened, and the item is pl
   )
 })
 
+Here, $m$ is the current number of open bins.
 In the worst case, a new bin must be opened for each of the $n$ items.
 This means that placing the $k$-th item will require $k$ bin size checks.
 This gives the algorithm the time complexity $Omicron (n^2)$.
@@ -91,16 +95,16 @@ If an item does not fit in any open bin, a new bin is opened, and the item is pl
       ("bins", "items"),
       {
         For($"object" i = 1,2,...,n$, {
-          Comment($"Let S be the set of capacities of all bins which fit object" i$)
-          Assign($S$, ${c(b) | b in "bins" , c(b) >= s(i)}$)
+          Comment($"Let S be the set of open bins which fit object" i$)
+          Assign($S$, ${b | b in "bins" , r(b) >= s(i)}$)
           IfElseChain(
-            $S = nothing$,
+            $S = emptyset$,
             {
               Comment[Open and place object $i$ in a new bin]
             },
             {
               Comment($"Let bin "j" be the bin which fits object "i" with minimum remaining capacity"$)
-              Assign($j$, FnInline([min], [S]))
+              Assign($j$, $arg min_(b in S) r(b)$)
               Comment[Place object $i$ in bin $j$]
             },
           )
@@ -110,7 +114,8 @@ If an item does not fit in any open bin, a new bin is opened, and the item is pl
   })
 })
 
-For the worst case, we must check each of the $m$ bins for each of the $n$ items.
+Here, $r(b)$ is the remaining capacity of bin $b$.
+For the worst case, we must check each of the $m$ open bins for each of the $n$ items.
 This gives the algorithm the time complexity $Omicron (n^2)$.
 
 === (WF) Worst fit
@@ -124,16 +129,16 @@ A variation of best-fit, where we instead select the bin with the largest remain
     ("bins", "items"),
     {
       For($"object" i = 1,2,...,n$, {
-        Comment($"Let "S" be the set of capacities of all bins which fit object "i$)
-        Assign($S$, ${c(b) | b in "bins" , c(b) >= s(i)}$)
+        Comment($"Let S be the set of open bins which fit object "i$)
+        Assign($S$, ${b | b in "bins" , r(b) >= s(i)}$)
         IfElseChain(
-          $S = nothing$,
+          $S = emptyset$,
           {
             Comment[Open and place object $i$ in a new bin]
           },
           {
             Comment($"Let bin "j" be the bin which fits object "i" with maximum remaining capacity"$)
-            Assign($j$, FnInline([max], [S]))
+            Assign($j$, $arg max_(b in S) r(b)$)
             Comment[Place object $i$ in bin $j$]
           },
         )
@@ -195,10 +200,9 @@ Due to this, we shall only discuss the latest results.
 By _bounds_, we mean the ratio between the number of bins used by the approximation algorithms, and the optimal number of bins possible for the input.
 
 In 2013, Dósa and Sgall @dosa_sgall_2013_ff_bounds showed new bounds for First-Fit: $"FF"(L) <= floor(1.7 "OPT"(L))$.
-This means that if the optimal number of required bins for the input $L$ is $"OPT"(L)$, then the First-Fit algorithm will require $floor(1.7 "OPT"(L))$ bins.
+This means that if the optimal number of required bins for the input $L$ is $"OPT"(L)$, then the First-Fit algorithm uses at most $floor(1.7 "OPT"(L))$ bins.
 
 In 2007, Dósa @dosa_2007_ffd_bounds showed new bounds for First-Fit-Decreasing: $"FFD"(L) ≤ 11/9 "OPT"(L) + 6/9$.
-In 2014, Dósa and Gyorgy @dosa_gyorgy_2014_bounds_bf showed that these same bounds also hold for Best-Fit.
+In 2014, Dósa and Sgall @dosa_sgall_2014_bounds_bf showed that the same absolute bound as for First-Fit also holds for Best-Fit: $"BF"(L) <= floor(1.7 "OPT"(L))$.
 
-In David Johnson's 1973 Ph.D. thesis @johnson_1973_phd, the bounds $A(L) ≤ 2 "OPT"(L) - 1$ for the Next-Fit and Worst-Fit algorithms were presented.
-
+In David Johnson's 1973 Ph.D. thesis @johnson_1973_phd, the bounds $"NF"(L) <= 2 "OPT"(L) - 1$ and $"WF"(L) <= 2 "OPT"(L) - 1$ for the Next-Fit and Worst-Fit algorithms were presented.
