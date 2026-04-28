@@ -230,90 +230,83 @@ We will now show a small example of the problem.
 
 $
   J=2, M=2, K=3, T=3 \
-  R = mat(2, 1; 1, 1; 0, 1) quad C = mat(3, 1; 2, 3; 1, 0) quad L = mat(1, 2, 0; 1, 0, 1) \
-  bold(c^p) = mat(5, 6) quad bold(c^r) = mat(1, 1/2)
+  bold(R) = mat(2, 1; 1, 1; 0, 1) quad bold(C) = mat(3, 1; 2, 3; 1, 0) quad bold(L) = mat(1, 2, 0; 1, 0, 1) \
+  bold(alpha) = vec(1/2, 1/2, 1/2) quad gamma = 1/2 \
+  bold(c^p) = bold(C)^T bold(alpha) = vec(3, 2) quad bold(c^r) = gamma bold(c^p) = vec(3/2, 1)
 $
 
-This problem instance has two job types, two machine types, three resource types, and three time slots.
-We now present a solution to the problem.
-This solution is not guaranteed to be optimal.
+For machine type $1$, the feasible packing configurations are:
 
 $
-  bold(x) = mat(2, 0) quad
-  bold(Y)_1 = mat(1, 0; 0, 1) quad
-  bold(Y)_2 = mat(0, 0; 0, 0) \
-  bold(n)_(1,1) = mat(1, 1) quad
-  bold(n)_(1,2) = mat(2, 0) quad
-  bold(n)_(1,3) = mat(0, 1) \
-  bold(n)_(2,t) = mat(0, 0) quad forall t \
+  S_1 = {vec(0, 0), vec(1, 0), vec(0, 1), vec(1, 1)}
 $
 
-Let us now interpret this solution.
-
-We shall buy $2$ instances of machine type $1$, and $0$ instances of machine type $2$.
-
-For time slot $1$, one machine instance will run $1$ type $1$ job and the other machine instance will run $1$ type $2$ job.
-
-For time slot $2$, both machine instances will each run $1$ type $1$ job.
-
-For time slot $3$, one machine instance will run $1$ type $2$ job. The other machine will be powered off.
-
-The solution can also be represented by this table.
-
-#let example_solution_data = csv("../data/example_job_schedule_solution.csv")
-
-#table(
-  columns: 6,
-  ..example_solution_data.flatten()
-)
-
-The matrices $bold(Y)_1$, $bold(Y)_2$ shown here do not contain all possible job packings for each respective machine type.
-We only show the job packings which we use for this specific solution.
-
-We shall now show that this is a valid solution.
-
-We begin with showing that all job packing configurations for all machine types are valid.
-In other words, for each machine type and for each job packing configuration for the machine type, the total resource demand for the configuration does not exceed the resource capacity of the machine type.
+For machine type $2$, the feasible packing configurations are:
 
 $
-  bold(y) in bold(S)_i <=> bold(R)bold(y) <= bold(m)_i quad forall i
+  S_2 = {vec(0, 0)}
 $
 
-#let Rmat = $mat(2, 1; 1, 1; 0, 1)$
+Thus, we can define the packing matrices:
 
 $
-  i=1:\
-  Rmat vec(1, 0) <= vec(3, 2, 1) ,quad
-  Rmat vec(0, 1) <= vec(3, 2, 1) \
-  i=2:\
-  Rmat bold(arrow(0)) <= vec(1, 3, 0)
+  bold(Y)_1 = mat(0, 1, 0, 1; 0, 0, 1, 1) quad
+  bold(Y)_2 = mat(0; 0)
 $
 
-Next, we show that our machines can run all scheduled jobs for all time slots.
+Consider the following solution:
 
 $
-  sum_(i=1)^M bold(Y)_i bold(n)_(i,t) >= bold(l)_t quad forall t \
+  bold(x) = vec(2, 0) \
+  bold(n)_(1,1) = vec(0, 0, 0, 1) quad
+  bold(n)_(1,2) = vec(0, 2, 0, 0) quad
+  bold(n)_(1,3) = vec(0, 0, 1, 0) \
+  bold(n)_(2,t) = vec(0) quad forall t
 $
 
-We see that the constraint is satisfied for all time slots.
+The solution buys two instances of machine type $1$ and no instances of machine type $2$.
+In time slot $1$, one machine of type $1$ runs one job of each type.
+In time slot $2$, two machines of type $1$ each run one job of type $1$.
+In time slot $3$, one machine of type $1$ runs one job of type $2$.
 
-#let Yone = $mat(1, 0; 0, 1)$
-#let Ytwo = $mat(0, 0; 0, 0)$
+We first verify that the used packing configurations are feasible:
+
 $
-  t=1: Yone vec(1, 1) + Ytwo vec(0, 0) >= vec(1, 1) \
-  t=2: Yone vec(2, 0) + Ytwo vec(0, 0) >= vec(2, 0) \
-  t=3: Yone vec(0, 1) + Ytwo vec(0, 0) >= vec(0, 1)
+  bold(R) vec(0, 0) = vec(0, 0, 0) <= vec(3, 2, 1) \
+  bold(R) vec(1, 0) = vec(2, 1, 0) <= vec(3, 2, 1) \
+  bold(R) vec(0, 1) = vec(1, 1, 1) <= vec(3, 2, 1) \
+  bold(R) vec(1, 1) = vec(3, 2, 1) <= vec(3, 2, 1) \
+  bold(R) vec(0, 0) = vec(0, 0, 0) <= vec(1, 3, 0)
 $
 
+We then verify that the scheduled jobs match the workload exactly:
 
-Now, we can calculate the cost of buying and running these machines.
-The cost to buy the machines is $2 * 5 + 0 * 4 = 10$.
-The type $1$ machine costs $5$ to buy, and we buy $2$ instances.
-We do not buy any type $2$ instances.
-The cost to run the machines is $1 * 5 + 1/2 * 0 = 5$.
-The type $1$ machine costs $1$ per time slot to run, and we run them for a total of $5$ time slots.
-We do not own any type $2$ machines.
+$
+  t=1: bold(Y)_1 vec(0, 0, 0, 1) + bold(Y)_2 vec(0) = vec(1, 1) = bold(l)_1 \
+  t=2: bold(Y)_1 vec(0, 2, 0, 0) + bold(Y)_2 vec(0) = vec(2, 0) = bold(l)_2 \
+  t=3: bold(Y)_1 vec(0, 0, 1, 0) + bold(Y)_2 vec(0) = vec(0, 1) = bold(l)_3
+$
 
-The total cost for this solution is $10 + 5 = 15$.
+The number of powered-on machines does not exceed the number of purchased machines:
 
-This solution shows how we can use different job packing configurations for a single machine type.
+$
+  t=1: sum_(k=1)^(abs(S_1)) n_(1,1,k) = 1 <= x_1 \
+  t=2: sum_(k=1)^(abs(S_1)) n_(1,2,k) = 2 <= x_1 \
+  t=3: sum_(k=1)^(abs(S_1)) n_(1,3,k) = 1 <= x_1 \
+  sum_(k=1)^(abs(S_2)) n_(2,t,k) = 0 <= x_2 quad forall t
+$
+
+The purchase cost is:
+
+$
+  bold(x)^T bold(c^p) = 2 dot 3 + 0 dot 2 = 6
+$
+
+The running cost is:
+
+$
+  sum_(i=1)^M c^r_i sum_(t=1)^T sum_(k=1)^(abs(S_i)) n_(i,t,k)
+  = (3/2) dot (1 + 2 + 1) + 1 dot 0 = 6
+$
+
+Therefore, the total cost of this solution is $6 + 6 = 12$.
