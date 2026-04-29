@@ -16,8 +16,6 @@ This value is, for each algorithm $s$, given by the performance profile function
 Note here that the sum of the win rates across all algorithms do not sum to $1$.
 The reason for this is that multiple algorithms can be tied for certain problem instances.
 
-Since the algorithm execution times are all nearly identical, we will not be comparing them.
-
 
 === Balanced dataset
 

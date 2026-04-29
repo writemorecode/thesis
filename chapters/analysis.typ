@@ -95,6 +95,13 @@ It is therefore possible for these datasets to have certain less expensive job-m
 This was consistent with increased packing flexibility.
 These patterns provide support for, but not proof of, the validity of our results.
 
+Finally, we mention a few things regarding algorithm execution time analysis.
+Since the execution time for algorithm for each problem instance was measured only once, the measurements may have been affected by noise from the machine on which they were collected.
+We used a laptop to run all algorithm evaluation and execution time collection.
+At this time, the laptop was running a minimal number of tasks required to carry out the evaluation and measurement tasks.
+A more rigorous algorithm benchmarking study would repeat each run multiple times, randomize execution order, collect all measurements on a dedicated server machine, and use a high-resolution monotonic timer.
+Further, such a study would also compare algorithms pairwise on the same problem instances.
+
 == Threats to external validity
 
 The generated problem instances may not fully capture real-world workload characteristics such as bursts, seasonality, and correlations.

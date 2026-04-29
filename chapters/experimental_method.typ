@@ -7,6 +7,7 @@
 
 This chapter describes how problem instances are generated, and how datasets are generated from these problem instances.
 We also describe our method for evaluating these algorithms on the generated datasets.
+We evaluate both the solution costs and execution times for each algorithm.
 
 === Problem instance generation <problem_instance_generation>
 
@@ -683,3 +684,14 @@ The performance profile function $rho_s (tau)$ for a solver $s$ can be interpret
 Specifically, $rho_s (1)$ gives the percentage of problem instances for which solver $s$ achieved the optimal performance ratio, which can be interpreted as the solver's _"win rate"_.
 
 We will use this performance profiles method as a second step in the process of determining which of the algorithms performs best on each of the datasets.
+
+==== Algorithm execution time analysis
+
+For each problem instance of each dataset, we recorded the wall-clock execution time of each algorithm.
+Execution time was measured only for the algorithm itself, excluding validating solutions and writing solution data to disk.
+For each algorithm-dataset pair, we computed the mean runtime and a $95\%$ confidence interval over the $100$ problem instances.
+We also ran paired two-tailed t-tests across dataset pairs for each algorithm to test whether the mean execution time of a given algorithm changed for different datasets.
+
+These t-tests compared the same algorithm across different datasets.
+They are not pairwise tests between different algorithms.
+Therefore they should be interpreted only as evidence of dataset-dependent execution time variation, and not as formal evidence that one algorithm is faster than another.
