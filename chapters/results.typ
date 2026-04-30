@@ -7,7 +7,7 @@ This chapter presents the evaluation datasets, metrics, and empirical results fo
 For each dataset, we first present a summary table of the evaluation results for each scheduler algorithm.
 We then compare the two best algorithms for the dataset, defined as the two schedulers with the lowest average total cost in the summary table.
 This comparison uses a paired two-tailed $t$-test on per-instance total-cost ratios and reports the mean ratio, the $95%$ confidence interval for the mean ratio, the $t$ statistic, the $p$-value, and the test decision.
-The ratio-distribution diagnostics are discussed in the appendix @appendix_data_normality.
+// The ratio-distribution diagnostics are discussed in the appendix @appendix_data_normality.
 Next, we present a plot of the performance profiles for each of the algorithms.
 Here, $tau$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for each solver $s$.
 Finally, we present a table of the performance ratio _"win rate"_ for each algorithm.
