@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+from dataclasses import dataclass
 from math import sqrt
 from pathlib import Path
 
@@ -33,7 +34,18 @@ from eval_utils import (
     scheduler_output_filename,
 )
 
-SIG_FIGS = 4
+SIG_FIGS = 6
+
+
+@dataclass(frozen=True)
+class TestResult:
+    n: int
+    mean_ratio: float
+    ci_low_ratio: float
+    ci_high_ratio: float
+    t_statistic: float
+    p_value: float
+    reject: bool
 
 
 def write_stats_csv(
@@ -41,10 +53,7 @@ def write_stats_csv(
     output_csv: Path,
     label_a: str,
     label_b: str,
-    p_value: float,
-    mean_ratio: float,
-    ci_low_ratio: float,
-    ci_high_ratio: float,
+    result: TestResult,
 ) -> None:
     output_csv.parent.mkdir(parents=True, exist_ok=True)
     with output_csv.open("w", newline="", encoding="utf-8") as f:
@@ -52,22 +61,28 @@ def write_stats_csv(
             f,
             fieldnames=[
                 "comparison",
-                "ci_ratio",
+                "n",
                 "mean_ratio",
+                "ci_ratio",
+                "t_statistic",
                 "p_value",
+                "decision",
             ],
         )
         writer.writeheader()
         comparison = (
             f"{display_scheduler_name(label_a)} / {display_scheduler_name(label_b)}"
         )
-        ci_ratio = f"{_fmt_sig(ci_low_ratio)}-{_fmt_sig(ci_high_ratio)}"
+        ci_ratio = f"{_fmt_sig(result.ci_low_ratio)}-{_fmt_sig(result.ci_high_ratio)}"
         writer.writerow(
             {
                 "comparison": comparison,
+                "n": str(result.n),
+                "mean_ratio": _fmt_sig(result.mean_ratio),
                 "ci_ratio": ci_ratio,
-                "mean_ratio": _fmt_sig(mean_ratio),
-                "p_value": _fmt_sig(p_value),
+                "t_statistic": _fmt_sig(result.t_statistic),
+                "p_value": _fmt_sig(result.p_value),
+                "decision": "REJECT H0" if result.reject else "FAIL TO REJECT H0",
             }
         )
 
@@ -168,24 +183,31 @@ def run_test(
     ci_low = mean - t_crit * se
     ci_high = mean + t_crit * se
 
-    pvalue = _scalar_float(res.pvalue)
-    if not np.isfinite(pvalue):
-        pvalue = float("nan")
-    reject = bool(pvalue < alpha) if np.isfinite(pvalue) else False
+    p_value = _scalar_float(res.pvalue)
+    if not np.isfinite(p_value):
+        p_value = float("nan")
+    reject = bool(p_value < alpha) if np.isfinite(p_value) else False
     confidence_level = 1.0 - alpha
     statistic = _scalar_float(res.statistic)
     if not np.isfinite(statistic):
         statistic = float("nan")
+
+    result = TestResult(
+        n=n,
+        mean_ratio=mean,
+        ci_low_ratio=ci_low,
+        ci_high_ratio=ci_high,
+        t_statistic=statistic,
+        p_value=p_value,
+        reject=reject,
+    )
 
     if stats_csv is not None:
         write_stats_csv(
             output_csv=stats_csv,
             label_a=label_a,
             label_b=label_b,
-            p_value=pvalue,
-            mean_ratio=mean,
-            ci_low_ratio=ci_low,
-            ci_high_ratio=ci_high,
+            result=result,
         )
 
     print(f"Algorithm A: {label_a} ({csv_a})")
@@ -198,7 +220,7 @@ def run_test(
     print(f"mean(ratio) = {_fmt_sig(mean)}")
     print(f"std(ratio)  = {_fmt_sig(std)}")
     print(f"t(df={df})       = {_fmt_sig(statistic)}")
-    print(f"p-value          = {_fmt_sig(pvalue)}")
+    print(f"p-value          = {_fmt_sig(p_value)}")
     print(
         f"{_fmt_sig(confidence_level * 100)}% CI mean(ratio): {_fmt_ci(ci_low, ci_high)}"
     )

@@ -644,17 +644,20 @@ $
 
 If $r_i < 1$, then $c_(A,i) < c_(B,i)$ and $A$ is better on instance $i$ (lower cost).
 
-We use the ratios $r_i$ to describe relative performance, but for statistical testing we compare paired differences in raw total cost:
-$
-  d_i = c_(A,i) - c_(B,i).
-$
-We test whether the algorithms differ using a paired Wilcoxon signed-rank test on the values $d_i$:
-$cal(H_0): med(d) = 0$ and $cal(H_1): med(d) != 0$, with $alpha = 0.05$.
-From this test, we report the $W$ statistic, the two-sided $p$-value, and summary statistics (mean/median difference and the number of non-zero pairs).
+We test whether the algorithms differ using a paired two-tailed $t$-test on the ratios $r_i$:
+$cal(H_0): "mean"(r) = 1$ and $cal(H_1): "mean"(r) != 1$, with $alpha = 0.05$.
+From this test, we report the mean ratio, the $95%$ confidence interval for the mean ratio, the $t$ statistic, the two-sided $p$-value, and the test decision.
 
-Here, $med(d) < 0$ indicates that $A$ has lower cost than $B$ on average, and $med(d) > 0$ indicates the opposite.
+Here, $"mean"(r) < 1$ indicates that $A$ has lower cost than $B$ on average, and $"mean"(r) > 1$ indicates the opposite.
 
-In addition to the comparison of the two best algorithms, we also run paired Wilcoxon signed-rank tests between _BFD_ and each remaining algorithm (excluding _FFDNew_).
+In addition to the comparison of the two best algorithms, we also run paired ratio $t$-tests between _BFD_ and each remaining algorithm (excluding _FFDNew_).
+
+We use the same ratio-based approach when comparing total machine counts.
+For two algorithms $A$ and $B$, let
+$
+  m_i = "machines"_(A,i) / "machines"_(B,i).
+$
+We then test $cal(H_0): "mean"(m) = 1$ and $cal(H_1): "mean"(m) != 1$ using a paired two-tailed $t$-test.
 
 ==== Dolan-Moré performance profiles
 

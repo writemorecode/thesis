@@ -8,7 +8,7 @@ The results of the evaluation are clear.
 We can divide the packing algorithms into two classes: the naive _FFDLex_, _FFDSum_, _FFDProd_, _FFDMax_, _FFDL2_, etc, and the more intelligent _BFD_ and _FFDNew_.
 We can make two initial conclusions.
 The performance of the naive algorithms are all comparable, with exception of one or two outliers with exceedingly poor performance.
-Any difference in performance between _BFD_ and _FFDNew_ is statistically indistinguishable.
+The performance difference between _BFD_ and _FFDNew_ is practically very small.
 These conclusions hold for all three datasets.
 
 Next, we consider the execution times of the algorithms.
@@ -24,19 +24,20 @@ It is possible that more efficient implementations would have yielded in differe
 
 We shall study the evaluation results of the _BFD_ and _FFDNew_ algorithms.
 The two algorithms have nearly identical average costs on each of the datasets.
-For all three datasets, the paired Wilcoxon signed-rank tests on raw total cost differences fail to reject the null hypothesis at $alpha=0.05$.
-This means that we can not conclude that _BFD_ outperforms _FFDNew_ on any of the datasets based on these tests alone.
+For the _Balanced_ and _Machine-heavy_ datasets, the paired ratio $t$-tests on raw total cost ratios fail to reject the null hypothesis at $alpha=0.05$.
+For the _Job-heavy_ dataset, the paired ratio $t$-test rejects the null hypothesis ($p approx 0.0407$), but the effect size is very small: the mean _BFD_ / _FFDNew_ cost ratio is approximately $1.00044$.
+This means that _FFDNew_ is slightly cheaper on average in the job-heavy dataset, while the two algorithms remain practically almost identical.
 
-The pairwise Wilcoxon signed-rank tests comparing _BFD_ to the remaining algorithms (excluding _FFDNew_) are all decisive.
-Across all three datasets, the median differences are negative, the $p$-values are far below $0.05$, and the results are consistent with _BFD_ yielding lower solution cost than the other evaluated baselines.
+The pairwise ratio $t$-tests comparing _BFD_ to the remaining algorithms (excluding _FFDNew_) are all decisive.
+Across all three datasets, the mean cost ratios are below $1$, the $p$-values are far below $0.05$, and the results are consistent with _BFD_ yielding lower solution cost than the other evaluated baselines.
 
 There are notable relationships between the total machine count and the solution cost for different algorithms.
 We find that the two algorithms with the lowest solution costs, _BFD_ and _FFDNew_, have the highest total machine count.
-We have run paired Wilcoxon signed-rank tests ($alpha=0.05$) between the total machine counts for the _BFD_ and _FFDMax_ algorithms.
+We have run paired ratio $t$-tests ($alpha=0.05$) between the total machine counts for the _BFD_ and _FFDMax_ algorithms.
 The null hypothesis was rejected for all three datasets.
-For the _Balanced_ dataset, the mean and median differences are $7.33$ and $7$ machines (_BFD_ - _FFDMax_), and $p=1.837 dot 10^(-16)$.
-For the _Job-heavy_ dataset, the mean and median differences are $8.87$ and $9$, with and $p=6.389 dot 10^(-18)$.
-For the _Machine-heavy_ dataset, the mean and median differences are $5.67$ and $7$, with and $p=4.76 dot 10^(-12)$.
+For the _Balanced_ dataset, the mean machine-count ratio is $1.323$ (_BFD_ / _FFDMax_), with $p=6.702 dot 10^(-23)$.
+For the _Job-heavy_ dataset, the mean machine-count ratio is $1.376$, with $p=1.34 dot 10^(-29)$.
+For the _Machine-heavy_ dataset, the mean machine-count ratio is $1.245$, with $p=3.065 dot 10^(-15)$.
 These results indicate that the _BFD_ algorithm consistently activates more machines than the _FFDMax_ algorithm, even while achieving lower total solution cost.
 This supports the interpretation that lower cost in our setting does not imply fewer active machines, but instead a more cost-efficient allocation across machine types over time.
 
@@ -123,4 +124,3 @@ We mitigate overgeneralization by not extending the findings to those environmen
 Previously, we assumed a deterministic load profile and the lack of an initial hardware fleet.
 However, these assumptions are not load-bearing and could be relaxed.
 This would allow our algorithms to be applied to more general problems which do not involve these assumptions.
-

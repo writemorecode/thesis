@@ -46,37 +46,46 @@ evaluate_dataset() {
     --output "${results_dir}/eval_summary_${name}.csv" \
     --verbose
 
-  echo "Running paired Wilcoxon test on raw costs (BFD vs FFDNew)..."
-  uv run python scripts/raw_cost_wilcoxon.py \
+  echo "Running paired ratio t-test on raw costs (BFD vs FFDNew)..."
+  uv run python scripts/raw_ratio_ttest.py \
     --results-dir "${raw_dir}" \
     --algo-a "bfd" \
     --algo-b "ffd_new" \
-    --stats-csv "${results_dir}/eval_raw_cost_wilcoxon_${name}.csv"
+    --stats-csv "${results_dir}/eval_raw_cost_ratio_ttest_${name}.csv"
 
-  echo "Running Shapiro-Wilk tests on raw costs (BFD and FFDNew)..."
-  uv run python scripts/raw_cost_shapiro.py \
+  echo "Running Shapiro-Wilk test on raw cost ratios (BFD / FFDNew)..."
+  uv run python scripts/raw_cost_ratio_shapiro.py \
     --results-dir "${raw_dir}" \
-    --algorithm "bfd,ffd_new" \
-    --stats-csv "${results_dir}/eval_raw_cost_shapiro.csv"
+    --algo-a "bfd" \
+    --algo-b "ffd_new" \
+    --stats-csv "${results_dir}/eval_raw_cost_ratio_shapiro.csv"
 
-  echo "Running paired Wilcoxon tests on raw costs (BFD vs others)..."
-  local pairwise_wilcoxon_csv="${results_dir}/eval_raw_cost_wilcoxon_pairwise_${name}.csv"
-  cat > "${pairwise_wilcoxon_csv}" <<'EOF'
-comparison,n_total,n_nonzero,mean_diff,median_diff,w_statistic,p_value
+  echo "Running paired ratio t-tests on raw costs (BFD vs others)..."
+  local pairwise_ratio_ttest_csv="${results_dir}/eval_raw_cost_ratio_ttest_pairwise_${name}.csv"
+  cat > "${pairwise_ratio_ttest_csv}" <<'EOF'
+comparison,n,mean_ratio,ci_ratio,t_statistic,p_value,decision
 EOF
 
   for scheduler in ${SCHEDULERS//,/ }; do
     if [[ "${scheduler}" == "bfd" || "${scheduler}" == "ffd_new" ]]; then
       continue
     fi
-    local pair_output_csv="${results_dir}/eval_raw_cost_wilcoxon_bfd_vs_${scheduler}_${name}.csv"
-    uv run python scripts/raw_cost_wilcoxon.py \
+    local pair_output_csv="${results_dir}/eval_raw_cost_ratio_ttest_bfd_vs_${scheduler}_${name}.csv"
+    uv run python scripts/raw_ratio_ttest.py \
       --results-dir "${raw_dir}" \
       --algo-a "bfd" \
       --algo-b "${scheduler}" \
       --stats-csv "${pair_output_csv}"
-    tail -n +2 "${pair_output_csv}" >> "${pairwise_wilcoxon_csv}"
+    tail -n +2 "${pair_output_csv}" >> "${pairwise_ratio_ttest_csv}"
   done
+
+  echo "Running paired ratio t-test on raw machine counts (BFD vs FFDMax)..."
+  uv run python scripts/raw_machines_ratio_ttest.py \
+    --raw-root "${EVAL_ROOT}/raw" \
+    --datasets "${name}" \
+    --algo-a "bfd" \
+    --algo-b "ffd_max" \
+    --stats-root "${EVAL_ROOT}/results"
 
   echo "Running performance profiles for schedulers..."
   local perf_profile_csv="${results_dir}/eval_performance_profiles_${name}.csv"

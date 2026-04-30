@@ -4,22 +4,21 @@
 
 We shall now discuss the validity of our experimental methods, and of our results.
 We begin with discussing the paired comparison between the _BFD_ and _FFDNew_ algorithms.
-We use a Wilcoxon signed-rank test on per-instance raw total cost differences, which does not require normality assumptions.
-Nevertheless, it is instructive to examine the distribution of cost ratios to understand why we avoid $t$-tests here.
+We use paired ratio $t$-tests on per-instance raw total cost ratios.
+It is therefore instructive to examine the distribution of these ratios as diagnostic context for the selected statistical test.
 
 First of all, all data points must be independent.
 We meet this requirement, since all problem instances are randomly generated using a deterministic pseudo-random number generated with a fixed seed value.
 No problem instances were generated based on other problem instances as input.
 
-The second requirement for a $t$-test is that the data must be, at least approximately, normally distributed.
-This requirement is met by only the balanced dataset.
+The second requirement for a $t$-test is that the data should be, at least approximately, normally distributed.
 Below, we present a histogram plot and a quantile-quantile (Q-Q) plot for each of the three datasets.
 For each dataset, the histogram plot is generated from the set of cost-ratio values (see @cost_ratios)
 $
   r_i = c_("BFD",i) / c_("FFDNew",i),
 $
 for each problem instance $i$.
-In order for such $t$-tests to be valid, we must have $r_i ~ cal(N)(mu_r, sigma_r^2)$ for some distribution parameters $mu_r$ and $sigma_r$.
+Ideally, these ratio values should be approximately distributed as $r_i ~ cal(N)(mu_r, sigma_r^2)$ for some distribution parameters $mu_r$ and $sigma_r$.
 Note that for all three datasets, the two algorithms perform equally well on a large number of problem instances (see also the performance profile plots in @results_section).
 This is shown in the histograms as the large spike at the cost ratio value at $1.0$.
 
@@ -79,89 +78,60 @@ Comparing the $R^2$ values, it is the job-heavy dataset that fits a normal distr
 
 
 
-In order to determine more rigorously if the cost ratio values for each dataset are normally distributed, we will use the _Shapiro-Wilk_ test of normality @shapiro_wilk_article.
+In order to determine more rigorously if the cost ratio values for each dataset are normally distributed, we use the _Shapiro-Wilk_ test of normality @shapiro_wilk_article.
 The test tests the null hypothesis $cal(H)_0$ that a sample came from a normally distributed population.
 As before, we use a significance level of $alpha = 0.05$.
-The results of these tests for _BFD_ and _FFDNew_ on all three datasets are presented below.
+The results of these tests for the _BFD_ / _FFDNew_ cost ratios on all three datasets are presented below.
 
-#let shapiro_balanced = csv("../evaluation/results/balanced/eval_raw_cost_shapiro.csv").slice(1)
-#let shapiro_balanced_bfd = shapiro_balanced.at(0)
-#let shapiro_balanced_ffdnew = shapiro_balanced.at(1)
+#let shapiro_ratio_balanced = csv("../evaluation/results/balanced/eval_raw_cost_ratio_shapiro.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 3,
-        table.header([*W statistic*], [*$p$-value*], [*Reject H0*]),
-        table.cell(colspan: 3)[*BFD*],
-        [#shapiro_balanced_bfd.at(1)],
-        [#shapiro_balanced_bfd.at(2)],
-        [#shapiro_balanced_bfd.at(3)],
-        table.cell(colspan: 3)[*FFDNew*],
-        [#shapiro_balanced_ffdnew.at(1)],
-        [#shapiro_balanced_ffdnew.at(2)],
-        [#shapiro_balanced_ffdnew.at(3)],
+        columns: 4,
+        table.header([*Comparison*], [*W statistic*], [*$p$-value*], [*Reject H0*]),
+        ..shapiro_ratio_balanced.flatten(),
       ),
-      caption: [Shapiro-Wilk normality test results for the balanced dataset.],
+      caption: [Shapiro-Wilk normality test results for _BFD_ / _FFDNew_ cost ratios in the balanced dataset.],
     )
   ])
 ]
 
-#let shapiro_job_heavy = csv("../evaluation/results/job_heavy/eval_raw_cost_shapiro.csv").slice(1)
-#let shapiro_job_heavy_bfd = shapiro_job_heavy.at(0)
-#let shapiro_job_heavy_ffdnew = shapiro_job_heavy.at(1)
+#let shapiro_ratio_job_heavy = csv("../evaluation/results/job_heavy/eval_raw_cost_ratio_shapiro.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 3,
-        table.header([*W statistic*], [*$p$-value*], [*Reject H0*]),
-        table.cell(colspan: 3)[*BFD*],
-        [#shapiro_job_heavy_bfd.at(1)],
-        [#shapiro_job_heavy_bfd.at(2)],
-        [#shapiro_job_heavy_bfd.at(3)],
-        table.cell(colspan: 3)[*FFDNew*],
-        [#shapiro_job_heavy_ffdnew.at(1)],
-        [#shapiro_job_heavy_ffdnew.at(2)],
-        [#shapiro_job_heavy_ffdnew.at(3)],
+        columns: 4,
+        table.header([*Comparison*], [*W statistic*], [*$p$-value*], [*Reject H0*]),
+        ..shapiro_ratio_job_heavy.flatten(),
       ),
-      caption: [Shapiro-Wilk normality test results for the job-heavy dataset.],
+      caption: [Shapiro-Wilk normality test results for _BFD_ / _FFDNew_ cost ratios in the job-heavy dataset.],
     )
   ])
 ]
 
-#let shapiro_machine_heavy = csv("../evaluation/results/machine_heavy/eval_raw_cost_shapiro.csv").slice(1)
-#let shapiro_machine_heavy_bfd = shapiro_machine_heavy.at(0)
-#let shapiro_machine_heavy_ffdnew = shapiro_machine_heavy.at(1)
+#let shapiro_ratio_machine_heavy = csv("../evaluation/results/machine_heavy/eval_raw_cost_ratio_shapiro.csv").slice(1)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 3,
-        table.header([*W statistic*], [*$p$-value*], [*Reject H0*]),
-        table.cell(colspan: 3)[*BFD*],
-        [#shapiro_machine_heavy_bfd.at(1)],
-        [#shapiro_machine_heavy_bfd.at(2)],
-        [#shapiro_machine_heavy_bfd.at(3)],
-        table.cell(colspan: 3)[*FFDNew*],
-        [#shapiro_machine_heavy_ffdnew.at(1)],
-        [#shapiro_machine_heavy_ffdnew.at(2)],
-        [#shapiro_machine_heavy_ffdnew.at(3)],
+        columns: 4,
+        table.header([*Comparison*], [*W statistic*], [*$p$-value*], [*Reject H0*]),
+        ..shapiro_ratio_machine_heavy.flatten(),
       ),
-      caption: [Shapiro-Wilk normality test results for the machine-heavy dataset.],
+      caption: [Shapiro-Wilk normality test results for _BFD_ / _FFDNew_ cost ratios in the machine-heavy dataset.],
     )
   ])
 ]
 
-For the balanced dataset, we fail to reject normality for both _BFD_ and _FFDNew_ at $alpha=0.05$.
-For the job-heavy and machine-heavy datasets, the Shapiro-Wilk test rejects normality for both algorithms.
-This suggests the per-instance cost-ratio distributions are non-normal in those datasets, which motivates using the Wilcoxon signed-rank test instead of ratio-based $t$-tests, even though the sample size is large ($n=100$).
+For all three datasets, the Shapiro-Wilk test rejects normality for the _BFD_ / _FFDNew_ cost-ratio distributions at $alpha=0.05$.
+The ratio distributions should therefore be interpreted as diagnostic context for the selected parametric tests.
+We still use paired ratio $t$-tests as the chosen comparison method, with $n=100$ paired observations for each dataset.
 
 We see here how a few outliers can affect the outcome of statistical tests.
 The outliers represent solution costs to problem instances which were either much easier or much more difficult than average.
 It may be a good idea to see if the test outcomes change if these outliers are controlled for.
 This could be done by, for example, dropping all data points further than $2$ or $3$ standard deviations from the mean.
 
-Since the sample size ($n = 100$) is greater than $30-40$, the _Central Limit Theorem_ does generally allow using $t$-tests on data that is not from a normal distribution.
-Nevertheless, we prefer the Wilcoxon signed-rank test here to avoid reliance on distributional assumptions for the paired comparisons.
-
+Since the sample size ($n = 100$) is greater than $30-40$, the _Central Limit Theorem_ provides support for using $t$-tests even when the observed ratio distribution is not itself normal.
