@@ -21,8 +21,14 @@ The reason for this is that multiple algorithms can be tied for certain problem 
   } else {
     row.at(0)
   }
+  let ci_parts = row.at(3).split("-")
+  let ci_ratio = (
+    str(calc.round(decimal(ci_parts.at(0)), digits: 4))
+    + "-"
+    + str(calc.round(decimal(ci_parts.at(1)), digits: 4))
+  )
   let reject_h0 = if row.at(6) == "REJECT H0" { "Yes" } else { "No" }
-  (comparison,) + row.slice(1, 4) + row.slice(5, 6) + (reject_h0,)
+  (comparison,) + row.slice(1, 3) + (ci_ratio,) + row.slice(5, 6) + (reject_h0,)
 })
 
 
