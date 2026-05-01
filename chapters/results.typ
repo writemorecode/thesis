@@ -15,9 +15,14 @@ This value is, for each algorithm $s$, given by the performance profile function
 Note here that the sum of the win rates across all algorithms do not sum to $1$.
 The reason for this is that multiple algorithms can be tied for certain problem instances.
 
-#let compact_ratio_ttest_rows(rows) = rows.map(row => {
+#let compact_ratio_ttest_rows(rows, strip_bfd_prefix: false) = rows.map(row => {
+  let comparison = if strip_bfd_prefix {
+    row.at(0).replace("BFD / ", "")
+  } else {
+    row.at(0)
+  }
   let reject_h0 = if row.at(6) == "REJECT H0" { "Yes" } else { "No" }
-  row.slice(0, 4) + row.slice(5, 6) + (reject_h0,)
+  (comparison,) + row.slice(1, 4) + row.slice(5, 6) + (reject_h0,)
 })
 
 
@@ -71,7 +76,10 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
 #let ratio_ttest_pairwise_balanced = csv(
   "../evaluation/results/balanced/eval_raw_cost_ratio_ttest_pairwise_balanced.csv",
 ).slice(1)
-#let ratio_ttest_pairwise_balanced = compact_ratio_ttest_rows(ratio_ttest_pairwise_balanced)
+#let ratio_ttest_pairwise_balanced = compact_ratio_ttest_rows(
+  ratio_ttest_pairwise_balanced,
+  strip_bfd_prefix: true,
+)
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -169,7 +177,10 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
 #let ratio_ttest_pairwise_job_heavy = csv(
   "../evaluation/results/job_heavy/eval_raw_cost_ratio_ttest_pairwise_job_heavy.csv",
 ).slice(1)
-#let ratio_ttest_pairwise_job_heavy = compact_ratio_ttest_rows(ratio_ttest_pairwise_job_heavy)
+#let ratio_ttest_pairwise_job_heavy = compact_ratio_ttest_rows(
+  ratio_ttest_pairwise_job_heavy,
+  strip_bfd_prefix: true,
+)
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -268,7 +279,10 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
 #let ratio_ttest_pairwise_machine_heavy = csv(
   "../evaluation/results/machine_heavy/eval_raw_cost_ratio_ttest_pairwise_machine_heavy.csv",
 ).slice(1)
-#let ratio_ttest_pairwise_machine_heavy = compact_ratio_ttest_rows(ratio_ttest_pairwise_machine_heavy)
+#let ratio_ttest_pairwise_machine_heavy = compact_ratio_ttest_rows(
+  ratio_ttest_pairwise_machine_heavy,
+  strip_bfd_prefix: true,
+)
 #align(center)[
   #block(breakable: false, [
     #figure(
