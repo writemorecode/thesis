@@ -6,7 +6,7 @@ This chapter presents the evaluation datasets, metrics, and empirical results fo
 
 For each dataset, we first present a summary table of the evaluation results for each scheduler algorithm.
 We then compare the two best algorithms for the dataset, defined as the two schedulers with the lowest average total cost in the summary table.
-This comparison uses a paired two-tailed $t$-test on per-instance total-cost ratios and reports the mean ratio, the $95%$ confidence interval for the mean ratio, the $t$ statistic, the $p$-value, and the test decision.
+This comparison uses a paired two-tailed $t$-test on per-instance total-cost ratios and reports the mean ratio, the $95%$ confidence interval for the mean ratio, the $p$-value, and the test decision.
 // The ratio-distribution diagnostics are discussed in the appendix @appendix_data_normality.
 Next, we present a plot of the performance profiles for each of the algorithms.
 Here, $tau$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for each solver $s$.
@@ -14,6 +14,8 @@ Finally, we present a table of the performance ratio _"win rate"_ for each algor
 This value is, for each algorithm $s$, given by the performance profile function $rho_s (tau)$ at $tau = 1$.
 Note here that the sum of the win rates across all algorithms do not sum to $1$.
 The reason for this is that multiple algorithms can be tied for certain problem instances.
+
+#let drop_t_statistic_column(rows) = rows.map(row => row.slice(0, 4) + row.slice(5))
 
 
 === Balanced dataset
@@ -40,17 +42,18 @@ The reason for this is that multiple algorithms can be tied for certain problem 
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
 Using the paired ratio $t$-test on raw total cost ratios, we fail to reject the null hypothesis at $alpha=0.05$ ($p approx 0.170$), and the mean ratio is close to $1$.
 
-#let ratio_ttest_balanced = csv("../evaluation/results/balanced/eval_raw_cost_ratio_ttest_balanced.csv").slice(1)
+#let ratio_ttest_balanced = drop_t_statistic_column(
+  csv("../evaluation/results/balanced/eval_raw_cost_ratio_ttest_balanced.csv").slice(1),
+)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 7,
+        columns: 6,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],
         [*$95%$ CI*],
-        [*$t$*],
         [*$p$-value*],
         [*Decision*],
         ..ratio_ttest_balanced.flatten(),
@@ -65,16 +68,16 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
 #let ratio_ttest_pairwise_balanced = csv(
   "../evaluation/results/balanced/eval_raw_cost_ratio_ttest_pairwise_balanced.csv",
 ).slice(1)
+#let ratio_ttest_pairwise_balanced = drop_t_statistic_column(ratio_ttest_pairwise_balanced)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 7,
+        columns: 6,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],
         [*$95%$ CI*],
-        [*$t$*],
         [*$p$-value*],
         [*Decision*],
         ..ratio_ttest_pairwise_balanced.flatten(),
@@ -137,17 +140,18 @@ The two best algorithms on this dataset are _BFD_ and _FFDNew_.
 Using the paired ratio $t$-test on raw total cost ratios, we reject the null hypothesis at $alpha=0.05$ ($p approx 0.0407$).
 The effect is very small, however: the mean ratio is approximately $1.00044$, meaning that _BFD_ is only slightly more costly than _FFDNew_ on average.
 
-#let ratio_ttest_job_heavy = csv("../evaluation/results/job_heavy/eval_raw_cost_ratio_ttest_job_heavy.csv").slice(1)
+#let ratio_ttest_job_heavy = drop_t_statistic_column(
+  csv("../evaluation/results/job_heavy/eval_raw_cost_ratio_ttest_job_heavy.csv").slice(1),
+)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 7,
+        columns: 6,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],
         [*$95%$ CI*],
-        [*$t$*],
         [*$p$-value*],
         [*Decision*],
         ..ratio_ttest_job_heavy.flatten(),
@@ -162,16 +166,16 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
 #let ratio_ttest_pairwise_job_heavy = csv(
   "../evaluation/results/job_heavy/eval_raw_cost_ratio_ttest_pairwise_job_heavy.csv",
 ).slice(1)
+#let ratio_ttest_pairwise_job_heavy = drop_t_statistic_column(ratio_ttest_pairwise_job_heavy)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 7,
+        columns: 6,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],
         [*$95%$ CI*],
-        [*$t$*],
         [*$p$-value*],
         [*Decision*],
         ..ratio_ttest_pairwise_job_heavy.flatten(),
@@ -233,19 +237,20 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
 Using the paired ratio $t$-test on raw total cost ratios, we fail to reject the null hypothesis at $alpha=0.05$ ($p approx 0.522$), and the mean ratio is close to $1$.
 
-#let ratio_ttest_machine_heavy = csv("../evaluation/results/machine_heavy/eval_raw_cost_ratio_ttest_machine_heavy.csv").slice(
-  1,
+#let ratio_ttest_machine_heavy = drop_t_statistic_column(
+  csv("../evaluation/results/machine_heavy/eval_raw_cost_ratio_ttest_machine_heavy.csv").slice(
+    1,
+  ),
 )
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 7,
+        columns: 6,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],
         [*$95%$ CI*],
-        [*$t$*],
         [*$p$-value*],
         [*Decision*],
         ..ratio_ttest_machine_heavy.flatten(),
@@ -260,16 +265,16 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
 #let ratio_ttest_pairwise_machine_heavy = csv(
   "../evaluation/results/machine_heavy/eval_raw_cost_ratio_ttest_pairwise_machine_heavy.csv",
 ).slice(1)
+#let ratio_ttest_pairwise_machine_heavy = drop_t_statistic_column(ratio_ttest_pairwise_machine_heavy)
 #align(center)[
   #block(breakable: false, [
     #figure(
       table(
-        columns: 7,
+        columns: 6,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],
         [*$95%$ CI*],
-        [*$t$*],
         [*$p$-value*],
         [*Decision*],
         ..ratio_ttest_pairwise_machine_heavy.flatten(),
