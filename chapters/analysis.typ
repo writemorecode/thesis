@@ -12,7 +12,7 @@ The performance difference between _BFD_ and _FFDNew_ is practically very small.
 These conclusions hold for all three datasets.
 
 Next, we consider the execution times of the algorithms.
-Our null hypothesis was that there was no statistically significant difference in execution times between any of the algorithms across all of the datasets.
+For each algorithm, the null hypothesis was that there was no statistically significant difference in execution time between the two datasets being compared.
 The null hypothesis is rejected in $17$ of the $24$ paired tests.
 The clearest pattern is that the _Machine-heavy_ dataset increases runtime for the two strongest cost-oriented algorithms, _BFD_ and _FFDNew_, whose mean runtimes rise to about $95.5$ milliseconds per instance.
 For the faster _FFD_ variants, _Balanced_ is consistently faster than both _Job-heavy_ and _Machine-heavy_, while _PeakDemand_ remains the fastest overall algorithm.
@@ -34,6 +34,7 @@ Across all three datasets, the mean cost ratios are below $1$, the $p$-values ar
 There are notable relationships between the total machine count and the solution cost for different algorithms.
 We find that the two algorithms with the lowest solution costs, _BFD_ and _FFDNew_, have the highest total machine count.
 We have run paired ratio $t$-tests ($alpha=0.05$) between the total machine counts for the _BFD_ and _FFDMax_ algorithms.
+This comparison was chosen because _BFD_ is one of the best cost-oriented algorithms, while _FFDMax_ tends to use fewer machines.
 The null hypothesis was rejected for all three datasets.
 For the _Balanced_ dataset, the mean machine-count ratio is $1.323$ (_BFD_ / _FFDMax_), with $p=6.702 dot 10^(-23)$.
 For the _Job-heavy_ dataset, the mean machine-count ratio is $1.376$, with $p=1.34 dot 10^(-29)$.

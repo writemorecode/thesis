@@ -631,6 +631,10 @@ The table below presents the parameters used to generate each dataset.
 
 === Evaluation method
 
+For each algorithm and problem instance, we record the total solution cost, execution time, and total number of activated machines.
+The total solution cost is the value of the objective function defined in @problem_description_section, using the generated purchase and running cost vectors for the instance.
+The total machine count is the number of machine instances used by the produced schedule.
+
 ==== Paired comparison via cost ratios <cost_ratios>
 Let $c_(A,i)$ and $c_(B,i)$ be the total costs of algorithms $A$ and $B$ on instance $i$.
 Define the per-instance cost ratio
@@ -646,6 +650,8 @@ Here, $mu_r < 1$ indicates that $A$ has lower cost than $B$ on average, and $mu_
 
 In addition to the comparison of the two best algorithms, we also run paired ratio $t$-tests between _BFD_ and each remaining algorithm (excluding _FFDNew_).
 We use the same ratio-based approach when comparing total machine counts.
+For this comparison we use _BFD_ and _FFDMax_.
+The purpose of this test is to compare one of the best cost-oriented algorithms against an algorithm which tends to use fewer machines, in order to study whether lower solution cost also implies a lower total machine count.
 Let $lambda_(A,i)$ and $lambda_(B,i)$ be the total number of machines used by algorithms $A$ and $B$ for problem instance $i$.
 Define the per-instance machine count ratio
 $
@@ -653,6 +659,12 @@ $
 $
 Let $mu_rho = sum_i rho_i \/ N$ be the mean per-instance machine count ratio.
 We test $cal(H_0): mu_rho = 1$ and $cal(H_1): mu_rho != 1$ using a paired two-tailed $t$-test.
+
+We also compare total solution costs across datasets for the _BFD_ algorithm.
+Since the machine-heavy dataset contains more machine types than the balanced dataset, we expect it to provide more possible job-machine placements.
+This can increase packing flexibility and may lower the total solution cost.
+We therefore test the directional hypothesis that _BFD_ has lower mean total cost on the machine-heavy dataset than on the balanced dataset.
+For this comparison, we use a paired one-tailed $t$-test on per-instance raw total costs, with $cal(H_0): mu_"machine-heavy" >= mu_"balanced"$ and $cal(H_1): mu_"machine-heavy" < mu_"balanced"$ for $alpha = 0.05$.
 
 ==== Dolan-Moré performance profiles
 
@@ -688,7 +700,8 @@ We will use this performance profiles method as a second step in the process of 
 For each problem instance of each dataset, we recorded the wall-clock execution time of each algorithm.
 Execution time was measured only for the algorithm itself, excluding validating solutions and writing solution data to disk.
 For each algorithm-dataset pair, we computed the mean runtime and a $95\%$ confidence interval over the $100$ problem instances.
-We also ran paired two-tailed t-tests across dataset pairs for each algorithm to test whether the mean execution time of a given algorithm changed for different datasets.
+We also ran paired two-tailed $t$-tests across dataset pairs for each algorithm to test whether the mean execution time of a given algorithm changed for different datasets.
+For each such test, the null hypothesis is that the mean execution time of that algorithm is equal on the two datasets being compared.
 
 These t-tests compared the same algorithm across different datasets.
 They are not pairwise tests between different algorithms.
