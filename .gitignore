@@ -3,7 +3,10 @@
 *.png
 __pycache__
 *.egg-info/
-evaluation
-images
+evaluation/*
+images/*
+*.csv
+*.svg
+*.png
 dataset
 *.md
