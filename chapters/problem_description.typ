@@ -171,30 +171,6 @@ $
                & quad bold(x) in ZZnonneg^M, quad bold(n)_(i,t) in ZZnonneg^(abs(S_i)) quad forall i,t
 $
 
-How shall we approach this problem?
-One idea would be to leverage the previous optimization problem.
-Since it has fewer constraints, it may be easier to solve.
-If we could solve that problem, then we could use its lower-bound solutions to help us find solutions to the real problem.
-We could accept approximate solutions to the real problem if they are close enough to a lower-bound solution.
-
-Another approach would be to view the problem as an integer linear programming problem.
-These problems are not convex, which makes them more difficult to solve than ordinary fractional LP problems.
-We could use an optimized version of the branch-and-bound algorithm where we choose to only round fractional variables up, and not down.
-For example, if at some step of the algorithm we find we should purchase $5.8$ of some machine type, we would only round this number up to $6$, and not down to $5$.
-With this optimization, we would only need to solve a single subproblem for each fractional variable.
-
-However, since bin-packing is an NP-hard problem, it is very likely that using exact solution methods will become computationally infeasible for problem instances involving a larger numbers of time slots
-A more suitable approach method may be to solve the problem in multiple stages.
-First, for each time slot, solve for the set of all valid job-machine allocations.
-This stage may be run in parallel across time slots.
-Next, given the set of all valid job-machine allocations for each time slot, find the subset of allocations which are valid for all time slots.
-Finally, find the optimal allocation from this subset.
-Solving for the valid allocations for each time slot can be considered a trivial problem.
-The cost function of a given allocation is also very easy to compute.
-The second stage is by far the most difficult.
-Just as there can be an extremely large number of valid placements of objects in bins, there can be an extremely large number of valid allocations for each time slot.
-Here we will need to study heuristics-based methods of pruning the search space.
-
 == Symbol reference table
 
 #figure(
