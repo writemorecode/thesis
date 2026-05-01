@@ -632,32 +632,27 @@ The table below presents the parameters used to generate each dataset.
 === Evaluation method
 
 ==== Paired comparison via cost ratios <cost_ratios>
-
-Each dataset contains the same set of problem instances evaluated by every algorithm.
-Therefore, comparisons between two algorithms are based on paired observations.
-
-Let $c_(A,i)$ and $c_(B,i)$ be the total costs of algorithms $A$ and $B$ on instance $i$, and define the per-instance cost ratio
-
+Let $c_(A,i)$ and $c_(B,i)$ be the total costs of algorithms $A$ and $B$ on instance $i$.
+Define the per-instance cost ratio
 $
   r_i = c_(A,i) / c_(B,i).
 $
 
 If $r_i < 1$, then $c_(A,i) < c_(B,i)$ and $A$ is better on instance $i$ (lower cost).
-
-We test whether the algorithms differ using a paired two-tailed $t$-test on the ratios $r_i$:
-$cal(H_0): "mean"(r) = 1$ and $cal(H_1): "mean"(r) != 1$, with $alpha = 0.05$.
-From this test, we report the mean ratio, the $95%$ confidence interval for the mean ratio, the $t$ statistic, the two-sided $p$-value, and the test decision.
-
-Here, $"mean"(r) < 1$ indicates that $A$ has lower cost than $B$ on average, and $"mean"(r) > 1$ indicates the opposite.
+Let $mu_r = sum_i r_i \/ N$ be the mean per-instance solution cost ratio.
+We test whether the algorithms differ using a paired two-tailed $t$-test on the ratios $r_i$, with $cal(H_0): mu_r = 1$ and $cal(H_1): mu_r != 1$ for $alpha = 0.05$.
+From this test, we report the mean ratio, the $95%$ confidence interval for the mean ratio, the two-sided $p$-value, and the test decision.
+Here, $mu_r < 1$ indicates that $A$ has lower cost than $B$ on average, and $mu_r > 1$ indicates the opposite.
 
 In addition to the comparison of the two best algorithms, we also run paired ratio $t$-tests between _BFD_ and each remaining algorithm (excluding _FFDNew_).
-
 We use the same ratio-based approach when comparing total machine counts.
-For two algorithms $A$ and $B$, let
+Let $lambda_(A,i)$ and $lambda_(B,i)$ be the total number of machines used by algorithms $A$ and $B$ for problem instance $i$.
+Define the per-instance machine count ratio
 $
-  m_i = "machines"_(A,i) / "machines"_(B,i).
+  rho_i = lambda_(A,i) / lambda_(B,i).
 $
-We then test $cal(H_0): "mean"(m) = 1$ and $cal(H_1): "mean"(m) != 1$ using a paired two-tailed $t$-test.
+Let $mu_rho = sum_i rho_i \/ N$ be the mean per-instance machine count ratio.
+We test $cal(H_0): mu_rho = 1$ and $cal(H_1): mu_rho != 1$ using a paired two-tailed $t$-test.
 
 ==== Dolan-Moré performance profiles
 
@@ -676,7 +671,7 @@ Let the _performance ratio_ for solver $s$ on problem $p$ be
 $
   r_(p,s) = t_(p,s) / t^*_p
 $
-be the ratio between the solver's cost for the problem and the optimal cost for the problem.
+be the ratio between the solver's cost for the problem and the lowest cost for the problem across all solvers in $S$.
 The _performance profile_ for solver $s$ is defined as the function
 
 $
