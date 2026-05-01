@@ -7,7 +7,7 @@
 #let thesis-degree = "Civilingenjör i datorsäkerhet"
 #let thesis-month = "May"
 #let thesis-year = "2026"
-#let faculty = "DIDA"
+#let faculty = "Computing"
 #let thesis-weeks = "30"
 #let thesis-title = "Procurement planning and offline job scheduling in private clouds"
 #let thesis-subtitle = ""
@@ -16,7 +16,7 @@
 #let author-second = ""
 #let author-second-mail = "...@student.bth.se"
 #let supervisor = "Professor Lars Lundberg"
-#let supervisor-affiliation = "DIDA"
+#let supervisor-affiliation = "Computing"
 
 #let bth-logo = "bthnotext.pdf"
 
