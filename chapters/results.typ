@@ -6,7 +6,7 @@ This chapter presents the evaluation datasets, metrics, and empirical results fo
 
 For each dataset, we first present a summary table of the evaluation results for each scheduler algorithm.
 We then compare the two best algorithms for the dataset, defined as the two schedulers with the lowest average total cost in the summary table.
-This comparison uses a paired two-tailed $t$-test on per-instance total-cost ratios and reports the mean ratio, the $95%$ confidence interval for the mean ratio, the $p$-value, and the test decision.
+This comparison uses a paired two-tailed $t$-test on per-instance total-cost ratios and reports the mean ratio, the $95%$ confidence interval for the mean ratio, the $p$-value, and whether the null hypothesis is rejected.
 // The ratio-distribution diagnostics are discussed in the appendix @appendix_data_normality.
 Next, we present a plot of the performance profiles for each of the algorithms.
 Here, $tau$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for each solver $s$.
@@ -15,7 +15,10 @@ This value is, for each algorithm $s$, given by the performance profile function
 Note here that the sum of the win rates across all algorithms do not sum to $1$.
 The reason for this is that multiple algorithms can be tied for certain problem instances.
 
-#let drop_t_statistic_column(rows) = rows.map(row => row.slice(0, 4) + row.slice(5))
+#let compact_ratio_ttest_rows(rows) = rows.map(row => {
+  let reject_h0 = if row.at(6) == "REJECT H0" { "Yes" } else { "No" }
+  row.slice(0, 4) + row.slice(5, 6) + (reject_h0,)
+})
 
 
 === Balanced dataset
@@ -42,7 +45,7 @@ The reason for this is that multiple algorithms can be tied for certain problem 
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
 Using the paired ratio $t$-test on raw total cost ratios, we fail to reject the null hypothesis at $alpha=0.05$ ($p approx 0.170$), and the mean ratio is close to $1$.
 
-#let ratio_ttest_balanced = drop_t_statistic_column(
+#let ratio_ttest_balanced = compact_ratio_ttest_rows(
   csv("../evaluation/results/balanced/eval_raw_cost_ratio_ttest_balanced.csv").slice(1),
 )
 #align(center)[
@@ -55,7 +58,7 @@ Using the paired ratio $t$-test on raw total cost ratios, we fail to reject the 
         [*Mean ratio*],
         [*$95%$ CI*],
         [*$p$-value*],
-        [*Decision*],
+        [*Reject $H_0$?*],
         ..ratio_ttest_balanced.flatten(),
       ),
       caption: [Paired ratio $t$-test summary for balanced dataset (_BFD_ / _FFDNew_).],
@@ -68,7 +71,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
 #let ratio_ttest_pairwise_balanced = csv(
   "../evaluation/results/balanced/eval_raw_cost_ratio_ttest_pairwise_balanced.csv",
 ).slice(1)
-#let ratio_ttest_pairwise_balanced = drop_t_statistic_column(ratio_ttest_pairwise_balanced)
+#let ratio_ttest_pairwise_balanced = compact_ratio_ttest_rows(ratio_ttest_pairwise_balanced)
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -79,7 +82,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
         [*Mean ratio*],
         [*$95%$ CI*],
         [*$p$-value*],
-        [*Decision*],
+        [*Reject $H_0$?*],
         ..ratio_ttest_pairwise_balanced.flatten(),
       ),
       caption: [Paired ratio $t$-tests for balanced dataset (_BFD_ / other algorithms except _FFDNew_).],
@@ -140,7 +143,7 @@ The two best algorithms on this dataset are _BFD_ and _FFDNew_.
 Using the paired ratio $t$-test on raw total cost ratios, we reject the null hypothesis at $alpha=0.05$ ($p approx 0.0407$).
 The effect is very small, however: the mean ratio is approximately $1.00044$, meaning that _BFD_ is only slightly more costly than _FFDNew_ on average.
 
-#let ratio_ttest_job_heavy = drop_t_statistic_column(
+#let ratio_ttest_job_heavy = compact_ratio_ttest_rows(
   csv("../evaluation/results/job_heavy/eval_raw_cost_ratio_ttest_job_heavy.csv").slice(1),
 )
 #align(center)[
@@ -153,7 +156,7 @@ The effect is very small, however: the mean ratio is approximately $1.00044$, me
         [*Mean ratio*],
         [*$95%$ CI*],
         [*$p$-value*],
-        [*Decision*],
+        [*Reject $H_0$?*],
         ..ratio_ttest_job_heavy.flatten(),
       ),
       caption: [Paired ratio $t$-test summary for job-heavy dataset (_BFD_ / _FFDNew_).],
@@ -166,7 +169,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
 #let ratio_ttest_pairwise_job_heavy = csv(
   "../evaluation/results/job_heavy/eval_raw_cost_ratio_ttest_pairwise_job_heavy.csv",
 ).slice(1)
-#let ratio_ttest_pairwise_job_heavy = drop_t_statistic_column(ratio_ttest_pairwise_job_heavy)
+#let ratio_ttest_pairwise_job_heavy = compact_ratio_ttest_rows(ratio_ttest_pairwise_job_heavy)
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -177,7 +180,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
         [*Mean ratio*],
         [*$95%$ CI*],
         [*$p$-value*],
-        [*Decision*],
+        [*Reject $H_0$?*],
         ..ratio_ttest_pairwise_job_heavy.flatten(),
       ),
       caption: [Paired ratio $t$-tests for job-heavy dataset (_BFD_ / other algorithms except _FFDNew_).],
@@ -237,7 +240,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
 Using the paired ratio $t$-test on raw total cost ratios, we fail to reject the null hypothesis at $alpha=0.05$ ($p approx 0.522$), and the mean ratio is close to $1$.
 
-#let ratio_ttest_machine_heavy = drop_t_statistic_column(
+#let ratio_ttest_machine_heavy = compact_ratio_ttest_rows(
   csv("../evaluation/results/machine_heavy/eval_raw_cost_ratio_ttest_machine_heavy.csv").slice(
     1,
   ),
@@ -252,7 +255,7 @@ Using the paired ratio $t$-test on raw total cost ratios, we fail to reject the 
         [*Mean ratio*],
         [*$95%$ CI*],
         [*$p$-value*],
-        [*Decision*],
+        [*Reject $H_0$?*],
         ..ratio_ttest_machine_heavy.flatten(),
       ),
       caption: [Paired ratio $t$-test summary for machine-heavy dataset (_BFD_ / _FFDNew_).],
@@ -265,7 +268,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
 #let ratio_ttest_pairwise_machine_heavy = csv(
   "../evaluation/results/machine_heavy/eval_raw_cost_ratio_ttest_pairwise_machine_heavy.csv",
 ).slice(1)
-#let ratio_ttest_pairwise_machine_heavy = drop_t_statistic_column(ratio_ttest_pairwise_machine_heavy)
+#let ratio_ttest_pairwise_machine_heavy = compact_ratio_ttest_rows(ratio_ttest_pairwise_machine_heavy)
 #align(center)[
   #block(breakable: false, [
     #figure(
@@ -276,7 +279,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
         [*Mean ratio*],
         [*$95%$ CI*],
         [*$p$-value*],
-        [*Decision*],
+        [*Reject $H_0$?*],
         ..ratio_ttest_pairwise_machine_heavy.flatten(),
       ),
       caption: [Paired ratio $t$-tests for machine-heavy dataset (_BFD_ / other algorithms except _FFDNew_).],
