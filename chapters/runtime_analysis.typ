@@ -7,10 +7,6 @@ Each test used the $N = 100$ per-instance runtime observations.
 The null hypothesis $cal(H_0)$ was that there was no statistically significant difference in execution time for the same algorithm between any two datasets.
 In other words, for each algorithm and for each pair $A$, $B$ of datasets, there should be no statistically significant difference in execution time for the algorithm on the datasets $A$ and $B$.
 
-All algorithm evaluations were ran sequentially.
-The execution time of each algorithm on each problem instance was measured only once with no warm-up period
-Execution times were measured using the Python standard library method `time.monotonic()` @python_time_time.
-
 @figure_alg_execution_time_chart shows the mean per-instance execution time for each algorithm for each of the three datasets, with $95\%$ confidence intervals.
 The mean execution time is below 100 milliseconds per problem instance.
 The _BFD_ and _FFDNew_ algorithms have the highest mean per-instance execution times, especially on the _Machine-heavy_ dataset.
