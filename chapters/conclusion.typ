@@ -9,8 +9,10 @@ We concluded that these two algorithms used a larger number of machines than the
 We also concluded that the best performing algorithm yielded lower cost solutions for problem instances with a greater number of available machine types.
 For our first research question (RQ1), we have found that we can construct efficient scheduling algorithms by adapting traditional packing heuristics such as _FFD_ and _BFD_.
 Regarding our second research question (RQ2), we concluded after evaluation that the _BFD_ and _FFDNew_ algorithms had execution times longer than all other algorithms.
-The difference in execution times was statistically significant, but was only on the order of tens of milliseconds.
-We did not note any statistically significant difference in execution times between _BFD_ and _FFDNew_.
+For the _Balanced_ dataset, _BFD_ was slightly slower than _FFDNew_.
+For the _Job-heavy_ dataset, _FFDNew_ was slightly slower than _BFD_.
+For the _Machine-heavy_ dataset, we did not find a statistically significant execution time difference between _BFD_ and _FFDNew_.
+The differences in execution time were only on the order of milliseconds to tens of milliseconds, and all average execution times remained below $100$ milliseconds per problem instance.
 This suggests that a trade-off between solution quality and execution time is not required for the algorithms we have evaluated and presented.
 
 == Future Work
@@ -50,7 +52,6 @@ This primitive cost-model could be expanded to support e.g. time-dependent energ
 
 Finally, a future study could take a more theoretical approach and attempt to find provable bounds for the _BFD_ and _FFDNew_ algorithms, and compare these to the bounds on the existing _BFD_ and _FFD_ algorithms.
 Such a study could also work on finding worst-case problem instances for these algorithms.
-
 
 
 

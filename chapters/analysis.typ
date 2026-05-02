@@ -12,10 +12,22 @@ The performance difference between _BFD_ and _FFDNew_ is practically very small.
 These conclusions hold for all three datasets.
 
 Next, we consider the execution times of the algorithms.
-For each algorithm, the null hypothesis was that there was no statistically significant difference in execution time between the two datasets being compared.
-The null hypothesis is rejected in $17$ of the $24$ paired tests.
-The clearest pattern is that the _Machine-heavy_ dataset increases runtime for the two strongest cost-oriented algorithms, _BFD_ and _FFDNew_, whose mean runtimes rise to about $95.5$ milliseconds per instance.
-For the faster _FFD_ variants, _Balanced_ is consistently faster than both _Job-heavy_ and _Machine-heavy_, while _PeakDemand_ remains the fastest overall algorithm.
+The execution time analysis shows that _BFD_ and _FFDNew_ are the two slowest algorithms across all three datasets.
+This is expected, since these two algorithms use more detailed placement rules than the simpler _FFD_ variants and _PeakDemand_.
+The paired runtime-ratio $t$-tests show that _BFD_ is significantly slower than the simpler _FFD_ variants and _PeakDemand_ on every dataset.
+The comparison between _BFD_ and _FFDNew_ is much closer.
+On the _Balanced_ dataset, _BFD_ is slightly slower than _FFDNew_.
+On the _Job-heavy_ dataset, _FFDNew_ is instead slightly slower than _BFD_.
+On the _Machine-heavy_ dataset, the null hypothesis is not rejected, meaning that there is no statistically significant execution time difference between _BFD_ and _FFDNew_.
+
+These results are reasonable given how the algorithms work.
+Both _BFD_ and _FFDNew_ perform more work when selecting placements than the simpler first-fit variants.
+This overhead becomes especially visible when there are more available machine types, because more machine types must be considered when selecting a new machine type for a job.
+This may explain why _BFD_ and _FFDNew_ have nearly identical execution times on the _Machine-heavy_ dataset.
+For the _Job-heavy_ dataset, the slightly higher execution time of _FFDNew_ may be explained by the larger number of job types.
+Although _FFDNew_ stops once it finds a suitable open machine, it still uses weighted ordering and slack-based machine-type selection.
+In contrast, _BFD_ may sometimes choose open machines that can store a larger number of jobs of the current job type, thereby reducing the number of placement iterations.
+This could offset the cost of searching over open machines.
 
 For RQ2, these results suggest that optimizing for both scheduling quality and execution time does not require choosing the absolutely fastest heuristic.
 The earlier cost analysis identified _BFD_ and _FFDNew_ as the strongest quality-oriented choices, and the present runtime results show that their overhead is still small in absolute terms: all average runtimes remain below 100 milliseconds per instance.
@@ -102,7 +114,8 @@ Since the execution time for algorithm for each problem instance was measured on
 We used a laptop to run all algorithm evaluation and execution time collection.
 At this time, the laptop was running a minimal number of tasks required to carry out the evaluation and measurement tasks.
 A more rigorous algorithm benchmarking study would repeat each run multiple times, randomize execution order, collect all measurements on a dedicated server machine, and use a high-resolution monotonic timer.
-Further, such a study would also compare algorithms pairwise on the same problem instances.
+Further, such a study could also collect operation counts, such as the number of open-machine checks, new-machine-type checks, and placement iterations.
+This would make it possible to test the proposed explanations for the observed runtime differences between _BFD_ and _FFDNew_.
 
 == Threats to external validity
 
