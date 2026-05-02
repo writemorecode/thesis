@@ -93,9 +93,9 @@ def run_on_instance(
 ) -> InstanceResult:
     problem = _load_problem(npz_path)
 
-    start = time.time()
+    start = time.monotonic()
     schedule = scheduler_fn(problem)
-    runtime_sec = time.time() - start
+    runtime_sec = time.monotonic() - start
 
     if validate:
         schedule.validate(problem)
@@ -142,7 +142,7 @@ def evaluate_schedulers(
         rows: list[dict[str, object]] = []
         for npz_path, dims in entries:
             result = run_on_instance(npz_path, scheduler_fn, validate=validate)
-            row = {
+            row: dict[str, object] = {
                 "filename": result.filename,
                 "K": dims["K"],
                 "J": dims["J"],
