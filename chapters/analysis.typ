@@ -117,7 +117,7 @@ A more rigorous algorithm benchmarking study would repeat each run multiple time
 Further, such a study could also collect operation counts, such as the number of open-machine checks, new-machine-type checks, and placement iterations.
 This would make it possible to test the proposed explanations for the observed runtime differences between _BFD_ and _FFDNew_.
 
-== Threats to external validity
+=== Threats to external validity
 
 The generated problem instances may not fully capture real-world workload characteristics such as bursts, seasonality, and correlations.
 This is a valid external threat because differences between synthetic and real workloads can limit generalizability.
