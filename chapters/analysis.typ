@@ -30,14 +30,16 @@ In contrast, _BFD_ may sometimes choose open machines that can store a larger nu
 This could offset the cost of searching over open machines.
 
 For RQ2, these results suggest that optimizing for both scheduling quality and execution time does not require choosing the absolutely fastest heuristic.
-The earlier cost analysis identified _BFD_ and _FFDNew_ as the strongest quality-oriented choices, and the present runtime results show that their overhead is still small in absolute terms: all average runtimes remain below 100 milliseconds per instance.
+The earlier cost analysis identified _BFD_ and _FFDNew_ as the strongest quality-oriented choices, and the present runtime results show that their overhead is still small in absolute terms.
+All average runtimes remain below 100 milliseconds per instance.
 It shall be noted that the algorithms were not implemented with performance in mind.
 It is possible that more efficient implementations would have yielded in different results.
 
 We shall study the evaluation results of the _BFD_ and _FFDNew_ algorithms.
 The two algorithms have nearly identical average costs on each of the datasets.
 For the _Balanced_ and _Machine-heavy_ datasets, the paired ratio $t$-tests on raw total cost ratios fail to reject the null hypothesis at $alpha=0.05$.
-For the _Job-heavy_ dataset, the paired ratio $t$-test rejects the null hypothesis ($p approx 0.0407$), but the effect size is very small: the mean _BFD_ / _FFDNew_ cost ratio is approximately $1.00044$.
+For the _Job-heavy_ dataset, the paired ratio $t$-test rejects the null hypothesis ($p approx 0.0407$), but the effect size is very small.
+The mean _BFD_ / _FFDNew_ cost ratio is approximately $1.00044$.
 This means that _FFDNew_ is slightly cheaper on average in the job-heavy dataset, while the two algorithms remain practically almost identical.
 
 The pairwise ratio $t$-tests comparing _BFD_ to the remaining algorithms (excluding _FFDNew_) are all decisive.
@@ -55,7 +57,8 @@ These results indicate that the _BFD_ algorithm consistently activates more mach
 This supports the interpretation that lower cost in our setting does not imply fewer active machines, but instead a more cost-efficient allocation across machine types over time.
 
 We also observe a dataset-level shift in absolute cost scale.
-This is consistent with the dataset definitions: the _Machine-heavy_ dataset has twice as many machine types as the other two datasets.
+This is consistent with the dataset definitions.
+The _Machine-heavy_ dataset has twice as many machine types as the other two datasets.
 A greater number of available machine types can, but is not guaranteed to, increase packing flexibility and reduce unused capacity.
 Using paired one-tailed cross-dataset $t$-tests for the _BFD_ algorithm on per-instance raw total costs, we find support for our hypothesis.
 For _Machine-heavy_ $<$ _Balanced_, the test rejects the null hypothesis at $alpha=0.05$ ($t=-2.279$, $p=0.01242$), with mean costs of $6983$ vs $8134$ and mean paired difference $-1151$.
@@ -88,7 +91,8 @@ This is relevant because fixed seeds improve reproducibility, but different seed
 We mitigate this by evaluating on three separate datasets with $100$ problem instances each.
 We also note that our conclusions are consistent across all three datasets, which reduces, but does not eliminate, seed value sensitivity as a threat.
 
-The algorithm evaluation workflow includes multiple error-prone steps: evaluating each algorithm on each problem instance of each dataset, recording per-instance solution data, computing statistical tests and performance profiles, and generating per-dataset summaries.
+The algorithm evaluation workflow includes multiple error-prone steps.
+Evaluating each algorithm on each problem instance of each dataset, recording per-instance solution data, computing statistical tests and performance profiles, and generating per-dataset summaries.
 This makes pipeline bugs a valid threat because errors in any step could invalidate results.
 We mitigate this by automating the full workflow to reduce manual data handling errors and by making the simulator and utility scripts publicly available on GitHub @python_simulator_repo_github @python_thesis_repo_github.
 
