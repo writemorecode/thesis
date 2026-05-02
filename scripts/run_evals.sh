@@ -130,14 +130,6 @@ uv run python scripts/plot_cost_ratio_distributions.py \
   --eval-root "${EVAL_ROOT}/raw" \
   --out-dir "${IMAGE_DIR}"
 
-echo "Running cross-dataset runtime analysis..."
-mkdir -p "${EVAL_ROOT}/results/cross_dataset"
-uv run python scripts/raw_runtime_dataset_ttest.py \
-  --raw-root "${EVAL_ROOT}/raw" \
-  --datasets "balanced,job_heavy,machine_heavy" \
-  --algorithms "${SCHEDULERS}" \
-  --stats-csv "${EVAL_ROOT}/results/cross_dataset/eval_raw_runtime_ttest_cross_dataset.csv"
-
 echo "Plotting cross-dataset runtime summary..."
 uv run python scripts/plot_runtime_cross_dataset.py \
   --raw-root "${EVAL_ROOT}/raw" \
