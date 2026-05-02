@@ -13,8 +13,8 @@ These conclusions hold for all three datasets.
 
 Next, we consider the execution times of the algorithms.
 The execution time analysis shows that _BFD_ and _FFDNew_ are the two slowest algorithms across all three datasets.
-This is expected, since these two algorithms use more detailed placement rules than the simpler _FFD_ variants and _PeakDemand_.
-The paired runtime-ratio $t$-tests show that _BFD_ is significantly slower than the simpler _FFD_ variants and _PeakDemand_ on every dataset.
+This is expected, since these two algorithms use more detailed placement rules than the simpler _FFD_ variants.
+The paired runtime-ratio $t$-tests show that _BFD_ is significantly slower than the simpler _FFD_ variants on every dataset.
 The comparison between _BFD_ and _FFDNew_ is much closer.
 On the _Balanced_ dataset, _BFD_ is slightly slower than _FFDNew_.
 On the _Job-heavy_ dataset, _FFDNew_ is instead slightly slower than _BFD_.
