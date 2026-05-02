@@ -611,6 +611,8 @@ The number of resource types is fixed to $K=4$ (CPU, memory, disk, I/O).
 
 We evaluate the algorithms on three different datasets.
 For evaluation, we developed a simulator in Python using the NumPy library @python_simulator_repo_github.
+We used Python version 3.14 and Numpy version 2.4.1.
+All algorithm evaluations were ran on a 2020 MacBook Pro M1 running macOS Sequoia 15.6.1.
 Each dataset was generated using the NumPy deterministic pseudorandom number generator, using the fixed seed value $5000$.
 Each dataset contains 100 randomly generated problem instances.
 Except for the dimension intervals $I_J$, $I_M$, and $I_T$, all other problem-instance generation parameters were kept at the default values from @dataset_parameter_table.
