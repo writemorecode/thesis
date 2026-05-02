@@ -117,7 +117,7 @@ Finally, we mention a few things regarding algorithm execution time analysis.
 Since the execution time for algorithm for each problem instance was measured only once, the measurements may have been affected by noise from the machine on which they were collected.
 We used a laptop to run all algorithm evaluation and execution time collection.
 At this time, the laptop was running a minimal number of tasks required to carry out the evaluation and measurement tasks.
-A more rigorous algorithm benchmarking study would repeat each run multiple times, randomize execution order, collect all measurements on a dedicated server machine, and use a high-resolution monotonic timer.
+A more rigorous algorithm benchmarking study would repeat each run multiple times, randomize execution order, and collect all measurements on a dedicated server machine.
 Further, such a study could also collect operation counts, such as the number of open-machine checks, new-machine-type checks, and placement iterations.
 This would make it possible to test the proposed explanations for the observed runtime differences between _BFD_ and _FFDNew_.
 
