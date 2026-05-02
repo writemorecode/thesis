@@ -79,6 +79,13 @@ EOF
     tail -n +2 "${pair_output_csv}" >> "${pairwise_ratio_ttest_csv}"
   done
 
+  echo "Running paired ratio t-tests on raw runtimes (BFD vs others)..."
+  uv run python scripts/raw_runtime_ratio_ttest.py \
+    --results-dir "${raw_dir}" \
+    --base-algo "bfd" \
+    --algorithms "${SCHEDULERS}" \
+    --stats-csv "${results_dir}/eval_raw_runtime_ratio_ttest_pairwise_${name}.csv"
+
   echo "Running paired ratio t-test on raw machine counts (BFD vs FFDMax)..."
   uv run python scripts/raw_machines_ratio_ttest.py \
     --raw-root "${EVAL_ROOT}/raw" \

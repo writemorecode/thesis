@@ -54,21 +54,27 @@ def _summarize_scheduler(
     machines_array = np.asarray(machine_counts, dtype=int)
 
     display_name = display_scheduler_name(scheduler_name)
-    row = {
+    avg_cost = float(costs_array.mean())
+    min_cost = float(costs_array.min())
+    max_cost = float(costs_array.max())
+    avg_runtime_sec = float(runtimes_array.mean())
+    avg_machines = float(machines_array.mean())
+
+    row: dict[str, object] = {
         "scheduler": display_name,
-        "avg_cost": float(costs_array.mean()),
-        "min_cost": float(costs_array.min()),
-        "max_cost": float(costs_array.max()),
-        "avg_runtime_sec": float(runtimes_array.mean()),
-        "avg_machines": float(machines_array.mean()),
+        "avg_cost": avg_cost,
+        "min_cost": min_cost,
+        "max_cost": max_cost,
+        "avg_runtime_sec": avg_runtime_sec,
+        "avg_machines": avg_machines,
     }
 
     if verbose:
         print(
-            f"{display_name}: avg_cost={row['avg_cost']:.2f}, "
-            f"min_cost={row['min_cost']:.2f}, max_cost={row['max_cost']:.2f}, "
-            f"avg_runtime={row['avg_runtime_sec']:.2f}s, "
-            f"avg_machines={row['avg_machines']:.2f}"
+            f"{display_name}: avg_cost={avg_cost:.2f}, "
+            f"min_cost={min_cost:.2f}, max_cost={max_cost:.2f}, "
+            f"avg_runtime={avg_runtime_sec:.2f}s, "
+            f"avg_machines={avg_machines:.2f}"
         )
 
     return row

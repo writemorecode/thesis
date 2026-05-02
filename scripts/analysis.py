@@ -51,7 +51,7 @@ def _t_critical(df: int, confidence: float = 0.95) -> float:
     alpha = 1.0 - confidence
     prob = 1.0 - alpha / 2.0
     try:
-        from scipy import stats  # type: ignore
+        from scipy import stats
 
         return float(stats.t.ppf(prob, df))
     except Exception:

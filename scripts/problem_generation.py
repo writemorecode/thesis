@@ -4,6 +4,7 @@ import csv
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
 # from typing import tuple
 import numpy as np
@@ -65,13 +66,14 @@ def _normalize_resource_values(
         values = default
 
     if isinstance(values, Mapping):
-        missing = [res for res in resource_types if res not in values]
+        value_mapping = cast(Mapping[str, int], values)
+        missing = [res for res in resource_types if res not in value_mapping]
         if missing:
             raise ValueError(f"{name} is missing values for resources: {missing}.")
-        extra = [key for key in values if key not in resource_types]
+        extra = [key for key in value_mapping if key not in resource_types]
         if extra:
             raise ValueError(f"{name} contains unknown resources: {extra}.")
-        vector = np.array([values[res] for res in resource_types], dtype=float)
+        vector = np.array([value_mapping[res] for res in resource_types], dtype=float)
     else:
         vector = np.asarray(list(values), dtype=float)
         if vector.shape != (len(resource_types),):
@@ -598,9 +600,9 @@ def write_dataset_parameters_csv(
     dataset_path.mkdir(parents=True, exist_ok=True)
     csv_path = dataset_path / csv_name
 
-    try:
-        parameter_dict = dict(parameters)  # type: ignore[arg-type]
-    except TypeError:
+    if isinstance(parameters, Mapping):
+        parameter_dict = dict(parameters)
+    else:
         parameter_dict = dict(vars(parameters))
 
     preferred = list(preferred_order)

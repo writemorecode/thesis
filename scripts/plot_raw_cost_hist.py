@@ -25,7 +25,7 @@ def parse_args() -> argparse.Namespace:
         dest="algorithm",
         type=str,
         required=True,
-        help="Algorithm/scheduler name (e.g. ffd, bfd, peak_demand).",
+        help="Algorithm/scheduler name (e.g. ffd, bfd).",
     )
     parser.add_argument(
         "--results-dir",

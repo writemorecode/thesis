@@ -38,7 +38,6 @@ DEFAULT_COMPARISON_ALGORITHMS = (
     "ffd_max",
     "ffd_prod",
     "ffd_new",
-    "peak_demand",
 )
 
 

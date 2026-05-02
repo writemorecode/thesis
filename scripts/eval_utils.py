@@ -20,7 +20,6 @@ DISPLAY_SCHEDULER_NAMES = {
     "ffd_new": "FFDNew",
     "ffd_prod": "FFDProd",
     "ffd_sum": "FFDSum",
-    "peak_demand": "PeakDemand",
 }
 
 
