@@ -37,7 +37,7 @@ The _FFDL2_ algorithm orders item types in decreasing order of the Euclidean (L2
 
 === Resource-weighted cost-aware best-fit algorithm <bfd_algo>
 
-Nexn, we will describe a new packing algorithm based on the best-fit heuristic.
+Next, we will describe a new packing algorithm based on the best-fit heuristic.
 As we shall later see in the coming Results section (@results_section), this algorithm yields excellent solutions, dominating all other packing algorithms previously described in this report.
 The strength of this algorithm comes from how it selects the type of bin to open for a new item.
 Previous algorithm have used naïve methods for this, such as simply selecting the cheapest feasible bin type.
