@@ -4,7 +4,7 @@ This chapter surveys prior research on energy-aware scheduling and multidimensio
 
 == Job-scheduling
 
-In 2012, Beloglazov et al. have proposed energy-aware VM allocation heuristics for provisioning physical machines while satisfying service-level agreements (SLAs) @beloglazov_energy-aware_2012
+In 2012, Beloglazov et al. @beloglazov_energy-aware_2012 proposed energy-aware VM allocation heuristics for provisioning physical machines while satisfying service-level agreements (SLAs).
 These SLAs were related to metrics such as total data center energy consumption, overloaded physical machines, the number of VM migrations, and the unmet resource demands from VMs.
 The authors presented heuristics for both placement of VMs and migration of VMs between physical machines.
 The authors used the CloudSim toolkit @cloudsim_2011 for evaluating their heuristics.
@@ -13,14 +13,14 @@ The results showed that dynamic migration of VMs between physical machines resul
 The authors also discussed a number of open challenges in the field of energy-efficient data centers.
 Among these was the optimization of VM placement according to utilization of multiple system resources.
 
-In 2016, Mosa and Paton presented similar work, applying genetic algorithm to the problem of finding an optimal VM placement strategy minimizing costs of both energy and SLA violations.
+In 2016, Mosa and Paton @mosa_paton_2016 presented similar work, applying genetic algorithm to the problem of finding an optimal VM placement strategy minimizing costs of both energy and SLA violations.
 The genetic algorithms are used to find a VM placement with maximum utility.
 The utility of a VM placement during a time period is defined by the authors as its future financial return after total costs over that period.
 Here, the cost of a VM placement is defined as the sum of costs from energy, SLA violations, and performance degradation from VM overallocation.
 The authors' proposed solution was evaluated using the CloudSim simulator, and compared to a heuristics-based solution presented by Beloglazov et al. @beloglazov_energy-aware_2012.
 Evaluation results showed that the proposed solution outperformed other existing heuristics-based solution, in terms of energy savings and SLA violations.
 
-In 2015, Mann presented a survey article on the subject of virtual machine allocation in cloud data centers @mann_allocation_2015
+In 2015, Mann @mann_allocation_2015 presented a survey article on the subject of virtual machine allocation in cloud data centers.
 The survey considered different problem models and optimization algorithms.
 The same year, Mann presented another article discussing how well the VM allocation problem could be approximated as a bin-packing problem @mann_approximability_2015.
 Mann discussed various cases of the problem, such as multi-dimensionality, VM migration, heterogeneous physical machines, etc.
@@ -29,18 +29,43 @@ The author found that the VM allocation problem is in many cases more complex th
 In 2010, Speitkamp and Bichler @speitkamp_bichler_2010 described a server consolidation problem.
 The authors presented an LP-based formulation of the problem, and a solution using a heuristic based on LP-relaxation.
 They also showed that the problem is strongly NP-hard, by reducing the problem to the multidimensional bin-packing problem (MDBP).
+Evaluation on real-world data showed that the authors' solution could result in up to 31\% of hardware resource savings.
 
 In 2012, Setzer and Wolke @setzer_wolke_2018 formulated a mathematical model for scheduling virtual machines in data centers.
-This model was optimized for minimizing the number of powered-on physical machines over time, while also attempting to minimize the overhead from virtual machine migration between physical machines.
+This model, which had the form of an integer program, was optimized for minimizing the number of powered-on physical machines over time, while also attempting to minimize the overhead from virtual machine migration between physical machines.
+Numerical experiments on real-world workload traces showed that nearly 50\% of operational server hours could be saved using this model.
+However, since solving integer programs is an NP-complete problems, this model could only be used for smaller problem instances.
 
-In 2013, Ghribi et al. @ghribi_hadji_djamal_2013 presented two exact algorithms for energy-efficient cloud job scheduling.
+In 2013, Ghribi et al. @ghribi_hadji_djamal_2013 presented an algorithm for energy-efficient cloud VM scheduling.
+This algorithm decomposed the scheduling problem into sub-problems of allocation and migration.
+The authors presented a separate algorithm for each of these sub-problems.
+The first algorithm handled VM allocation and was based on a bin-packing algorithm with a minimum power consumption objective.
+Specifically, this algorithm used the best-fit heuristic for bin-packing.
+The second algorithm VM migration and consolidation, and was based on solving an integer linear problem (ILP).
+The authors found that their proposed algorithm could achieve significant energy savings at low resource load, and lower savings at higher load.
 
 In 2018, Lei et al. @liu_li_li_2018 presented, analyzed, and benchmarked a randomized approximation algorithm for solving the minimal cost job-server configuration problem.
+This problem involves finding a heterogeneous set of servers with minimal cost such that for a given set of time slots, the resources of the servers can meet the total resource demand of the workloads in the time slot.
+This is an NP-hard problem, since it can be reduced to the multidimensional knapsack problem (MKP).
+The authors solve the problem with a randomized rounding algorithm.
 
 In 2010, Khuller et al. @khuller_scheduling_energy_partial_shutdown studied job scheduling problems with machine activation costs.
 In this case, a subset of all available machines must be selected for use, and each machine type has a cost for selecting it.
 This machine activation cost shall not be confused with a machine purchase cost.
 Later in 2011, Khuller et al. @khuller_gma presented a generalization of their previous work.
+
+In 2021, Stakić et al. @stakic2021reduced presented a solution to the two-dimensional heterogeneous vector bin-packing problem (2DHet-VBPP).
+This solution to this NP-hard problem used a metaheuristic approach based on Reduced variable neighborhood search (RVNS).
+RVNS is based on the variable neighborhood search method, which was proposed by in 2010 by Hansen et al. @Hansen_vns_2010.
+In general, these kinds of solutions work in three phases.
+First, we generate an initial solution $S_0$, and let the current solution $S$ and best solution $S^*$ be $S_0$.
+Next, we apply a shaking operator to $S$ to attempt to move $S$ to a different neighborhood of the solution space.
+This gives us a new shaken solution $S'$.
+Next, we run a local search procedure to find the local optimal solution in the new neighborhood of $S'$.
+This gives us a new solution $S''$.
+Finally, we decide if $S''$ is a better solution than the current best solution $S^*$.
+If so, we set $S^*$ to $S''$.
+This process then continues for some number of iterations.
 
 == Bin-packing
 
