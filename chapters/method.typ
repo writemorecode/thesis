@@ -327,11 +327,18 @@ As with other previously discussed packing algorithms, this process is repeated 
 For each bin type $i$, we let $x_i = max_t X_(i,t)$ be the maximum number of bins of type $i$ used across all time slots.
 Finally, we return the bin-type vector $bold(x)$ and the item-bin-time slot packing variable $y$.
 
+Let $N$ be the total number of jobs to pack across all time slots and job types.
+The _BFD_ algorithm has worst-case time complexity:
+$
+  Omicron(J K N^2 + M K N).
+$
+
 === Resource-weighted cost-aware first-fit algorithm
 
 We can now construct a new FFD-based packing algorithm by modifying the open-bin selection rule of the previous algorithm.
 We will call this algorithm _"FFDNew"_.
 This algorithm uses exactly the same resource-weighted job ordering and the same cost-aware $"SelectNewBinType"$ helper as _BFD_.
+The algorithm has the same worst-case time complexity as the previous _BFD_ algorithm.
 Thus, both algorithms open new bins according to the same normalized weighted slack score.
 The only difference lies in how already open bins are selected.
 
