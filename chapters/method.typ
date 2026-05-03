@@ -43,6 +43,7 @@ As we shall later see in the coming Results section (@results_section), this alg
 The strength of this algorithm comes from how it selects the type of bin to open for a new item.
 Previous algorithm have used naïve methods for this, such as simply selecting the cheapest feasible bin type.
 This algorithm takes a more intelligent approach to the problem, instead attempting to place multiple items of the same type into a new open bin, and selecting the bin type which can accomplish this with minimum remaining slack.
+The algorithm was inspired by previous work such as @Panigrahy2011HeuristicsFV, @MOMMESSIN2025106860, @gabay_vector_2016 and others.
 Because of this, the algorithm could also be viewed as a best-fit-next-fit hybrid algorithm.
 This new method encourages the selection of bin types which are neither too large or too small.
 A similar slack-based method is used to select which of the already open bins should store a given item.
