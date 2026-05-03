@@ -54,18 +54,12 @@ In this case, a subset of all available machines must be selected for use, and e
 This machine activation cost shall not be confused with a machine purchase cost.
 Later in 2011, Khuller et al. @khuller_gma presented a generalization of their previous work.
 
-In 2021, Stakić et al. @stakic2021reduced presented a solution to the two-dimensional heterogeneous vector bin-packing problem (2DHet-VBPP).
-This solution to this NP-hard problem used a metaheuristic approach based on Reduced variable neighborhood search (RVNS).
-RVNS is based on the variable neighborhood search method, which was proposed by in 2010 by Hansen et al. @Hansen_vns_2010.
-In general, these kinds of solutions work in three phases.
-First, we generate an initial solution $S_0$, and let the current solution $S$ and best solution $S^*$ be $S_0$.
-Next, we apply a shaking operator to $S$ to attempt to move $S$ to a different neighborhood of the solution space.
-This gives us a new shaken solution $S'$.
-Next, we run a local search procedure to find the local optimal solution in the new neighborhood of $S'$.
-This gives us a new solution $S''$.
-Finally, we decide if $S''$ is a better solution than the current best solution $S^*$.
-If so, we set $S^*$ to $S''$.
-This process then continues for some number of iterations.
+In 2015, Gabay and Zaourar @gabay_vector_2016 introduced a generalization for the vector bin-packing problem for variable-sized bins.
+The authors propose a number of greedy heuristics for the problem.
+They describe the machine reassignment problem, which involves assigning or re-assigning a set of processes to a set of machines while minimizing total cost of the new assignments.
+Next, the authors show how their proposed heuristics can be used to solve this problem.
+Finally, the authors' solutions to the variable-sized vector bin-packing problem and the machine reassignment problem are evaluated on a randomly generated and a real-world benchmark, respectively.
+For further work on the machine reassignment problem, see @mrp_multineighborhood_local_search.
 
 == Bin-packing
 
@@ -83,6 +77,24 @@ In 2004, Chekuri and Khanna studied approximation algorithms for multidimensiona
 In 2025, Mommessin, Erlebach, Sahkhlevich studied the vector bin packing problem (VBP) with homogeneous bins @MOMMESSIN2025106860.
 The authors present a systematic classification of heuristics for the problem.
 Existing VBP algorithms are combined, and new algorithms are proposed.
+
+In 2021, Stakić et al. @stakic2021reduced presented a solution to the two-dimensional heterogeneous vector bin-packing problem (2DHet-VBPP).
+This solution to this NP-hard problem used a metaheuristic approach based on Reduced variable neighborhood search (RVNS).
+RVNS is based on the variable neighborhood search method, which was proposed by in 2010 by Hansen et al. @Hansen_vns_2010.
+In general, these kinds of solutions work in three phases.
+First, we generate an initial solution $S_0$, and let the current solution $S$ and best solution $S^*$ be $S_0$.
+Next, we apply a shaking operator to $S$ to attempt to move $S$ to a different neighborhood of the solution space.
+This gives us a new shaken solution $S'$.
+Next, we run a local search procedure to find the local optimal solution in the new neighborhood of $S'$.
+This gives us a new solution $S''$.
+Finally, we decide if $S''$ is a better solution than the current best solution $S^*$.
+If so, we set $S^*$ to $S''$.
+This process then continues for some number of iterations.
+
+In 2011, Hemmelmayr, Schmid and Blum @hemmelmayr_variable_2012 presented a similar to the variable-sized bin-packing problem, also based on the variable-sized neighhborhood search method.
+This work was similar to the Stakić's later work @stakic2021reduced, but for the one-dimensional variable-sized case.
+The authors' solution made use of multiple different shaking operators for moving between different neighborhoods of the solution space.
+The solution also used multiple different local search methods for searching for local optima in a given neighborhood.
 
 
 == Research gap
