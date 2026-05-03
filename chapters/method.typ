@@ -12,8 +12,9 @@ This chapter summarizes our research questions and the scheduling algorithms tha
 
 With this research, we aim to answer the following research questions:
 
-RQ1: How can we create a cost-efficient offline multi-resource cloud job scheduler? \
-RQ2: How can we create a cloud job scheduler which is optimized for both scheduling quality and execution time?
+RQ1: How can we create a cost-efficient algorithm for offline multi-resource cloud procurement planning and job scheduling? \
+
+RQ2: How can we create a procurement planner and cloud job scheduler which is optimized for both scheduling quality and execution time?
 
 == Algorithms
 
