@@ -33,9 +33,9 @@ For RQ2, these results suggest that optimizing for both scheduling quality and e
 The earlier cost analysis identified _BFD_ and _FFDNew_ as the strongest quality-oriented choices, and the present runtime results show that their overhead is still small in absolute terms.
 All average runtimes remain below 100 milliseconds per instance.
 It shall be noted that the algorithms were not implemented with performance in mind.
-It is possible that more efficient implementations would have yielded in different results.
+It is likely that more efficient implementations would have yielded different results.
 
-We shall study the evaluation results of the _BFD_ and _FFDNew_ algorithms.
+Let us now consider the evaluation results of the _BFD_ and _FFDNew_ algorithms.
 The two algorithms have nearly identical average costs on each of the datasets.
 For the _Balanced_ and _Machine-heavy_ datasets, the paired ratio $t$-tests on raw total cost ratios fail to reject the null hypothesis at $alpha=0.05$.
 For the _Job-heavy_ dataset, the paired ratio $t$-test rejects the null hypothesis ($p approx 0.0407$), but the effect size is very small.
@@ -67,7 +67,7 @@ Thus, with the current data, our directional hypothesis is supported.
 
 We note that the Dolan-Moré performance profiles are generally consistent across all datasets.
 The _BFD_ and _FFDNew_ algorithms are dominant over all other algorithms.
-These two algorithms are tied on between $80%$ and $86$ of problem instances, for the _Balanced_ and _Machine-heavy_ datasets.
+These two algorithms are tied on between $80\%$ and $86\%$ of problem instances, for the _Balanced_ and _Machine-heavy_ datasets.
 For the _Job-heavy_ dataset, there are some notable differences.
 Here, the two algorithms are tied on only $43%$ of problem instances.
 

@@ -23,9 +23,7 @@ The reason for this is that multiple algorithms can be tied for certain problem 
   }
   let ci_parts = row.at(3).split("-")
   let ci_ratio = (
-    str(calc.round(decimal(ci_parts.at(0)), digits: 4))
-    + "-"
-    + str(calc.round(decimal(ci_parts.at(1)), digits: 4))
+    str(calc.round(decimal(ci_parts.at(0)), digits: 4)) + "-" + str(calc.round(decimal(ci_parts.at(1)), digits: 4))
   )
   let reject_h0 = if row.at(6) == "REJECT H0" { "Yes" } else { "No" }
   (comparison,) + row.slice(1, 3) + (ci_ratio,) + row.slice(5, 6) + (reject_h0,)
@@ -155,7 +153,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
 
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
 Using the paired ratio $t$-test on raw total cost ratios, we reject the null hypothesis at $alpha=0.05$ ($p approx 0.0407$).
-The effect is very small, however: the mean ratio is approximately $1.00044$, meaning that _BFD_ is only slightly more costly than _FFDNew_ on average.
+The effect is very small since the mean ratio is approximately $1.00044$, meaning that _BFD_ is only slightly more costly than _FFDNew_ on average.
 
 #let ratio_ttest_job_heavy = compact_ratio_ttest_rows(
   csv("../evaluation/results/job_heavy/eval_raw_cost_ratio_ttest_job_heavy.csv").slice(1),
