@@ -69,13 +69,13 @@ This process then continues for some number of iterations.
 
 == Bin-packing
 
-In 1972, Gary, Graham, and Ullman analyzed the worst-case performance of heuristics-based methods for bin-packing @garey_worst_mem_alloc.
+In 1972, Garey, Graham, and Ullman analyzed the worst-case performance of heuristics-based methods for bin-packing @garey_worst_mem_alloc.
 The authors viewed these algorithms from a more practical point of view, as algorithms for memory allocation.
 
 David Johnson was first to study approximation algorithms for the bin-packing problem, in his 1973 Ph.D. thesis @johnson_1973_phd.
 He presented bounds for both the First-Fit and Best-fit algorithms.
 
-In 1976, Gary, Graham Johnson, and Yao studied bin-packing applied to the problem of job scheduling with precedence constraints @Garey1976ResourceCS.
+In 1976, Garey, Graham, Johnson, and Yao studied bin-packing applied to the problem of job scheduling with precedence constraints @Garey1976ResourceCS.
 With precedence constraints, certain jobs may need to be scheduled before others.
 
 In 2004, Chekuri and Khanna studied approximation algorithms for multidimensional versions of classic packing problems, including the bin-packing problem @chekuri_multidim_packing.
