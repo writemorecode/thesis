@@ -1,0 +1,944 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+
+% Build from this directory with a standard LaTeX toolchain, for example:
+%   latexmk -pdf defense_presentation.tex
+
+\usetheme{Madrid}
+\usecolortheme{default}
+\usefonttheme{professionalfonts}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+
+\graphicspath{{assets/}}
+
+\definecolor{bthblue}{RGB}{0,64,128}
+\definecolor{bthcyan}{RGB}{0,150,190}
+\definecolor{bthgray}{RGB}{65,70,75}
+\definecolor{lightpanel}{RGB}{244,247,250}
+
+\setbeamercolor{palette primary}{bg=bthblue,fg=white}
+\setbeamercolor{palette secondary}{bg=bthcyan,fg=white}
+\setbeamercolor{frametitle}{bg=bthblue,fg=white}
+\setbeamercolor{title}{fg=bthblue}
+\setbeamercolor{structure}{fg=bthblue}
+\setbeamercolor{block title}{bg=bthblue,fg=white}
+\setbeamercolor{block body}{bg=lightpanel,fg=black}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\raisebox{0.15ex}{\scriptsize$\blacktriangleright$}}
+\setbeamertemplate{itemize subitem}{\raisebox{0.15ex}{\tiny$\blacktriangleright$}}
+
+\newcommand{\alg}[1]{\textsc{#1}}
+\newcommand{\R}{\mathbf{R}}
+\newcommand{\C}{\mathbf{C}}
+\newcommand{\Lmat}{\mathbf{L}}
+\newcommand{\cp}{\mathbf{c}^{p}}
+\newcommand{\cr}{\mathbf{c}^{r}}
+\newcommand{\x}{\mathbf{x}}
+\newcommand{\zt}{\mathbf{z}_{t}}
+\newcommand{\lt}{\mathbf{l}_{t}}
+\newcommand{\mt}{\mathbf{m}}
+\newcommand{\yt}{\mathbf{y}}
+
+\title[Private cloud scheduling]{Procurement planning and offline job scheduling in private clouds}
+\subtitle{Thesis defense presentation}
+\author[G. Karlsson]{Gustav Karlsson}
+\institute[BTH]{Blekinge Institute of Technology\\Faculty of Computing}
+\date{May 2026}
+
+\begin{document}
+
+{
+\setbeamertemplate{footline}{}
+\begin{frame}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.72\textwidth}
+      \vspace{0.5cm}
+      {\usebeamerfont{title}\usebeamercolor[fg]{title}\LARGE\inserttitle\par}
+      \vspace{0.35cm}
+      {\large\insertsubtitle\par}
+      \vspace{0.8cm}
+      {\large\insertauthor\par}
+      \vspace{0.15cm}
+      {\normalsize Supervisor: Professor Lars Lundberg\par}
+      \vspace{0.65cm}
+      {\normalsize \insertinstitute\par}
+      \vspace{0.15cm}
+      {\normalsize \insertdate\par}
+    \end{column}
+    \begin{column}{0.22\textwidth}
+      \raggedleft
+      \includegraphics[width=0.88\linewidth]{bthnotext.pdf}
+    \end{column}
+  \end{columns}
+\end{frame}
+}
+
+\begin{frame}{Defense Roadmap}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.47\textwidth}
+      \begin{enumerate}
+        \item Introduction and motivation
+        \item Theory: bin-packing
+        \item Problem description and model
+        \item Related work and design gap
+        \item Method: evaluated algorithms
+      \end{enumerate}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{enumerate}
+        \setcounter{enumi}{5}
+        \item Experimental methodology
+        \item Results: cost and runtime
+        \item Analysis and validity
+        \item Conclusion and future work
+      \end{enumerate}
+    \end{column}
+  \end{columns}
+  \vspace{0.35cm}
+  \begin{block}{Core thesis question}
+    How can a private-cloud operator choose a hardware fleet and schedule predicted offline workloads at low total cost?
+  \end{block}
+\end{frame}
+
+\section{Introduction}
+
+\begin{frame}{Motivation: Private Clouds Need Planning}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.50\textwidth}
+      \begin{itemize}
+        \item Organizations may avoid public cloud for regulatory, privacy, risk, or control reasons.
+        \item In private clouds, the operator owns both the procurement decision and the scheduling decision.
+        \item Energy-aware scheduling is not only about using fewer machines; it is about buying and powering the right machines over time.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{tikzpicture}[
+        node distance=0.75cm,
+        box/.style={rounded corners=2pt,draw=bthblue,thick,fill=lightpanel,align=center,minimum height=0.75cm,text width=3.0cm},
+        arrow/.style={-{Latex[length=2mm]},thick,bthblue}
+      ]
+        \node[box] (predict) {Predicted workload};
+        \node[box,below=of predict] (procure) {Hardware fleet\\procurement};
+        \node[box,below=of procure] (schedule) {Offline job\\scheduling};
+        \node[box,below=of schedule] (cost) {Total cost\\purchase + running};
+        \draw[arrow] (predict) -- (procure);
+        \draw[arrow] (procure) -- (schedule);
+        \draw[arrow] (schedule) -- (cost);
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Research Questions}
+  \begin{block}{RQ1}
+    How can we create a cost-efficient algorithm for offline multi-resource cloud procurement planning and job scheduling?
+  \end{block}
+  \begin{block}{RQ2}
+    How can we create a procurement planner and cloud job scheduler which is optimized for both scheduling quality and execution time?
+  \end{block}
+  \vspace{0.25cm}
+  \begin{itemize}
+    \item The thesis treats complete workload demand as known for a finite planning horizon.
+    \item Each job must run in its assigned time slot and cannot be split across machines.
+  \end{itemize}
+\end{frame}
+
+\section{Theory}
+
+\begin{frame}{Bin-Packing View}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.47\textwidth}
+      \begin{block}{Classical bin-packing}
+        Pack items into bins while respecting capacity constraints and minimizing the number or cost of opened bins.
+      \end{block}
+      \begin{itemize}
+        \item Jobs become multi-resource items.
+        \item Machines become heterogeneous bins.
+        \item Opening a bin has purchase and running cost consequences.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      \centering
+      \begin{tikzpicture}[
+        item/.style={draw=bthcyan,fill=bthcyan!15,rounded corners=1pt,minimum width=0.75cm,minimum height=0.35cm},
+        bin/.style={draw=bthblue,thick,minimum width=2.4cm,minimum height=1.55cm},
+        label/.style={font=\scriptsize}
+      ]
+        \node[item] at (0,1.2) {};
+        \node[item] at (0.9,1.2) {};
+        \node[item] at (1.8,1.2) {};
+        \node[label] at (0.9,0.73) {jobs};
+        \node[bin] at (0, -0.35) {};
+        \node[bin] at (2.9, -0.35) {};
+        \node[label] at (0,-1.35) {machine type 1};
+        \node[label] at (2.9,-1.35) {machine type 2};
+        \node[item,minimum width=0.65cm] at (-0.45,-0.55) {};
+        \node[item,minimum width=0.95cm] at (0.35,-0.12) {};
+        \node[item,minimum width=0.55cm] at (2.45,-0.48) {};
+        \draw[-{Latex[length=2mm]},thick,bthgray] (0.9,0.95) -- (0.2,0.35);
+        \draw[-{Latex[length=2mm]},thick,bthgray] (1.3,0.95) -- (2.6,0.35);
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+  \vspace{0.15cm}
+  \[
+    \sum_i \mathbf{s}(i)x_{ij} \leq \mathbf{c}(j)y_j
+  \]
+\end{frame}
+
+\begin{frame}{Problem Inputs}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{align*}
+        \R &= \begin{bmatrix}
+          | & | & & |\\
+          \mathbf{r}_1 & \mathbf{r}_2 & \cdots & \mathbf{r}_J\\
+          | & | & & |
+        \end{bmatrix}
+        &&\in \mathbb{Z}_{\geq 0}^{K \times J}\\[0.3cm]
+        \C &= \begin{bmatrix}
+          | & | & & |\\
+          \mathbf{m}_1 & \mathbf{m}_2 & \cdots & \mathbf{m}_M\\
+          | & | & & |
+        \end{bmatrix}
+        &&\in \mathbb{Z}_{\geq 0}^{K \times M}
+      \end{align*}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{align*}
+        \Lmat &= \begin{bmatrix}
+          | & | & & |\\
+          \mathbf{l}_1 & \mathbf{l}_2 & \cdots & \mathbf{l}_T\\
+          | & | & & |
+        \end{bmatrix}
+        &&\in \mathbb{Z}_{\geq 0}^{J \times T}\\[0.3cm]
+        \cp &= \C^\top \boldsymbol{\alpha}, \qquad
+        \cr = \gamma \cp
+      \end{align*}
+    \end{column}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{itemize}
+    \item $K$: resources; $J$: job types; $M$: machine types; $T$: time slots.
+    \item $\boldsymbol{\alpha}$ weights resources by cost; $\gamma$ maps purchase cost to per-slot running cost.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Lower-Bound Procurement Model}
+  \begin{block}{Simplified model}
+    This model checks aggregate capacity, but does not guarantee that individual jobs can be packed into individual machines.
+  \end{block}
+  \begin{align*}
+    \min_{\x,\zt}\quad
+      & \x^\top\cp + \sum_{t=1}^{T}\sum_{i=1}^{M} z_{t,i}c_i^r\\
+    \text{s.t.}\quad
+      & \C\zt \geq \R\lt, && \forall t\\
+      & \zt \leq \x, && \forall t\\
+      & \x \in \mathbb{Z}_{\geq 0}^{M},\quad
+        \zt \in \mathbb{Z}_{\geq 0}^{M}, && \forall t
+  \end{align*}
+  \vspace{-0.1cm}
+  \begin{itemize}
+    \item Useful as a lower bound, but insufficient for valid schedules.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Packing-Aware Model}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Valid packing configurations}
+        \[
+          S_i = \{\mathbf{y}\in\mathbb{Z}_{\geq 0}^{J}\mid \R\mathbf{y}\leq\mathbf{m}_i\}
+        \]
+        Each element of $S_i$ is a feasible set of jobs for one machine of type $i$.
+      \end{block}
+      \[
+        \mathbf{Y}_i =
+        \begin{bmatrix}
+          | & | & & |\\
+          \mathbf{y}_{i,1} & \mathbf{y}_{i,2} & \cdots & \mathbf{y}_{i,|S_i|}\\
+          | & | & & |
+        \end{bmatrix}
+      \]
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{align*}
+        \min\quad
+          & \x^\top\cp
+          + \sum_{i=1}^{M} c_i^r
+            \sum_{t=1}^{T}\sum_{k=1}^{|S_i|} n_{i,t,k}\\
+        \text{s.t.}\quad
+          & \sum_{i=1}^{M}\mathbf{Y}_i\mathbf{n}_{i,t} \geq \lt,
+          && \forall t\\
+          & \sum_{k=1}^{|S_i|} n_{i,t,k} \leq x_i,
+          && \forall i,t\\
+          & \x,\mathbf{n}_{i,t}\in\mathbb{Z}_{\geq 0}
+      \end{align*}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Method}
+
+\begin{frame}{Algorithms Evaluated}
+  \begin{table}
+    \centering
+    \scriptsize
+    \begin{tabularx}{\textwidth}{@{}lX@{}}
+      \toprule
+      Algorithm & Sorting and placement idea\\
+      \midrule
+      \alg{FFD} / \alg{FFDLex} & First-fit decreasing with lexicographic ordering.\\
+      \alg{FFDSum} & Sort jobs by decreasing sum of resource demands.\\
+      \alg{FFDProd} & Sort jobs by decreasing product of resource demands.\\
+      \alg{FFDMax} & Sort jobs by largest single resource demand.\\
+      \alg{FFDL2} & Sort jobs by Euclidean norm of resource demand vector.\\
+      \alg{FFDNew} & Weighted ordering plus slack-aware new-machine selection.\\
+      \alg{BFD} & Resource-weighted, cost-aware best-fit over open and new machines.\\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+  \vspace{0.2cm}
+  \begin{itemize}
+    \item All algorithms select feasible machine types and produce validated schedules.
+    \item The central comparison is quality versus runtime overhead.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{BFD and FFDNew: Shared Setup}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.50\textwidth}
+      \begin{enumerate}
+        \item For each time slot, start with no open machines.
+        \item Compute weighted job priority:
+        \[
+          \mathbf{v}=\R^\top\boldsymbol{\alpha}
+        \]
+        \item Sort job types by decreasing $v_j$.
+        \item Pack all remaining jobs of the current type before moving to the next type.
+      \end{enumerate}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{block}{Common placement count}
+        \[
+          q=\min_{k:\hat{r}_{j,k}>0}
+            \left\lfloor\frac{z_k}{\hat{r}_{j,k}}\right\rfloor
+        \]
+        \[
+          n=\min(q,\eta),\qquad
+          \mathbf{u}=\mathbf{z}-n\hat{\mathbf{r}}_j
+        \]
+        $q$ is how many jobs fit in the candidate capacity vector $\mathbf{z}$; $n$ is how many are actually placed.
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{BFD: Open-Bin Score \texorpdfstring{$\Phi_b$}{Phi}}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Remaining capacity of open bin $b$}
+        If $i=\tau_{t,b}$ is the machine type of open bin $b$:
+        \[
+          \boldsymbol{\rho}_b
+          =
+          \mathbf{m}_i
+          -
+          \sum_{j'=1}^{J} y_{t,j',b}\hat{\mathbf{r}}_{j'}
+        \]
+      \end{block}
+      \begin{itemize}
+        \item For open bins, the candidate capacity is $\mathbf{z}=\boldsymbol{\rho}_b$.
+        \item Only bins with $q_b\geq 1$ are feasible.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{BFD selection key}
+        \[
+          \Phi_b
+          =
+          \sum_{k=1}^{K}
+          \alpha_k
+          \left(\rho_{b,k}-n_b\hat{r}_{j,k}\right)^2
+        \]
+        \[
+          \kappa_b =
+          \left(\Phi_b,\;c^r_{\tau_{t,b}},\;b\right)
+        \]
+      \end{block}
+      \begin{itemize}
+        \item Select $b^*=\arg\,\min_{b:q_b\geq 1}\kappa_b$.
+        \item The score favors tight fits in expensive or scarce resource dimensions.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{New-Machine Score \texorpdfstring{$\Psi_i$}{Psi}: Shared by BFD and FFDNew}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Empty machine type candidate}
+        When no open bin is feasible, evaluate every machine type $i$:
+        \[
+          q_i=
+          \min_{k:\hat{r}_{j,k}>0}
+          \left\lfloor
+            \frac{m_{i,k}}{\hat{r}_{j,k}}
+          \right\rfloor
+        \]
+        \[
+          n_i=\min(\eta,q_i)
+        \]
+      \end{block}
+      \begin{itemize}
+        \item Candidate capacity is the full machine vector $\mathbf{z}=\mathbf{m}_i$.
+        \item Only machine types with $q_i\geq 1$ can be opened.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Normalized new-bin score}
+        \[
+          \Psi_i
+          =
+          \frac{
+            \sum_{k=1}^{K}
+            \alpha_k
+            \left(m_{i,k}-n_i\hat{r}_{j,k}\right)^2
+          }{c_i^p}
+        \]
+        \[
+          \kappa_i =
+          \left(\Psi_i,\;c_i^p+c_i^r,\;i\right)
+        \]
+      \end{block}
+      \begin{itemize}
+        \item Select $i^*=\arg\,\min_{i:q_i\geq 1}\kappa_i$.
+        \item Dividing by $c_i^p$ avoids unfairly penalizing larger machine types only because they have more raw capacity.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{FFDNew: Same New-Bin Logic, Simpler Open-Bin Logic}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.50\textwidth}
+      \begin{block}{BFD}
+        \begin{enumerate}
+          \item Score all feasible open bins with $\Phi_b$.
+          \item Choose the minimum key $\kappa_b$.
+          \item If none fit, open a new machine type using $\Psi_i$.
+        \end{enumerate}
+      \end{block}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{block}{FFDNew}
+        \begin{enumerate}
+          \item Scan open bins in the order they were opened.
+          \item Select the first bin with $q_b\geq 1$:
+          \[
+            b^*=\arg\,\min_{b\in B:q_b\geq 1} b
+          \]
+          \item If none fit, open a new machine type using the same $\Psi_i$ as BFD.
+        \end{enumerate}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \vspace{0.15cm}
+  \begin{itemize}
+    \item FFDNew is therefore a hybrid: BFD-style ordering and new-machine selection, but first-fit selection among already-open bins.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Experimental Datasets}
+  \begin{table}
+    \centering
+    \small
+    \begin{tabular}{@{}lccccc@{}}
+      \toprule
+      Dataset & Instances & $K$ & $J$ range & $M$ range & $T$ range\\
+      \midrule
+      Balanced & 100 & 4 & 6--8 & 6--8 & 100--200\\
+      Job-heavy & 100 & 4 & 12--16 & 6--8 & 100--200\\
+      Machine-heavy & 100 & 4 & 6--8 & 12--16 & 100--200\\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \vspace{0.25cm}
+  \begin{itemize}
+    \item Resource types: CPU, memory, disk, and I/O.
+    \item Machine, job, and time-slot generation uses controlled specialization rather than uniform sampling.
+    \item Each dataset uses 100 independently generated problem instances.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Instance Generation Structure}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.50\textwidth}
+      \begin{block}{Baseline plus jitter}
+        \[
+          C_{k,i}\leftarrow c_{0,k}U([c_{\min},c_{\max}])
+        \]
+        \[
+          R_{k,j}\leftarrow d_{0,k}U([d_{\min},d_{\max}])
+        \]
+      \end{block}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{block}{Correlated specialization}
+        \[
+          \mathbf{q}^{\mathrm{machine}}
+          =
+          \eta^{\mathrm{machine}}\mathbf{q}^{\mathrm{job}}
+          +(1-\eta^{\mathrm{machine}})\frac{\mathbf{1}_K}{K}
+        \]
+      \end{block}
+    \end{column}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{itemize}
+    \item Some jobs are CPU-, memory-, disk-, or I/O-heavy.
+    \item Some machines are specialized toward matching resource dimensions.
+    \item This creates structured heterogeneity similar to private-cloud fleet planning.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Problem Instance Generation Pipeline}
+  \centering
+  \begin{tikzpicture}[
+    scale=0.88,
+    transform shape,
+    node distance=0.85cm,
+    box/.style={rounded corners=2pt,draw=bthblue,thick,fill=lightpanel,align=center,minimum height=0.72cm,text width=3.2cm},
+    smallbox/.style={rounded corners=2pt,draw=bthcyan,thick,fill=bthcyan!10,align=center,minimum height=0.64cm,text width=2.7cm},
+    arrow/.style={-{Latex[length=2mm]},thick,bthblue}
+  ]
+    \node[box] (dims) {Sample dimensions\\$K,M,J,T$};
+    \node[box,right=of dims] (jobp) {Assign job primary resources\\$\mathbf{p}^{\mathrm{job}}$};
+    \node[box,right=of jobp] (hist) {Build job-resource histogram\\$\mathbf{q}^{\mathrm{job}}$};
+    \node[smallbox,below=of jobp] (R) {Generate job demands\\$\R$};
+    \node[smallbox,below=of hist] (C) {Generate machine capacities\\$\C$};
+    \node[smallbox,right=of hist] (L) {Generate time slots\\$\Lmat$};
+    \node[box,below=of C] (cost) {Compute costs\\$\cp,\cr,\boldsymbol{\alpha}$};
+    \draw[arrow] (dims) -- (jobp);
+    \draw[arrow] (jobp) -- (hist);
+    \draw[arrow] (jobp) -- (R);
+    \draw[arrow] (hist) -- (C);
+    \draw[arrow] (hist) -- (L);
+    \draw[arrow] (R) -- (C);
+    \draw[arrow] (C) -- (cost);
+  \end{tikzpicture}
+  \vspace{0.25cm}
+  \begin{itemize}
+    \item The output is random, but not independent noise: supply, demand, and temporal load are coupled through primary resources.
+    \item The generated instance is $(\C,\R,\Lmat,\cp,\cr,\boldsymbol{\alpha})$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Primary Resources: Creating Structured Heterogeneity}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Choose primary resources}
+        For $n$ objects and specialization rate $\rho$:
+        \[
+          s=\mathrm{round}(n\rho)
+        \]
+        Select $s$ objects without replacement, then assign each selected object a resource
+        \[
+          k\sim\mathrm{Categorical}(\mathbf{q})
+        \]
+      \end{block}
+      \begin{itemize}
+        \item Unselected objects have no primary resource.
+        \item Each selected object has at most one primary resource.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Correlation from job profile}
+        Job types are sampled first. Their primary-resource histogram becomes:
+        \[
+          \mathbf{q}^{\mathrm{job}}
+          =
+          \frac{\mathbf{h}}{\sum_{k=1}^{K}h_k}
+        \]
+        Machine and slot probabilities blend this profile with uniform randomness:
+        \[
+          \mathbf{q}^{\mathrm{machine}}
+          =
+          \eta^{\mathrm{machine}}\mathbf{q}^{\mathrm{job}}
+          +(1-\eta^{\mathrm{machine}})\frac{\mathbf{1}_K}{K}
+        \]
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Generating Job and Machine Types}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Job demand matrix $\R$}
+        Initialize every demand with a base value and jitter:
+        \[
+          R_{k,j}\leftarrow d_{0,k}U([d_{\min},d_{\max}])
+        \]
+        If job type $j$ has primary resource $k^*$:
+        \[
+          R_{k^*,j}\leftarrow uR_{k^*,j},
+          \qquad
+          u\sim\mathrm{UniformInteger}([u_{\min},u_{\max}])
+        \]
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Machine capacity matrix $\C$}
+        Initialize every capacity similarly:
+        \[
+          C_{k,i}\leftarrow c_{0,k}U([c_{\min},c_{\max}])
+        \]
+        If machine type $i$ has primary resource $k^*$:
+        \[
+          C_{k^*,i}\leftarrow uC_{k^*,i}
+        \]
+      \end{block}
+    \end{column}
+  \end{columns}
+  \vspace{0.15cm}
+  \begin{itemize}
+    \item Values are rounded and clamped to at least 1.
+    \item If any job type fits on no machine, capacity is added to a selected machine type, preferably one with a matching primary resource.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Generating Time Slots and Workload Matrix}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Slot primary resources}
+        Time-slot specialization follows the job-type profile:
+        \[
+          \mathbf{q}^{\mathrm{slot}}
+          =
+          \eta^{\mathrm{slot}}\mathbf{q}^{\mathrm{job}}
+          +(1-\eta^{\mathrm{slot}})\frac{\mathbf{1}_K}{K}
+        \]
+        Then:
+        \[
+          \mathbf{p}^{\mathrm{slot}}
+          =
+          \mathrm{ChoosePrimaryResources}(T,\rho^{\mathrm{slot}},\mathbf{q}^{\mathrm{slot}})
+        \]
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Slot job counts}
+        Total jobs in slot $t$:
+        \[
+          N_t=\max(1,\mathrm{round}(\lambda_0 u)),
+          \qquad
+          u\sim U([\lambda_{\min},\lambda_{\max}))
+        \]
+        After emphasizing matching job types:
+        \[
+          \boldsymbol{\ell}_t
+          \sim
+          \mathrm{Multinomial}(N_t,\boldsymbol{\phi})
+        \]
+      \end{block}
+    \end{column}
+  \end{columns}
+  \vspace{0.15cm}
+  \begin{itemize}
+    \item A slot with primary resource $k^*$ increases the weights of job types that also have primary resource $k^*$.
+    \item This creates temporal bursts of related job types while preserving random variation in total load.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{From Problem Instances to Datasets}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Per-instance sampling}
+        For each generated instance:
+        \[
+          J\sim U(I_J),\qquad
+          M\sim U(I_M),\qquad
+          T\sim U(I_T)
+        \]
+        with $K=4$ fixed to CPU, memory, disk, and I/O.
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Three dataset regimes}
+        \begin{itemize}
+          \item Balanced: $J=6$--$8$, $M=6$--$8$.
+          \item Job-heavy: $J=12$--$16$, $M=6$--$8$.
+          \item Machine-heavy: $J=6$--$8$, $M=12$--$16$.
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \vspace{0.15cm}
+  \begin{itemize}
+    \item Each dataset contains 100 generated problem instances using fixed seed 5000.
+    \item The regimes isolate whether extra job diversity or extra machine diversity changes scheduler behavior.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Evaluation Metrics}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Cost}
+        \[
+          \text{total cost} =
+          \x^\top\cp + \sum_{t=1}^{T}\zt^\top\cr
+        \]
+        Reported as average, min, max, and paired ratios.
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Performance profile}
+        \[
+          \rho_s(\tau)=
+          \frac{1}{|P|}
+          \left|\{p\in P:r_{p,s}\leq\tau\}\right|
+        \]
+        Summarizes how often solver $s$ is within factor $\tau$ of the best solver.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{itemize}
+    \item Runtime is measured per problem instance.
+    \item Paired two-tailed $t$-tests compare per-instance ratios.
+  \end{itemize}
+\end{frame}
+
+\section{Results}
+
+\begin{frame}{Cost Summary: Best Two Algorithms Dominate}
+  \begin{table}
+    \centering
+    \scriptsize
+    \begin{tabular}{@{}lrrrr@{}}
+      \toprule
+      Dataset / algorithm & Avg. cost & Avg. runtime & Avg. machines & Rank\\
+      \midrule
+      Balanced \alg{FFDNew} & 8132.64 & 0.07s & 32.26 & 1\\
+      Balanced \alg{BFD} & 8134.48 & 0.07s & 32.26 & 2\\
+      Balanced best simple FFD & 8943.51 & 0.05s & 24.63 & 3\\
+      \addlinespace
+      Job-heavy \alg{FFDNew} & 8433.94 & 0.08s & 34.89 & 1\\
+      Job-heavy \alg{BFD} & 8437.84 & 0.07s & 34.88 & 2\\
+      Job-heavy best simple FFD & 8991.99 & 0.05s & 25.61 & 3\\
+      \addlinespace
+      Machine-heavy \alg{FFDNew} & 6982.95 & 0.09s & 33.32 & 1\\
+      Machine-heavy \alg{BFD} & 6983.41 & 0.09s & 33.32 & 2\\
+      Machine-heavy best simple FFD & 8053.82 & 0.05s & 27.37 & 3\\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \vspace{-0.1cm}
+  \begin{itemize}
+    \item \alg{BFD} and \alg{FFDNew} are consistently the two lowest-cost schedulers.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{BFD vs. FFDNew: Paired Cost Ratios}
+  \begin{table}
+    \centering
+    \small
+    \begin{tabular}{@{}lrrrrl@{}}
+      \toprule
+      Dataset & $n$ & Mean ratio & 95\% CI & $p$-value & Decision\\
+      \midrule
+      Balanced & 100 & 1.00028 & 0.999877--1.00069 & 0.170 & Fail to reject\\
+      Job-heavy & 100 & 1.00044 & 1.00002--1.00086 & 0.0407 & Reject\\
+      Machine-heavy & 100 & 1.00011 & 0.999771--1.00045 & 0.522 & Fail to reject\\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \vspace{0.2cm}
+  \begin{block}{Interpretation}
+    Even where the null hypothesis is rejected, the effect size is very small: the job-heavy mean ratio differs from 1 by about 0.044\%.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Performance Profiles: Balanced Dataset}
+  \centering
+  \includegraphics[width=0.88\textwidth,height=0.72\textheight,keepaspectratio]{eval_performance_profiles_balanced.pdf}
+  \vspace{-0.1cm}
+  \begin{itemize}
+    \item \alg{FFDNew} and \alg{BFD} tie on 81 out of 100 balanced instances.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Performance Profiles: Job-Heavy and Machine-Heavy}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.62\textheight,keepaspectratio]{eval_performance_profiles_job_heavy.pdf}\\
+      \scriptsize Job-heavy: \alg{FFDNew} and \alg{BFD} tie on 43 instances.
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.62\textheight,keepaspectratio]{eval_performance_profiles_machine_heavy.pdf}\\
+      \scriptsize Machine-heavy: \alg{FFDNew} and \alg{BFD} tie on 86 instances.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Cost Ratio Distributions}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.33\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.46\textheight,keepaspectratio]{eval_cost_ratio_dist_balanced_bfd_vs_ffd_new.pdf}\\
+      \scriptsize Balanced
+    \end{column}
+    \begin{column}{0.33\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.46\textheight,keepaspectratio]{eval_cost_ratio_dist_job_heavy_bfd_vs_ffd_new.pdf}\\
+      \scriptsize Job-heavy
+    \end{column}
+    \begin{column}{0.33\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.46\textheight,keepaspectratio]{eval_cost_ratio_dist_machine_heavy_bfd_vs_ffd_new.pdf}\\
+      \scriptsize Machine-heavy
+    \end{column}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{itemize}
+    \item The distributions are tightly concentrated around a cost ratio of 1.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Runtime: Quality Comes With Small Overhead}
+  \centering
+  \includegraphics[width=0.86\textwidth,height=0.68\textheight,keepaspectratio]{eval_runtime_cross_dataset.pdf}
+  \vspace{-0.05cm}
+  \begin{itemize}
+    \item All average runtimes remain below 100 ms per instance.
+    \item \alg{BFD} and \alg{FFDNew} are slower than simpler FFD variants, but the absolute overhead is small.
+  \end{itemize}
+\end{frame}
+
+\section{Analysis}
+
+\begin{frame}{Why Lower Cost Can Use More Machines}
+  \begin{table}
+    \centering
+    \small
+    \begin{tabular}{@{}lrrr@{}}
+      \toprule
+      Dataset & Mean machine ratio & 95\% CI & $p$-value\\
+      \midrule
+      Balanced & 1.323 & 1.273--1.373 & $6.70\cdot 10^{-23}$\\
+      Job-heavy & 1.376 & 1.330--1.422 & $1.34\cdot 10^{-29}$\\
+      Machine-heavy & 1.245 & 1.193--1.297 & $3.06\cdot 10^{-15}$\\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \vspace{0.25cm}
+  \begin{block}{Interpretation}
+    \alg{BFD} uses more machines than \alg{FFDMax}, yet achieves lower total cost. In this model, cost efficiency comes from choosing cheaper and better-fitting machine types, not merely minimizing active machine count.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Dataset-Level Interpretation}
+  \begin{itemize}
+    \item The machine-heavy dataset has more available machine types, increasing placement flexibility.
+    \item For \alg{BFD}, machine-heavy instances had lower mean cost than balanced instances:
+      \[
+        6983 \quad \text{vs.}\quad 8134
+      \]
+    \item The paired one-tailed cross-dataset test supported this directional hypothesis:
+      \[
+        t=-2.279,\qquad p=0.01242,\qquad \Delta=-1151
+      \]
+    \item This is consistent with the generator: more machine types raise the chance of finding a machine specialized for the workload.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Answering the Research Questions}
+  \begin{block}{RQ1: Cost-efficient offline scheduling}
+    Traditional packing heuristics can be adapted to private-cloud procurement planning by adding heterogeneous machine types, purchase costs, running costs, and multi-resource feasibility checks.
+  \end{block}
+  \begin{block}{RQ2: Quality and execution time}
+    \alg{BFD} and \alg{FFDNew} produce the lowest observed solution costs. Their runtimes are higher than simpler heuristics, but remain below 100 ms per instance in the evaluation.
+  \end{block}
+  \vspace{0.15cm}
+  \begin{itemize}
+    \item The practical trade-off is mild in the studied setting: the best quality-oriented algorithms remain fast.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Validity Considerations}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Internal validity}
+        \begin{itemize}
+          \item Random generator may favor some heuristics.
+          \item Fixed seeds improve reproducibility but do not remove seed sensitivity.
+          \item Pipeline bugs or scheduler implementation errors could affect results.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{External validity}
+        \begin{itemize}
+          \item Synthetic workloads omit bursts, seasonality, and production-specific correlations.
+          \item Cost model is linear and simplified.
+          \item Startup delays, maintenance windows, and multi-slot jobs are not modeled.
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Conclusion}
+
+\begin{frame}{Conclusion}
+  \begin{itemize}
+    \item The thesis models private-cloud procurement and offline job scheduling as a cost-aware, multi-resource, heterogeneous bin-packing problem.
+    \item \alg{BFD} and \alg{FFDNew} dominate the evaluated algorithms on solution cost.
+    \item Their cost difference is practically very small across all datasets.
+    \item Although they are slower than simpler FFD variants, all average runtimes remain below 100 ms per instance.
+    \item Lower cost does not necessarily mean fewer machines; it can mean a more cost-efficient allocation across machine types.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Future Work}
+  \begin{itemize}
+    \item Treat workload predictions probabilistically rather than deterministically.
+    \item Evaluate advanced search methods such as simulated annealing, tabu search, variable neighborhood search, or hybrid exact-heuristic approaches.
+    \item Extend the objective beyond total cost, e.g. jointly minimize cost, machine count, or number of machine types used.
+    \item Evaluate on realistic production traces such as the Google Borg cluster workload trace.
+    \item Add operational constraints: startup delays, shutdown delays, maintenance windows, and jobs spanning multiple time slots.
+    \item Study theoretical bounds and worst-case instances for the proposed algorithms.
+  \end{itemize}
+\end{frame}
+
+{
+\setbeamertemplate{footline}{}
+\begin{frame}
+  \begin{columns}[c,totalwidth=\textwidth]
+    \begin{column}{0.70\textwidth}
+      {\usebeamerfont{title}\usebeamercolor[fg]{title}\Huge Thank you\par}
+      \vspace{0.45cm}
+      {\Large Questions?\par}
+      \vspace{0.8cm}
+      {\normalsize Gustav Karlsson\\Blekinge Institute of Technology\par}
+    \end{column}
+    \begin{column}{0.22\textwidth}
+      \raggedleft
+      \includegraphics[width=0.92\linewidth]{bthnotext.pdf}
+    \end{column}
+  \end{columns}
+\end{frame}
+}
+
+\end{document}
