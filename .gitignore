@@ -10,3 +10,4 @@ images/*
 *.png
 dataset
 *.md
+.DS_Store
