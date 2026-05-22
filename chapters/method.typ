@@ -83,11 +83,11 @@ Thereafter, we describe each step of the algorithm in greater detail.
           "Sort items",
         )
 
-        LineComment(Assign($X_(i,t)$, $0, quad forall i,t$), "Initialize bin-type matrix to zero")
+        LineComment(Assign($X_(i,t)$, $0, quad forall i in cal(M), t in cal(T)$), "Initialize bin-type matrix to zero")
 
-        For($1<=t<=T$, {
+        For($t in cal(T)$, {
           LineComment(Assign($B$, $emptyset$), "Initialize empty set of bins for time slot")
-          For($1<=j<=J$, {
+          For($j in cal(J)$, {
             LineComment(Assign($eta$, $hat(l)_(j,t)$), "Initialize remaining jobs counter")
             While($eta > 0$, {
               LineComment(Assign($p$, $"SelectOpenBin"(t, j, eta, B)$), "Try feasible open bins first")
@@ -140,12 +140,12 @@ $
   bold(I)_J = mat(|, |, , |; bold(e)_1, bold(e)_2, dots.c, bold(e)_J; |, |, , |)
 $
 be the identity matrix of dimension $J$.
-Let $pi$ be a permutation function on the set ${1,dots.h,J}$ where the following holds:
+Let $pi$ be a permutation function on the set $cal(J)$ where the following holds:
 $
   v_(pi(1)) > v_(pi(2)) > v_(pi(3)) > dots.h > v_(pi(J)).
 $
 
-The permutation $pi$ permutes the indices ${1,dots.h,J}$ of the $bold(v)$ vector to be in decreasing order of their respective vector elements ${v_1,dots.h,v_J}$.
+The permutation $pi$ permutes the indices $cal(J)$ of the $bold(v)$ vector to be in decreasing order of their respective vector elements ${v_1,dots.h,v_J}$.
 In other words, we are sorting the elements of the $bold(v)$ vector in decreasing order.
 Using this permutation, we form the permutation matrix:
 
@@ -180,7 +180,7 @@ Item types are packed in non-increasing order of their priorities.
       Comment($pi(q)" is index of "q"-th largest entry of "bold(v)$)
       Assign($pi$, $"SortIndicesDescending"(bold(v))$)
       LineComment(Assign($bold(P)$, $0$), $"Initialize a "(J,J)" zero matrix"$)
-      For($1 <= q <= J$, {
+      For($q in cal(J)$, {
         LineComment(Assign($bold(P)_(pi(q), q)$, $1$), $"Put "1" at row "pi(q)", column "q$)
       })
       LineComment(Assign($bold(hat(R))$, $bold(R) bold(P)$), $"Reorder item-type columns using "pi$)
@@ -282,7 +282,7 @@ This can in turn lead to item fragmentation and a overall inferior packing.
   #algorithm-figure("Select new bin type", vstroke: .5pt + luma(200), inset: 0.3em, {
     import algorithmic: *
     Procedure("SelectNewBinType", ($j, eta$), {
-      For($1<=i<=M$, {
+      For($i in cal(M)$, {
         LineComment(
           Assign($q_i$, $min_(k: hat(r)_(j,k)>0) floor(m_(i,k)\/hat(r)_(j,k))$),
           "Num. of items which fit in empty bin of type i",
@@ -357,11 +357,11 @@ The only difference lies in how already open bins are selected.
           "Sort items",
         )
 
-        LineComment(Assign($X_(i,t)$, $0, quad forall i,t$), "Initialize bin-type matrix to zero")
+        LineComment(Assign($X_(i,t)$, $0, quad forall i in cal(M), t in cal(T)$), "Initialize bin-type matrix to zero")
 
-        For($1<=t<=T$, {
+        For($t in cal(T)$, {
           LineComment(Assign($B$, $emptyset$), "Initialize empty set of bins for time slot")
-          For($1<=j<=J$, {
+          For($j in cal(J)$, {
             LineComment(Assign($eta$, $hat(l)_(j,t)$), "Initialize remaining jobs counter")
             While($eta > 0$, {
               LineComment(

@@ -6,6 +6,7 @@
 = Theory <theory_section>
 
 This chapter introduces the bin-packing formulations and algorithmic bounds that underpin the scheduler design.
+Throughout this thesis, for a positive integer $n$, let $cal(n) = {1,dots.h,n}$ denote the index set from $1$ to $n$.
 
 == Bin-packing problem definition
 
@@ -17,9 +18,9 @@ The problem can be formulated as an integer LP problem:
 
 $
     "minimize" & quad sum_(j=1)^n y_j \
-  "subject to" & quad sum_(j=1)^n x_(i j) = 1, quad forall 1 <= i <= n \
-               & quad sum_(i=1)^n s(i) x_(i j) <= c y_j, quad forall 1 <= j <= n \
-               & x_(i j) in {0,1}, quad y_j in {0,1} quad forall 1 <= i,j <= n \
+  "subject to" & quad sum_(j=1)^n x_(i j) = 1, quad forall i in cal(n) \
+               & quad sum_(i=1)^n s(i) x_(i j) <= c y_j, quad forall j in cal(n) \
+               & x_(i j) in {0,1}, quad y_j in {0,1} quad forall i,j in cal(n) \
 $
 
 Here, $n$ is the number of items.
@@ -42,9 +43,9 @@ The problem can be formulated as an integer LP problem:
 
 $
     "minimize" & quad sum_(j=1)^m y_j \
-  "subject to" & quad sum_(j=1)^m x_(i j) = 1, quad forall 1 <= i <= n \
-               & quad sum_(i=1)^n bold(s)(i) x_(i j) <= bold(c)(j) y_j, quad forall 1 <= j <= m \
-               & x_(i j) in {0,1}, quad y_j in {0,1} quad forall 1 <= i <= n, 1 <= j <= m \
+  "subject to" & quad sum_(j=1)^m x_(i j) = 1, quad forall i in cal(n) \
+               & quad sum_(i=1)^n bold(s)(i) x_(i j) <= bold(c)(j) y_j, quad forall j in cal(m) \
+               & x_(i j) in {0,1}, quad y_j in {0,1} quad forall i in cal(n), j in cal(m) \
 $
 
 Here, $n$ is the number of items and $m$ is the number of candidate bins.
