@@ -70,7 +70,7 @@ The generator keeps these values as real numbers during the specialization step,
 
 $
   C_(k,i) arrow.l c_(0,k) U([c_"min", c_"max"]), quad
-  R_(k,j) arrow.l d_(0,k) U([d_"min", d_"max"]), quad forall i,j,k.
+  R_(k,j) arrow.l d_(0,k) U([d_"min", d_"max"]), quad forall i in cal(M), j in cal(J), k in cal(K).
 $
 
 At this stage, however, the resulting matrices are still relatively close to uniform.
@@ -92,7 +92,7 @@ Thus, for example, given $M$ different machine types, $round(rho M)$ machine typ
 
 The primary resources of machine types, job types, and time slots are computed using @alg_choose_primary_resources, described below.
 The function takes as arguments the number $n$ of elements to consider, the fraction $rho$ of elements to assign a primary resource to, and a probability vector $bold(q) in [0,1]^K$ with $sum_(k=1)^K q_k = 1$.
-For each selected element, the resource $k$ is selected with probability $q_k$, for $1<=k<=K$.
+For each selected element, the resource $k$ is selected with probability $q_k$, for $k in cal(K)$.
 If we set $bold(q)=bold(1)_K\/K$, then each of the $K$ resources can be selected with equal probability.
 By adjusting the probabilities of $bold(q)$, we can instead make some resource types more likely to be selected than others.
 
@@ -114,13 +114,13 @@ By adjusting the probabilities of $bold(q)$, we can instead make some resource t
           ),
           {
             Assign($s$, $"Round"(n rho)$)
-            Comment[Sample set $S$ of size $s$ from set ${1,dots.h,n}$ without replacement]
-            Assign($S$, $"UniformWithoutReplacement"({1,dots.h,n}, s ; G)$)
+            Comment[Sample set $S$ of size $s$ from set $cal(n)$ without replacement]
+            Assign($S$, $"UniformWithoutReplacement"(cal(n), s ; G)$)
             Comment[Let $bold(p)$ be $n$-dimensional vector initialized to value $-1$]
             Assign($bold(p)$, $mat(-1, dots.h, -1)$)
             For($i in S$, {
-              Comment[Sample $p_i$ from set ${1,dots.h,K}$ with probabilities ${q_1,dots.h,q_K}$]
-              Assign($p_i$, $"Categorical"({1,dots.h,K}, bold(q) ; G)$)
+              Comment[Sample $p_i$ from set $cal(K)$ with probabilities ${q_1,dots.h,q_K}$]
+              Assign($p_i$, $"Categorical"(cal(K), bold(q) ; G)$)
             })
             Return($bold(p)$)
           },
@@ -201,7 +201,7 @@ The generation of the job types is handled by @alg_job_types.
             )
 
             Comment[Amplify assigned primary resources for job types]
-            For($1<=j<=J$, {
+            For($j in cal(J)$, {
               Comment[Check if job type $j$ was assigned a primary resource]
               If($p^"job"_j >= 0$, {
                 LineComment(Assign($k^*$, $p^"job"_j$), $"Let" k^* "be primary resource of job type "j$)
@@ -253,7 +253,7 @@ The generation of the machine types is handled by @alg_machine_types.
             )
 
             Comment[Amplify assigned primary resources for machine types]
-            For($1<=i<=M$, {
+            For($i in cal(M)$, {
               Comment[Check if machine type $i$ was assigned a primary resource]
               If($p^"machine"_i >= 0$, {
                 LineComment(Assign($k^*$, $p^"machine"_i$), $"Let" k^* "be primary resource of machine type "i$)
@@ -268,7 +268,7 @@ The generation of the machine types is handled by @alg_machine_types.
             LineComment(Assign($C_(k,i)$, $max(1, "Round"(C_(k,i)))$), $"Round all capacity values and ensure" >=1$)
 
             Comment[Ensure all job types can be packed]
-            For($1<=j<=J$, {
+            For($j in cal(J)$, {
               Comment[Check if no machine type can store job type $j$]
               If($exists.not i: bold(m)_i >= bold(r)_j$, {
                 LineComment(
@@ -381,7 +381,7 @@ It therefore creates job-type concentration in time slots without removing the r
         Comment[Compute primary resources for time slots]
         Assign($p^"slot"$, $"ChoosePrimaryResources"(T, rho^"slot", bold(q)^"slot", G)$)
         Assign($L_(j,t)$, $0$)
-        For($1<=t<=T$, {
+        For($t in cal(T)$, {
           LineComment(Assign($u$, $"Uniform"([lambda_"min", lambda_"max"); G)$), "Sample jitter value")
           LineComment(Assign($N_t$, $max(1, "Round"(lambda_0 u))$), "Multiply base load by jitter, round, clip")
 
@@ -586,7 +586,7 @@ The number of resource types is fixed to $K=4$ (CPU, memory, disk, I/O).
       {
         Assign($S$, $emptyset$)
         Assign($K$, $4$)
-        For($1<=i<=N$, {
+        For($i in cal(N)$, {
           Assign($J$, $"UniformInteger"(I_J; G)$)
           Assign($M$, $"UniformInteger"(I_M; G)$)
           Assign($T$, $"UniformInteger"(I_T; G)$)
