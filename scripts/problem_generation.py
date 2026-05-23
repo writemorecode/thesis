@@ -14,17 +14,18 @@ from simulator.problem import ProblemInstance
 RESOURCE_TYPES = ("cpu", "memory", "disk", "io")
 RESOURCE_COUNT = len(RESOURCE_TYPES)
 
+# Default units: vCPU cores, GiB memory, GiB disk capacity, MiB/s storage I/O.
 DEFAULT_BASE_CAPACITY = {
-    "cpu": 10,
-    "memory": 20,
-    "disk": 50,
-    "io": 15,
+    "cpu": 16,
+    "memory": 64,
+    "disk": 1000,
+    "io": 1000,
 }
 DEFAULT_BASE_DEMAND = {
     "cpu": 4,
-    "memory": 8,
-    "disk": 20,
-    "io": 6,
+    "memory": 16,
+    "disk": 250,
+    "io": 250,
 }
 
 ResourceValues = Mapping[str, int] | Sequence[int] | np.ndarray
@@ -299,10 +300,13 @@ def generate_random_instance(
     Parameters
     ----------
     K, M, J, T: dimensionality of resources, machines, jobs, and time slots. K must be 4.
-    base_capacity: per-resource base capacities for CPU, memory, disk, and I/O. Accepts
-        a mapping keyed by {"cpu", "memory", "disk", "io"} or a length-4 sequence.
-    base_demand: per-resource base demands for CPU, memory, disk, and I/O. Accepts
-        a mapping keyed by {"cpu", "memory", "disk", "io"} or a length-4 sequence.
+    base_capacity: per-resource base capacities for CPU, memory, disk, and I/O. The
+        default units are vCPU cores, GiB memory, GiB disk capacity, and MiB/s storage
+        throughput. Accepts a mapping keyed by {"cpu", "memory", "disk", "io"} or a
+        length-4 sequence.
+    base_demand: per-resource base demands for CPU, memory, disk, and I/O, using the
+        same units as ``base_capacity``. Accepts a mapping keyed by
+        {"cpu", "memory", "disk", "io"} or a length-4 sequence.
     specialization_multiplier: low/high integer multiplier applied to a primary resource when
         a job or machine is specialized.
     capacity_jitter: multiplicative jitter range applied to base capacities.

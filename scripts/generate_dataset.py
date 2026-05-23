@@ -45,56 +45,56 @@ def parse_args():
         dest="base_capacity_cpu",
         type=int,
         default=DEFAULT_BASE_CAPACITY["cpu"],
-        help="Base CPU capacity value.",
+        help="Base CPU capacity in vCPU cores.",
     )
     parser.add_argument(
         "--base-capacity-memory",
         dest="base_capacity_memory",
         type=int,
         default=DEFAULT_BASE_CAPACITY["memory"],
-        help="Base memory capacity value.",
+        help="Base memory capacity in GiB.",
     )
     parser.add_argument(
         "--base-capacity-disk",
         dest="base_capacity_disk",
         type=int,
         default=DEFAULT_BASE_CAPACITY["disk"],
-        help="Base disk capacity value.",
+        help="Base disk capacity in GiB.",
     )
     parser.add_argument(
         "--base-capacity-io",
         dest="base_capacity_io",
         type=int,
         default=DEFAULT_BASE_CAPACITY["io"],
-        help="Base I/O capacity value.",
+        help="Base storage I/O capacity in MiB/s.",
     )
     parser.add_argument(
         "--base-demand-cpu",
         dest="base_demand_cpu",
         type=int,
         default=DEFAULT_BASE_DEMAND["cpu"],
-        help="Base CPU demand value.",
+        help="Base CPU demand in vCPU cores.",
     )
     parser.add_argument(
         "--base-demand-memory",
         dest="base_demand_memory",
         type=int,
         default=DEFAULT_BASE_DEMAND["memory"],
-        help="Base memory demand value.",
+        help="Base memory demand in GiB.",
     )
     parser.add_argument(
         "--base-demand-disk",
         dest="base_demand_disk",
         type=int,
         default=DEFAULT_BASE_DEMAND["disk"],
-        help="Base disk demand value.",
+        help="Base disk demand in GiB.",
     )
     parser.add_argument(
         "--base-demand-io",
         dest="base_demand_io",
         type=int,
         default=DEFAULT_BASE_DEMAND["io"],
-        help="Base I/O demand value.",
+        help="Base storage I/O demand in MiB/s.",
     )
     parser.add_argument(
         "--J-min",

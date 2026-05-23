@@ -20,14 +20,14 @@ The table below describes each of these parameters.
     table(
       columns: 3,
       [*Parameter*], [*Purpose*], [*Default value*],
-      [$c_0^"cpu"$], [Base CPU capacity value], [$10$],
-      [$c_0^"memory"$], [Base memory capacity value], [$20$],
-      [$c_0^"disk"$], [Base disk capacity value], [$50$],
-      [$c_0^"io"$], [Base I/O capacity value], [$15$],
-      [$d_0^"cpu"$], [Base CPU demand value], [$4$],
-      [$d_0^"memory"$], [Base memory demand value], [$8$],
-      [$d_0^"disk"$], [Base disk demand value], [$20$],
-      [$d_0^"io"$], [Base I/O demand value], [$6$],
+      [$c_0^"cpu"$], [Base CPU capacity value], [$16$ vCPU],
+      [$c_0^"memory"$], [Base memory capacity value], [$64$ GiB],
+      [$c_0^"disk"$], [Base disk capacity value], [$1000$ GiB],
+      [$c_0^"io"$], [Base I/O capacity value], [$1000$ MiB/s],
+      [$d_0^"cpu"$], [Base CPU demand value], [$4$ vCPU],
+      [$d_0^"memory"$], [Base memory demand value], [$16$ GiB],
+      [$d_0^"disk"$], [Base disk demand value], [$250$ GiB],
+      [$d_0^"io"$], [Base I/O demand value], [$250$ MiB/s],
       [$lambda_0$], [Base time-slot job count value], [$12$],
       [$[c_"min",c_"max"]$], [Random machine capacity jitter interval], [$(0.8,1.3)$],
       [$[d_"min",d_"max"]$], [Random job demand jitter interval], [$(0.8,1.2)$],
@@ -62,6 +62,11 @@ These kinds of specialized machine types are commonly found in major public clou
 Each resource type $k$ has its own base machine capacity $c_(0,k)$ and base job demand $d_(0,k)$, collected in the vectors
 $bold(c)_0=(c_0^"cpu", c_0^"memory", c_0^"disk", c_0^"io")$ and
 $bold(d)_0=(d_0^"cpu", d_0^"memory", d_0^"disk", d_0^"io")$.
+The default base capacity vector is $(16, 64, 1000, 1000)$, interpreted as vCPU cores, GiB memory, GiB disk capacity, and MiB/s storage throughput.
+The CPU and memory values correspond to a 16-vCPU, 64-GiB general-purpose cloud instance, matching the 4:1 memory-to-vCPU ratio used by AWS M7i instances @aws_ec2_instance_types.
+The disk and I/O values model a machine with 1 TiB of provisioned block storage and 1000 MiB/s of storage throughput; these values are within the range of general-purpose SSD block storage such as Amazon EBS gp3 volumes @aws_ebs_gp3.
+The default base demand vector is $(4, 16, 250, 250)$ in the same units, so an unspecialized job type represents a medium workload consuming roughly one quarter of the baseline machine in each dimension.
+This keeps the synthetic instances computationally compact while giving the resource dimensions a concrete hardware interpretation.
 Each machine type resource capacity value $C_(k,i)$ is initialized according to the corresponding base capacity $c_(0,k)$.
 Each job type resource demand value $R_(k,j)$ is initialized according to the corresponding base demand $d_(0,k)$.
 Next, a moderate amount of variation is introduced to each element $C_(k,i)$ and $R_(k,j)$ with multiplicative jitter values sampled uniformly from the configurable ranges $[c_"min",c_"max"]$ and $[d_"min",d_"max"]$, respectively.
@@ -531,16 +536,16 @@ The primary-resource values are shown in bold.
 
 $
   C=mat(
-    11, bold(48), bold(24);
-    21, 24, 26;
-    59, 61, 52;
-    15, 22, 16;
+    18, bold(76), bold(38);
+    67, 77, 83;
+    1185, 1211, 1045;
+    1030, 837, 1074;
   ),
   R=mat(
     4, bold(17), bold(8), 5, bold(12);
-    8, 8, 8, 7, 9;
-    19, 17, 19, 21, 21;
-    bold(22), 7, 5, 7, 7;
+    15, 15, 15, 14, 18;
+    235, 206, 241, 268, 266;
+    bold(898), 280, 220, 277, 294;
   )
 $
 
@@ -550,16 +555,16 @@ This is precisely the effect that the primary-resource mechanism is intended to 
 
 $
   C=mat(
-    8, 10, 12;
-    16, 18, 21;
-    58, 42, 49;
-    17, 18, 12;
+    13, 16, 19;
+    52, 57, 67;
+    1155, 842, 986;
+    1147, 1191, 802;
   ),
   R=mat(
     4, 4, 5, 4, 5;
-    8, 8, 7, 8, 8;
-    22, 21, 23, 21, 19;
-    6, 6, 5, 7, 6;
+    16, 16, 13, 16, 17;
+    271, 258, 288, 258, 237;
+    236, 237, 224, 283, 235;
   ) quad
 $
 
