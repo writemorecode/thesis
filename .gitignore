@@ -11,3 +11,4 @@ images/*
 dataset
 *.md
 .DS_Store
+simulator_symlink
