@@ -18,12 +18,13 @@ The paired runtime-ratio $t$-tests show that _BFD_ is significantly slower than 
 The comparison between _BFD_ and _FFDNew_ is much closer.
 On the _Balanced_ dataset, _BFD_ is slightly slower than _FFDNew_.
 On the _Job-heavy_ dataset, _FFDNew_ is instead slightly slower than _BFD_.
-On the _Machine-heavy_ dataset, the null hypothesis is not rejected, meaning that there is no statistically significant execution time difference between _BFD_ and _FFDNew_.
+On the _Machine-heavy_ dataset, _FFDNew_ is also slightly slower than _BFD_, and the runtime-ratio test rejects the null hypothesis.
+The absolute difference is still small.
 
 These results are reasonable given how the algorithms work.
 Both _BFD_ and _FFDNew_ perform more work when selecting placements than the simpler first-fit variants.
 This overhead becomes especially visible when there are more available machine types, because more machine types must be considered when selecting a new machine type for a job.
-This may explain why _BFD_ and _FFDNew_ have nearly identical execution times on the _Machine-heavy_ dataset.
+This may explain why _BFD_ and _FFDNew_ have similar execution times on the _Machine-heavy_ dataset.
 For the _Job-heavy_ dataset, the slightly higher execution time of _FFDNew_ may be explained by the larger number of job types.
 Although _FFDNew_ stops once it finds a suitable open machine, it still uses weighted ordering and slack-based machine-type selection.
 In contrast, _BFD_ may sometimes choose open machines that can store a larger number of jobs of the current job type, thereby reducing the number of placement iterations.

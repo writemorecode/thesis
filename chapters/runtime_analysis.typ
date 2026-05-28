@@ -44,7 +44,8 @@ The tables below summarize the pairwise runtime-ratio tests.
 A mean ratio above $1$ means that _BFD_ was slower on average, and a mean ratio below $1$ means that _BFD_ was faster on average.
 Across the datasets, _BFD_ is consistently and significantly slower than the simpler _FFD_ variants.
 The comparison with _FFDNew_ is much closer.
-_BFD_ is slightly slower on the balanced dataset, slightly faster on the job-heavy dataset, and not significantly different on the machine-heavy dataset.
+_BFD_ is slightly slower on the balanced dataset, and slightly faster on the job-heavy and machine-heavy datasets.
+The runtime-ratio test rejects the null hypothesis for the job-heavy and machine-heavy datasets, while the balanced dataset difference is not statistically significant.
 Because the chart shows that all mean runtimes remain below $100$ milliseconds per instance, these differences are small in absolute terms, but they still help separate algorithms with similar solution quality.
 
 #let runtime_ttest_balanced = compact_runtime_ttest_rows(
