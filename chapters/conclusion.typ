@@ -8,7 +8,7 @@ For the _Balanced_ and _Machine-heavy_ datasets, the paired ratio $t$-tests did 
 For the _Job-heavy_ dataset, the test did find a statistically significant difference, but the mean ratio was close to $1$.
 These two algorithms greatly outperformed the other evaluated algorithms.
 We concluded that these two algorithms used a larger number of machines than the others.
-We also concluded that the best performing algorithm yielded lower cost solutions for problem instances with a greater number of available machine types.
+We also observed that _BFD_ had lower average solution cost on the _Machine-heavy_ dataset than on the _Balanced_ dataset, but the corresponding cross-dataset test was inconclusive.
 For our first research question (RQ1), we have found that we can construct efficient scheduling algorithms by adapting traditional packing heuristics such as _FFD_ and _BFD_.
 Regarding our second research question (RQ2), we concluded after evaluation that the _BFD_ and _FFDNew_ algorithms had execution times longer than all other algorithms.
 For the _Balanced_ dataset, _BFD_ was slightly slower than _FFDNew_.
@@ -54,7 +54,6 @@ This primitive cost-model could be expanded to support e.g. time-dependent energ
 
 Finally, a future study could take a more theoretical approach and attempt to find provable bounds for the _BFD_ and _FFDNew_ algorithms, and compare these to the bounds on the existing _BFD_ and _FFD_ algorithms.
 Such a study could also work on finding worst-case problem instances for these algorithms.
-
 
 
 
