@@ -52,7 +52,7 @@ The reason for this is that multiple algorithms can be tied for certain problem 
 ]
 
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
-Using the paired ratio $t$-test on raw total cost ratios, we fail to reject the null hypothesis at $alpha=0.05$ ($p approx 0.170$), and the mean ratio is close to $1$.
+Using the paired ratio $t$-test on raw total cost ratios, we fail to reject the null hypothesis at $alpha=0.05$ ($p approx 0.842$), and the mean ratio is close to $1$.
 
 #let ratio_ttest_balanced = compact_ratio_ttest_rows(
   csv("../evaluation/results/balanced/eval_raw_cost_ratio_ttest_balanced.csv").slice(1),
@@ -152,8 +152,8 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
 ]
 
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
-Using the paired ratio $t$-test on raw total cost ratios, we reject the null hypothesis at $alpha=0.05$ ($p approx 0.0407$).
-The effect is very small since the mean ratio is approximately $1.00044$, meaning that _BFD_ is only slightly more costly than _FFDNew_ on average.
+Using the paired ratio $t$-test on raw total cost ratios, we reject the null hypothesis at $alpha=0.05$ ($p approx 1.07 dot 10^(-5)$).
+The effect is very small since the mean ratio is approximately $1.00071$, meaning that _BFD_ is only slightly more costly than _FFDNew_ on average.
 
 #let ratio_ttest_job_heavy = compact_ratio_ttest_rows(
   csv("../evaluation/results/job_heavy/eval_raw_cost_ratio_ttest_job_heavy.csv").slice(1),
@@ -253,7 +253,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
 ]
 
 The two best algorithms on this dataset are _BFD_ and _FFDNew_.
-Using the paired ratio $t$-test on raw total cost ratios, we fail to reject the null hypothesis at $alpha=0.05$ ($p approx 0.522$), and the mean ratio is close to $1$.
+Using the paired ratio $t$-test on raw total cost ratios, we fail to reject the null hypothesis at $alpha=0.05$ ($p approx 0.259$), and the mean ratio is close to $1$.
 
 #let ratio_ttest_machine_heavy = compact_ratio_ttest_rows(
   csv("../evaluation/results/machine_heavy/eval_raw_cost_ratio_ttest_machine_heavy.csv").slice(
