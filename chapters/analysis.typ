@@ -38,8 +38,8 @@ It is likely that more efficient implementations would have yielded different re
 Let us now consider the evaluation results of the _BFD_ and _FFDNew_ algorithms.
 The two algorithms have nearly identical average costs on each of the datasets.
 For the _Balanced_ and _Machine-heavy_ datasets, the paired ratio $t$-tests on raw total cost ratios fail to reject the null hypothesis at $alpha=0.05$.
-For the _Job-heavy_ dataset, the paired ratio $t$-test rejects the null hypothesis ($p approx 0.0407$), but the effect size is very small.
-The mean _BFD_ / _FFDNew_ cost ratio is approximately $1.00044$.
+For the _Job-heavy_ dataset, the paired ratio $t$-test rejects the null hypothesis ($p approx 1.07 dot 10^(-5)$), but the effect size is very small.
+The mean _BFD_ / _FFDNew_ cost ratio is approximately $1.00071$.
 This means that _FFDNew_ is slightly cheaper on average in the job-heavy dataset, while the two algorithms remain practically almost identical.
 
 The pairwise ratio $t$-tests comparing _BFD_ to the remaining algorithms (excluding _FFDNew_) are all decisive.
@@ -50,9 +50,9 @@ We find that the two algorithms with the lowest solution costs, _BFD_ and _FFDNe
 We have run paired ratio $t$-tests ($alpha=0.05$) between the total machine counts for the _BFD_ and _FFDMax_ algorithms.
 This comparison was chosen because _BFD_ is one of the best cost-oriented algorithms, while _FFDMax_ tends to use fewer machines.
 The null hypothesis was rejected for all three datasets.
-For the _Balanced_ dataset, the mean machine-count ratio is $1.323$ (_BFD_ / _FFDMax_), with $p=6.702 dot 10^(-23)$.
-For the _Job-heavy_ dataset, the mean machine-count ratio is $1.376$, with $p=1.34 dot 10^(-29)$.
-For the _Machine-heavy_ dataset, the mean machine-count ratio is $1.245$, with $p=3.065 dot 10^(-15)$.
+For the _Balanced_ dataset, the mean machine-count ratio is $1.3325$ (_BFD_ / _FFDMax_), with $p=1.79102 dot 10^(-19)$.
+For the _Job-heavy_ dataset, the mean machine-count ratio is $1.5986$, with $p=7.7149 dot 10^(-44)$.
+For the _Machine-heavy_ dataset, the mean machine-count ratio is $1.3189$, with $p=4.619 dot 10^(-18)$.
 These results indicate that the _BFD_ algorithm consistently activates more machines than the _FFDMax_ algorithm, even while achieving lower total solution cost.
 This supports the interpretation that lower cost in our setting does not imply fewer active machines, but instead a more cost-efficient allocation across machine types over time.
 
