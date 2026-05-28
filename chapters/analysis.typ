@@ -60,10 +60,8 @@ We also observe a dataset-level shift in absolute cost scale.
 This is consistent with the dataset definitions.
 The _Machine-heavy_ dataset has twice as many machine types as the other two datasets.
 A greater number of available machine types can, but is not guaranteed to, increase packing flexibility and reduce unused capacity.
-Using paired one-tailed cross-dataset $t$-tests for the _BFD_ algorithm on per-instance raw total costs, we find support for our hypothesis.
-For _Machine-heavy_ $<$ _Balanced_, the test rejects the null hypothesis at $alpha=0.05$ ($t=-2.279$, $p=0.01242$), with mean costs of $6983$ vs $8134$ and mean paired difference $-1151$.
-This supports the claim that the machine-heavy dataset yields lower _BFD_ cost.
-Thus, with the current data, our directional hypothesis is supported.
+We ran a paired one-tailed cross-dataset $t$-test for the _BFD_ algorithm on per-instance raw total costs.
+For the test for _Machine-heavy_ $<$ _Balanced_, the test does not reject the null hypothesis at $alpha=0.05$ ($p=0.0527$), with mean costs of $93,311.47$ (machine-heavy) vs $104,938.47$ (balanced) and mean paired cost difference $-11,627$.
 
 We note that the Dolan-Moré performance profiles are generally consistent across all datasets.
 The _BFD_ and _FFDNew_ algorithms are dominant over all other algorithms.
