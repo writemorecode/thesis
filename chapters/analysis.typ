@@ -31,7 +31,7 @@ This could offset the cost of searching over open machines.
 
 For RQ2, these results suggest that optimizing for both scheduling quality and execution time does not require choosing the absolutely fastest heuristic.
 The earlier cost analysis identified _BFD_ and _FFDNew_ as the strongest quality-oriented choices, and the present runtime results show that their overhead is still small in absolute terms.
-All average runtimes remain below 100 milliseconds per instance.
+All average runtimes remain below 110 milliseconds per instance.
 It shall be noted that the algorithms were not implemented with performance in mind.
 It is likely that more efficient implementations would have yielded different results.
 
@@ -67,9 +67,9 @@ But since the $t$-test was not conclusive, we can not draw any stronger conclusi
 
 We note that the Dolan-Moré performance profiles are generally consistent across all datasets.
 The _BFD_ and _FFDNew_ algorithms are dominant over all other algorithms.
-These two algorithms are tied on between $80\%$ and $86\%$ of problem instances, for the _Balanced_ and _Machine-heavy_ datasets.
+These two algorithms are tied on $64\%$ and $72\%$ of problem instances, for the _Balanced_ and _Machine-heavy_ datasets respectively.
 For the _Job-heavy_ dataset, there are some notable differences.
-Here, the two algorithms are tied on only $43%$ of problem instances.
+Here, the two algorithms are tied on only $11\%$ of problem instances.
 
 == Discussion <discussion_section>
 
@@ -104,14 +104,14 @@ We mitigate this threat by code-reviewing new implementations before evaluation 
 In @analysis_section we identified two empirical patterns that are consistent with the expected scheduler algorithm behavior.
 First, the best-performing algorithms with the lowest average solution costs used more machines on average than weaker algorithms.
 This indicates that lower solution costs are achieved through better job-machine placements rather than using fewer active machines.
-Second, solution costs were lower for datasets with a larger number of available machine types.
-This is as expected given the problem instance generation algorithms which were described in @problem_instance_generation.
+Second, average solution costs were lower for the _Machine-heavy_ dataset than for the _Balanced_ dataset, although the corresponding cross-dataset $t$-test was inconclusive.
+This is directionally consistent with what we would expect given the problem instance generation algorithms which were described in @problem_instance_generation.
 If there is a higher number of available machine types then for each job type with a primary resource there is a higher probability for there to exist more machine types with a matching primary resource.
 In other words, for datasets with more machine types, there may be a higher maximum number of feasible job-machine placements.
 It is therefore possible for these datasets to have certain less expensive job-machine placements which do not exist in other datasets with fewer machine types.
 
-This was consistent with increased packing flexibility.
-These patterns provide support for, but not proof of, the validity of our results.
+This average cost difference is consistent with increased packing flexibility, but the inconclusive statistical test means that it should be interpreted cautiously.
+Together, these patterns provide support for, but not proof of, the validity of our results.
 
 Finally, we mention a few things regarding algorithm execution time analysis.
 Since the execution time for algorithm for each problem instance was measured only once, the measurements may have been affected by noise from the machine on which they were collected.
