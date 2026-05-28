@@ -3,7 +3,9 @@
 == Conclusion
 
 In this report, we have studied a job scheduling problem, presenting and evaluating a number of algorithms for solving it.
-We found the solution cost difference between the _BFD_ and _FFDNew_ algorithms to be statistically insignificant.
+We found the solution cost difference between the _BFD_ and _FFDNew_ algorithms to be practically very small.
+For the _Balanced_ and _Machine-heavy_ datasets, the paired ratio $t$-tests did not find a statistically significant solution cost difference between these two algorithms.
+For the _Job-heavy_ dataset, the test did find a statistically significant difference, but the mean ratio was close to $1$.
 These two algorithms greatly outperformed the other evaluated algorithms.
 We concluded that these two algorithms used a larger number of machines than the others.
 We also concluded that the best performing algorithm yielded lower cost solutions for problem instances with a greater number of available machine types.
@@ -34,7 +36,7 @@ Such a problem could be to, for example, minimize both the total cost of ownersh
 It could also be interesting to attempt to minimize the number of different machine types used.
 
 One of the main results of this study was the similarity between the _BFD_ and _FFDNew_ algorithms.
-We found that these two algorithms did not have a statistically significant solution cost difference.
+Although the _Job-heavy_ dataset showed a statistically significant solution cost difference, the observed difference was very small.
 A future study could attempt to determine the characteristics of the problem instances which cause the performance of these algorithms to diverge.
 
 In this study, we have only evaluated our algorithms on synthetic randomly-generated problem instances.
@@ -52,7 +54,6 @@ This primitive cost-model could be expanded to support e.g. time-dependent energ
 
 Finally, a future study could take a more theoretical approach and attempt to find provable bounds for the _BFD_ and _FFDNew_ algorithms, and compare these to the bounds on the existing _BFD_ and _FFD_ algorithms.
 Such a study could also work on finding worst-case problem instances for these algorithms.
-
 
 
 
