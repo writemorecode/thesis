@@ -2,9 +2,12 @@
 
 We measured the execution time for each algorithm on each problem instance of each dataset.
 We analyzed execution time in the same way as solution cost.
-Within each dataset, we compared _BFD_ against each other algorithm using paired two-tailed $t$-tests at $alpha = 0.05$.
-For each matched problem instance $i$, the tested value was the runtime ratio
-$ r_i = "runtime"_("BFD", i) / "runtime"_("other", i) $.
+Within each dataset, we compared the _BFD_ algorithm against each other algorithm using paired two-tailed $t$-tests at $alpha = 0.05$.
+For each dataset $D$ and matched problem instance $i$, the tested value was the execution time ratio
+
+$ r_(D, i) = t_("BFD", D, i) / t_(A, D, i) $
+
+where $t_(A,D,i)$ was the execution time for algorithm $A$ on problem instance $i$ of dataset $D$.
 The null hypothesis $cal(H_0)$ was that there was no statistically significant difference in execution time between _BFD_ and the compared algorithm, expressed as $mu_r = 1$.
 Each test used the $N = 100$ per-instance runtime observations from one dataset.
 
