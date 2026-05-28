@@ -91,7 +91,7 @@ The key validity condition is that algorithms are evaluated on independently gen
 Each problem instance in each dataset was generated with a single fixed seed value.
 This is relevant because fixed seeds improve reproducibility, but different seeds could still produce different outcomes.
 We mitigate this by evaluating on three separate datasets with $100$ problem instances each.
-We also note that our conclusions are consistent across all three datasets, which reduces, but does not eliminate, seed value sensitivity as a threat.
+We also note that the main cost-ranking pattern is consistent across all three datasets, which reduces, but does not eliminate, seed value sensitivity as a threat.
 
 The algorithm evaluation workflow includes multiple error-prone steps.
 Evaluating each algorithm on each problem instance of each dataset, recording per-instance solution data, computing statistical tests and performance profiles, and generating per-dataset summaries.
