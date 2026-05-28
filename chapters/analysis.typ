@@ -55,7 +55,8 @@ For the _Balanced_ dataset, the mean machine-count ratio is $1.3325$ (_BFD_ / _F
 For the _Job-heavy_ dataset, the mean machine-count ratio is $1.5986$, with $p=7.7149 dot 10^(-44)$.
 For the _Machine-heavy_ dataset, the mean machine-count ratio is $1.3189$, with $p=4.619 dot 10^(-18)$.
 These results indicate that the _BFD_ algorithm consistently activates more machines than the _FFDMax_ algorithm, even while achieving lower total solution cost.
-This supports the interpretation that lower cost in our setting does not imply fewer active machines, but instead a more cost-efficient allocation across machine types over time.
+This supports the interpretation that lower cost in our setting does not imply fewer active machines.
+It is also consistent with _BFD_ finding a more cost-efficient choice of machine types over time, although the aggregate machine-count data does not by itself prove the detailed allocation mechanism.
 
 We also observe a dataset-level shift in absolute cost scale.
 This is consistent with the dataset definitions.
@@ -104,7 +105,7 @@ We mitigate this threat by code-reviewing new implementations before evaluation 
 
 In @analysis_section we identified two empirical patterns that are consistent with the expected scheduler algorithm behavior.
 First, the best-performing algorithms with the lowest average solution costs used more machines on average than weaker algorithms.
-This indicates that lower solution costs are achieved through better job-machine placements rather than using fewer active machines.
+This indicates that lower solution costs are not achieved by simply using fewer active machines.
 Second, average solution costs were lower for the _Machine-heavy_ dataset than for the _Balanced_ dataset, although the corresponding cross-dataset $t$-test was inconclusive.
 This is directionally consistent with what we would expect given the problem instance generation algorithms which were described in @problem_instance_generation.
 If there is a higher number of available machine types then for each job type with a primary resource there is a higher probability for there to exist more machine types with a matching primary resource.
