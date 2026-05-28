@@ -30,7 +30,7 @@ Although _FFDNew_ stops once it finds a suitable open machine, it still uses wei
 In contrast, _BFD_ may sometimes choose open machines that can store a larger number of jobs of the current job type, thereby reducing the number of placement iterations.
 This could offset the cost of searching over open machines.
 
-For RQ2, these results suggest that optimizing for both scheduling quality and execution time does not require choosing the absolutely fastest heuristic.
+For RQ2, these results suggest that, for the evaluated datasets and implementation, optimizing for both scheduling quality and execution time does not require choosing the absolutely fastest heuristic.
 The earlier cost analysis identified _BFD_ and _FFDNew_ as the strongest quality-oriented choices, and the present runtime results show that their overhead is still small in absolute terms.
 All average runtimes remain below 110 milliseconds per instance.
 It shall be noted that the algorithms were not implemented with performance in mind.

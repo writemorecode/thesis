@@ -16,7 +16,7 @@ For the _Balanced_ dataset, _BFD_ was slightly slower than _FFDNew_.
 For the _Job-heavy_ dataset, _FFDNew_ was slightly slower than _BFD_.
 For the _Machine-heavy_ dataset, _FFDNew_ was also slightly slower than _BFD_, and the runtime-ratio test rejected the null hypothesis.
 The differences in execution time were only on the order of milliseconds to tens of milliseconds, and all average execution times remained below $100$ milliseconds per problem instance.
-This suggests that a trade-off between solution quality and execution time is not required for the algorithms we have evaluated and presented.
+Within the evaluated datasets and implementation, this suggests that selecting the strongest cost-oriented algorithms does not require a practically large execution-time penalty.
 
 == Future Work
 In this report, we have studied an offline job scheduling problem where the given load profile data $bold(L)$ is deterministic.
@@ -55,6 +55,5 @@ This primitive cost-model could be expanded to support e.g. time-dependent energ
 
 Finally, a future study could take a more theoretical approach and attempt to find provable bounds for the _BFD_ and _FFDNew_ algorithms, and compare these to the bounds on the existing _BFD_ and _FFD_ algorithms.
 Such a study could also work on finding worst-case problem instances for these algorithms.
-
 
 
