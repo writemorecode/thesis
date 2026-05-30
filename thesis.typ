@@ -256,15 +256,14 @@ Faculty of #faculty, Blekinge Institute of Technology, 371 79 Karlskrona, Sweden
 
 #v(1cm)
 #par(first-line-indent: 0pt)[
-  *Nyckelord:*
+  *Nyckelord:* jobbschemaläggning, cloud computing, gröna moln, låd-packing
 ]
 
 #cleardoublepage()
 
 // ACKNOWLEDGEMENTS
 #front-heading("Acknowledgments")
-// #todo[Add acknowledgments.]
-//To my parents.
+I want to thank my excellent supervisor Lars Lundberg, as well as my parents.
 
 #cleardoublepage()
 
