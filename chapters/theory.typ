@@ -132,12 +132,26 @@ In order to do this, we must first define how items and bins shall be sorted.
 
 Much research has been done on finding tight bounds for approximation algorithms for bin-packing.
 Due to this, we shall only discuss the latest results.
-By _bounds_, we mean the ratio between the number of bins used by the approximation algorithms, and the optimal number of bins possible for the input.
+By bounds, we mean the ratio between the number of bins used by the approximation algorithms, and the optimal number of bins possible for the input.
+For some given problem $L$, we denote by $A(L)$ the maximum number of bins required by algorithm $A$ for the problem.
+By $"OPT"$ we denote the theoretical optimal bin-packing algorithm.
 
-In 2013, Dósa and Sgall @dosa_sgall_2013_ff_bounds showed new bounds for First-Fit: $"FF"(L) <= floor(1.7 "OPT"(L))$.
+We shall now present a few important theoretical bounds for bin-packing algorithms.
+In 2007, Dósa @dosa_2007_ffd_bounds showed new bounds for First-Fit-Decreasing:
+$
+  "FFD"(L) ≤ 11/9 "OPT"(L) + 6/9.
+$
+
+In 2013, Dósa and Sgall @dosa_sgall_2013_ff_bounds showed new bounds for First-Fit:
+
+$
+  "FF"(L) <= floor(1.7 "OPT"(L)).
+$
+
 This means that if the optimal number of required bins for the input $L$ is $"OPT"(L)$, then the First-Fit algorithm uses at most $floor(1.7 "OPT"(L))$ bins.
 
-In 2007, Dósa @dosa_2007_ffd_bounds showed new bounds for First-Fit-Decreasing: $"FFD"(L) ≤ 11/9 "OPT"(L) + 6/9$.
-In 2014, Dósa and Sgall @dosa_sgall_2014_bounds_bf showed that the same absolute bound as for First-Fit also holds for Best-Fit: $"BF"(L) <= floor(1.7 "OPT"(L))$.
+In 2014, Dósa and Sgall @dosa_sgall_2014_bounds_bf showed that the same absolute bound for First-Fit also holds for Best-Fit:
+$
+  "BF"(L) <= floor(1.7 "OPT"(L)).
+$
 
-In David Johnson's 1973 Ph.D. thesis @johnson_1973_phd, the bounds $"NF"(L) <= 2 "OPT"(L) - 1$ and $"WF"(L) <= 2 "OPT"(L) - 1$ for the Next-Fit and Worst-Fit algorithms were presented.
