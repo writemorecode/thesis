@@ -89,7 +89,7 @@ The solutions given by the simplified optimization problem above are not guarant
 In reality, jobs must be _packed_ into machines.
 For each time slot and for each machine type, the sum of the resource requirements for all jobs allocated to the machine type must not exceed its resource capacities.
 This is a form of _bin-packing_, in which the machine types are the bins, and the job types are the objects which must be placed in the bins.
-Specifically, is is a _multi-dimensional heterogeneous bin-packing_ problem.
+Specifically, it is a _multi-dimensional heterogeneous bin-packing_ problem.
 The problem is _multi-dimensional_ since the jobs have multiple dimensions in the form of resource requirements.
 The problem is _heterogeneous_ since the bins have different resource capacities.
 
