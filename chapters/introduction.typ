@@ -82,9 +82,9 @@ Finally, we evaluate multiple scheduling algorithms and discuss their strengths 
 The thesis is structured as follows.
 In @theory_section, we present theory related to bin-packing and relevant generalizations.
 In @problem_description_section, we formalize the offline job scheduling problem and introduce the mathematical model.
-In @method_section, we describe the evaluated scheduling algorithms.
 In @chp-relatedwork we discuss previous related work on the subject.
-In @exp_method_section, we describe the experimental methodology and dataset generation.
+In @method_section, we describe our method.
+This includes our research questions in @rq_section, a description of our evaluated scheduling algorithms in @algos_section, and a description of our experimental methodology in @exp_method_section.
 In @results_section, we present the evaluation results.
 In @analysis_section, we analyze and discuss our results.
 In, @discussion_section we discuss threats to validity.

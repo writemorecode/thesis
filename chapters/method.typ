@@ -8,7 +8,7 @@
 
 This chapter summarizes our research questions and the scheduling algorithms that are evaluated.
 
-== Research questions
+== Research questions <rq_section>
 
 With this research, we aim to answer the following research questions:
 
@@ -16,7 +16,7 @@ RQ1: How can we create a cost-efficient algorithm for offline multi-resource clo
 
 RQ2: How can we create a procurement planner and cloud job scheduler which is optimized for both scheduling quality and execution time?
 
-== Algorithms
+== Algorithms <algos_section>
 
 In this chapter, we will use the terms item and job interchangeably.
 The same goes for the terms bin and machine.
