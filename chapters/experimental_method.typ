@@ -39,7 +39,10 @@ The table below describes each of these parameters.
       [$rho^"slot"$], [Time slot specialization ratio], [$0.6$],
       [$eta^"machine"$], [Machine-job primary resource correlation factor], [$0.7$],
       [$eta^"slot"$], [Time slot-job primary resource correlation factor], [$0.7$],
-      [$bold(alpha)$], [Resource-cost weight vector], [Sampled iid from $U([0,1))$],
+      [$bold(alpha)$],
+      [Resource-cost weight vector],
+      [Sampled i.i.d. #footnote[Independent and identically distributed] from $U([0,1))$],
+
       [$gamma$], [Running-cost factor], [$0.10$],
     ),
     caption: [Table of parameters used for problem instance generation],
@@ -64,7 +67,8 @@ $bold(c)_0=(c_0^"cpu", c_0^"memory", c_0^"disk", c_0^"io")$ and
 $bold(d)_0=(d_0^"cpu", d_0^"memory", d_0^"disk", d_0^"io")$.
 The default base capacity vector is $(16, 64, 1000, 1000)$, interpreted as vCPU cores, GiB memory, GiB disk capacity, and MiB/s storage throughput.
 The CPU and memory values correspond to a 16-vCPU, 64-GiB general-purpose cloud instance, matching the 4:1 memory-to-vCPU ratio used by AWS M7i instances @aws_ec2_instance_types.
-The disk and I/O values model a machine with 1 TiB of provisioned block storage and 1000 MiB/s of storage throughput; these values are within the range of general-purpose SSD block storage such as Amazon EBS gp3 volumes @aws_ebs_gp3.
+The disk and I/O values model a machine with 1 TiB of provisioned block storage and 1000 MiB/s of storage throughput.
+These values are within the range of general-purpose SSD block storage such as Amazon EBS gp3 volumes @aws_ebs_gp3.
 The default base demand vector is $(4, 16, 250, 250)$ in the same units, so an unspecialized job type represents a medium workload consuming roughly one quarter of the baseline machine in each dimension.
 This keeps the synthetic instances computationally compact while giving the resource dimensions a concrete hardware interpretation.
 Each machine type resource capacity value $C_(k,i)$ is initialized according to the corresponding base capacity $c_(0,k)$.
@@ -73,9 +77,14 @@ Next, a moderate amount of variation is introduced to each element $C_(k,i)$ and
 This gives every machine type and job type a common baseline while still allowing them to differ slightly already before any specialization is introduced.
 The generator keeps these values as real numbers during the specialization step, and rounds them to the nearest integer only afterwards.
 
+Here, $G$ is a deterministic pseudo-random number generator.
+This random number generator is initialized with a fixed seed value.
+When $G$ is used for sampling from a set, e.g. for $x arrow.l U([a,b];G)$, this denotes that we are sampling uniformly from the set $[a,b]$ using the random number generator $G$.
+This makes all random number generation deterministic.
 $
-  C_(k,i) arrow.l c_(0,k) U([c_"min", c_"max"]), quad
-  R_(k,j) arrow.l d_(0,k) U([d_"min", d_"max"]), quad forall i in cal(M), j in cal(J), k in cal(K).
+  C_(k,i) arrow.l c_(0,k) U([c_"min", c_"max"];G), quad \
+  R_(k,j) arrow.l d_(0,k) U([d_"min", d_"max"];G), quad \
+  forall i in cal(M), j in cal(J), k in cal(K).
 $
 
 At this stage, however, the resulting matrices are still relatively close to uniform.
@@ -116,6 +125,7 @@ By adjusting the probabilities of $bold(q)$, we can instead make some resource t
             $n$,
             $rho$,
             $bold(q)$,
+            $G$,
           ),
           {
             Assign($s$, $"Round"(n rho)$)
@@ -144,9 +154,10 @@ Next, we use the resulting job-type assignments to construct the probability vec
 Let $bold(1)_K$ be the $K$-dimensional ones vector.
 Let $bold(h)$ be the histogram vector of the elements of $bold(p)^"job"$.
 The element $h_k$ of the histogram vector $bold(h)$ is the number of job types assigned resource $k$ as their primary resource.
+Let $overline(h) = sum_(k=1)^K h_k$ be the sum of the elements of histogram $bold(h)$.
 If at least one job type has been assigned a primary resource, then we normalize this histogram to
-$bold(q)^"job" = bold(h) / (sum_(k=1)^K h_k$).
-Otherwise, we fall back to the uniform vector $bold(1)_K / K$.
+$bold(q)^"job" = bold(h) \/ overline(h)$.
+Otherwise, we fall back to the uniform vector $bold(1)_K \/ K$.
 The machine-type probability vector is defined as the weighted vector sum
 
 $
@@ -154,7 +165,7 @@ $
 $
 
 This construction already yields a valid probability distribution, so
-$ sum_(k=1)^K q^"machine"_k = 1, quad bold(q)^"machine" in [0,1]^K $.
+$ sum_(k=1)^K q^"machine"_k = 1, quad bold(q)^"machine" in [0,1]^K. $
 
 Here, $eta^"machine" in [0,1]$ is a configurable correlation parameter.
 For larger values of $eta^"machine"$, the machine-type primary resources become more similar to the sampled job-type primary resources, while smaller values keep the machine types closer to a uniform mix.
@@ -165,7 +176,7 @@ The blend with the uniform vector preserves randomness and prevents the generate
 ==== Step 4: Generate machine and job types
 
 Once the primary resources have been assigned, they are converted into concrete capacities and demands.
-Let $u ~ "UniformInteger"([u_"min", u_"max"])$.
+Let $u ~ "UniformInteger"([u_"min", u_"max"];G)$.
 For each machine type $i$, if the machine type has been assigned primary resource $k^*$, then we multiply $C_(k^*,i)$ by $u$.
 For each job type $j$, if the job type has been assigned primary resource $k^*$, then we multiply $R_(k^*,j)$ by $u$.
 Note that $u$ is re-sampled for each amplified entry.
@@ -284,7 +295,7 @@ The generation of the machine types is handled by @alg_machine_types.
                   $p^"job"_j>=0 "and" A != emptyset$,
                   {
                     LineComment(
-                      Assign($i$, $"Uniform"(A)$),
+                      Assign($i$, $"Uniform"(A; G)$),
                       "Sample machine type with matching primary resource",
                     )
                   },
@@ -336,7 +347,7 @@ The primary resources for the time slots are then sampled from this distribution
 Thus, if a particular resource type is common among the job types, then some time slots also become more likely to emphasize jobs associated with that resource type.
 
 For each time slot $t$, let $N_t$ be the total number of jobs in the slot.
-The value $N_t$ is initialized from the base load $lambda_0$ and then multiplied by a jitter value $u$ sampled uniformly from the configurable interval $[lambda_"min", lambda_"max")$, after which it is rounded to the nearest integer and clamped to a value $>=1$.
+The value $N_t$ is initialized from the base load $lambda_0$ and then multiplied by a jitter value $u$ sampled uniformly from the configurable interval $[lambda_"min", lambda_"max"]$, after which it is rounded to the nearest integer and clamped to a value $>=1$.
 Next, we sample a $J$-dimensional job-type weight vector $bold(w)$ from the interval $[0.5,1)$.
 If time slot $t$ has primary resource $k^*$, then we compute the set $A$ of job types whose primary resource is also $k^*$.
 For these matching job types, we sample a positive integer $v$ from the configurable interval $[v_"min", v_"max"]$ and multiply the corresponding weights $w_j$ by $v$.
@@ -387,7 +398,7 @@ It therefore creates job-type concentration in time slots without removing the r
         Assign($p^"slot"$, $"ChoosePrimaryResources"(T, rho^"slot", bold(q)^"slot", G)$)
         Assign($L_(j,t)$, $0$)
         For($t in cal(T)$, {
-          LineComment(Assign($u$, $"Uniform"([lambda_"min", lambda_"max"); G)$), "Sample jitter value")
+          LineComment(Assign($u$, $"Uniform"([lambda_"min", lambda_"max"]; G)$), "Sample jitter value")
           LineComment(Assign($N_t$, $max(1, "Round"(lambda_0 u))$), "Multiply base load by jitter, round, clip")
 
           LineComment(Assign($bold(w)$, $"UniformVector"([0.5, 1), J ; G)$), "Sample job type weight vector")
@@ -616,11 +627,11 @@ The number of resource types is fixed to $K=4$ (CPU, memory, disk, I/O).
 
 We evaluate the algorithms on three different datasets.
 For evaluation, we developed a simulator in Python using the NumPy library @python_simulator_repo_github.
-We used Python version 3.14 and Numpy version 2.4.1.
-All algorithm evaluations were ran sequentially.
-The execution time of each algorithm on each problem instance was measured only once with no warm-up period
+We used Python version 3.14 and NumPy version 2.4.1.
+All algorithm evaluations were run sequentially.
+The execution time of each algorithm on each problem instance was measured only once with no warm-up period.
 Execution times were measured using the Python standard library method `time.monotonic()` @python_time_monotonic.
-All algorithm evaluations were ran on a 2020 MacBook Pro M1 running macOS Sequoia 15.6.1.
+All algorithm evaluations were run on a 2020 MacBook Pro M1 running macOS Sequoia 15.6.1.
 Each dataset was generated using the NumPy deterministic pseudorandom number generator @numpy_default_rng, using the fixed seed value $5000$.
 Each dataset contains 100 randomly generated problem instances.
 Except for the dimension intervals $I_J$, $I_M$, and $I_T$, all other problem-instance generation parameters were kept at the default values from @dataset_parameter_table.
