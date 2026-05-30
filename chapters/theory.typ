@@ -13,13 +13,15 @@ Throughout this thesis, for a positive integer $n$, let $cal(n) = {1,dots.h,n}$ 
 === One-dimensional bin-packing problem
 
 The book _Computers and Intractability_ @book_computers_intractability gives the following definition of the bin-packing problem.
-Given a finite set $U={u_1,dots.h,u_n}$ of items and a rational item size $s(u)$, where $0 < s(u) <= 1$, for each item $u in U$, find a partition of $U$ into disjoint subsets $U_1,dots.h,U_k$ such that the sum of the size of the items in each $U_i$ is no more than $1$ and such that $k$ is as small as possible.
+We are given a finite set $U={u_1,dots.h,u_n}$ of items where item $u in U$ has item size $s_u$, where $0 < s_u <= c$.
+The problem is to find a partition of $U$ into $k$ disjoint subsets $U_1,dots.h,U_k$ such that the sum of the size of the items in each subset $U_i$ is no more than $c$ and such that $k$ is as small as possible.
+Each subset $U_i$ is as a _bin_, and the elements of $U_i$ are the items in the bin.
 The problem can be formulated as an integer LP problem:
 
 $
     "minimize" & quad sum_(j=1)^n y_j \
   "subject to" & quad sum_(j=1)^n x_(i j) = 1, quad forall i in cal(n) \
-               & quad sum_(i=1)^n s(i) x_(i j) <= c y_j, quad forall j in cal(n) \
+               & quad sum_(i=1)^n s_i x_(i j) <= c y_j, quad forall j in cal(n) \
                & x_(i j) in {0,1}, quad y_j in {0,1} quad forall i,j in cal(n) \
 $
 
@@ -28,23 +30,24 @@ The model uses $n$ candidate bins, since no feasible solution requires more bins
 The capacity of all bins is $c$.
 The variable $y_j$ is equal to 1 if bin $j$ is used, and $0$ otherwise.
 The variable $x_(i j)$ is equal to 1 if item $i$ is placed in bin $j$, and $0$ otherwise.
-As before, the objective is to minimize the number of bins used.
+The objective is to minimize the number of bins used.
 The first constraint ensures that each item $i$ is placed in exactly one bin.
 The second constraint ensures that no bin capacity is exceeded by the items placed in it.
 
 === Multidimensional heterogeneous bin-packing problem
 
-We now consider a more general case, where both items and bins have different sizes and capacities in multiple dimensions.
-Items and bins have $K$ dimensions.
-The size of item $i$ is given by the vector $bold(s)(i) in ZZnonneg^K$.
-The capacity of bin $j$ is given by the vector $bold(c)(j) in ZZnonneg^K$.
+We now consider a more general case of the problem, where both items and bins have different sizes and capacities in multiple dimensions.
+For this case, items and bins both have $K$ dimensions.
+The size of item $i$ is given by the $K$-dimensional vector $bold(s)_i in ZZnonneg^K$.
+The capacity of bin $j$ is given by the $K$-dimensional vector $bold(c)_j in ZZnonneg^K$.
+The set $ZZnonneg^K$ is the set of all $K$-dimensional vectors with non-negative integer elements.
 
 The problem can be formulated as an integer LP problem:
 
 $
     "minimize" & quad sum_(j=1)^m y_j \
   "subject to" & quad sum_(j=1)^m x_(i j) = 1, quad forall i in cal(n) \
-               & quad sum_(i=1)^n bold(s)(i) x_(i j) <= bold(c)(j) y_j, quad forall j in cal(m) \
+               & quad sum_(i=1)^n bold(s)_i x_(i j) <= bold(c)_j y_j, quad forall j in cal(m) \
                & x_(i j) in {0,1}, quad y_j in {0,1} quad forall i in cal(n), j in cal(m) \
 $
 
@@ -81,7 +84,8 @@ If an item does not fit in any open bin, a new bin is opened, and the item is pl
 Here, $m$ is the current number of open bins.
 In the worst case, a new bin must be opened for each of the $n$ items.
 This means that placing the $k$-th item will require $k$ bin size checks.
-This gives the algorithm the time complexity $Omicron (n^2)$.
+This gives this implementation of the algorithm the time complexity $Omicron (n^2)$.
+Better time complexities may be achievable using better implementations.
 
 === (BF) Best fit
 Place each item into the bin with the smallest remaining capacity which is at least as large as the size of item.
@@ -131,10 +135,11 @@ In order to do this, we must first define how items and bins shall be sorted.
 == Algorithmic bounds for bin-packing algorithms
 
 Much research has been done on finding tight bounds for approximation algorithms for bin-packing.
-Due to this, we shall only discuss the latest results.
+Due to this, we shall only discuss some of the latest relevant results.
 By bounds, we mean the ratio between the number of bins used by the approximation algorithms, and the optimal number of bins possible for the input.
-For some given problem $L$, we denote by $A(L)$ the maximum number of bins required by algorithm $A$ for the problem.
-By $"OPT"$ we denote the theoretical optimal bin-packing algorithm.
+For some given problem $L$, we denote by $A(L)$ the number of bins opened by algorithm $A$ for problem $L$.
+By $"OPT"(L)$ we denote the theoretical minimum number of opened bins required for problem $L$.
+Note that these bounds hold only for the classical one-dimensional unit-capacity bin-packing problem.
 
 We shall now present a few important theoretical bounds for bin-packing algorithms.
 In 2007, Dósa @dosa_2007_ffd_bounds showed new bounds for First-Fit-Decreasing:
