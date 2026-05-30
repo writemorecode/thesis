@@ -119,76 +119,10 @@ Here, $r(b)$ is the remaining capacity of bin $b$.
 For the worst case, we must check each of the $m$ open bins for each of the $n$ items.
 This gives the algorithm the time complexity $Omicron (n^2)$.
 
-=== (WF) Worst fit
-A variation of best-fit, where we instead select the bin with the largest remaining capacity @garey_graham_ullman_1972.
-
-#show: style-algorithm
-#algorithm-figure("Worst fit", vstroke: .5pt + luma(200), {
-  import algorithmic: *
-  Procedure(
-    "WorstFit",
-    ("bins", "items"),
-    {
-      For($"object" i = 1,2,...,n$, {
-        Comment($"Let S be the set of open bins which fit object "i$)
-        Assign($S$, ${b | b in "bins" , r(b) >= s(i)}$)
-        IfElseChain(
-          $S = emptyset$,
-          {
-            Comment[Open and place object $i$ in a new bin]
-          },
-          {
-            Comment($"Let bin "j" be the bin which fits object "i" with maximum remaining capacity"$)
-            Assign($j$, $arg max_(b in S) r(b)$)
-            Comment[Place object $i$ in bin $j$]
-          },
-        )
-      })
-    },
-  )
-})
-
-Worst-fit has the same worst-case time complexity as best fit.
-
-=== (NF) Next-fit
-First, open a single bin.
-Let this bin be the current bin.
-Place items into this bin until an item does not fit into the bin.
-When this happens, close this bin, open a new bin, and make the new bin the current bin @garey_graham_ullman_1972.
-
-#show: style-algorithm
-#block(breakable: false, {
-  algorithm-figure("Next fit", vstroke: .5pt + luma(200), {
-    import algorithmic: *
-    Procedure(
-      "NextFit",
-      ("bins", "items"),
-      {
-        Assign([Current bin], [First bin])
-        For($"object" i = 1,2,...,n$, {
-          IfElseChain(
-            $"object "i" fits in current bin"$,
-            {
-              Comment[Place object $i$ in current bin]
-            },
-            {
-              Comment[Open and place object $i$ in a new bin, make this the current bin]
-            },
-          )
-        })
-      },
-    )
-  })
-})
-
-
-Each item only checks the current bin, opening a new bin if needed.
-This gives the algorithm the time complexity $Theta (n)$.
-
 == Offline bin-packing algorithms
 
 For the offline case, we can improve the previous online algorithms by sorting the items in decreasing order.
-This gives us the First-Fit-Decreasing and Next-Fit-Decreasing algorithms @garey_graham_ullman_1972.
+This gives us the First-Fit-Decreasing algorithm @garey_graham_ullman_1972.
 
 We can extend the first-fit decreasing algorithm for multidimensional heterogeneous bin-packing.
 In order to do this, we must first define how items and bins shall be sorted.
