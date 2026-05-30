@@ -52,15 +52,18 @@ Below, we present a table of symbols used by this algorithm.
 #block(breakable: false, [
   #figure(
     table(
-      columns: 2,
-      [*Symbol*], [*Description*],
-      [$B$], [Set of open bins for the current time slot],
-      [$X_(i,t)$], [Number of bins of type $i$ open for time slot $t$],
-      [$eta$], [Number of remaining unpacked items of current type],
-      [$tau_(t,b)$], [Bin type of bin $b$ for time slot $t$],
-      [$Phi_b$], [Slack score for bin $b$],
-      [$y_(t,j,b)$], [Number of items of type $j$ in bin $b$ in time slot $t$],
-      [$Psi_i$], [Slack score for bin type $i$],
+      columns: 4,
+      [*Symbol*], [*Type*], [*Shape*], [*Description*],
+      [$B$], [Set], [-], [Set of open bins for the current time slot],
+      [$X_(i,t)$], [Scalar], [-], [Number of bins of type $i$ open for time slot $t$],
+      [$eta$], [Scalar], [-], [Number of remaining unpacked items of current type],
+      [$tau_(t,b)$], [Scalar], [-], [Bin type of bin $b$ for time slot $t$],
+      [$Phi_b$], [Scalar], [-], [Slack score for bin $b$],
+      [$y_(t,j,b)$], [Scalar], [-], [Number of items of type $j$ in bin $b$ in time slot $t$],
+      [$Psi_i$], [Scalar], [-], [Slack score for bin type $i$],
+      [$bold(alpha)$], [Vector], [$K$], [Value of each resource],
+      [$alpha_k$], [Scalar], [-], [Value of resource $k$],
+      [$gamma$], [Scalar], [-], [Machine type running cost multiplier factor],
     ),
     caption: [Symbol table for BFD and FFDNew algorithms.],
   )
