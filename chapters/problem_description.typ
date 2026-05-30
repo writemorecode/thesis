@@ -162,14 +162,14 @@ $ sum_(k=1)^(abs(S_i)) n_(i,t,k) = z_(t,i), quad forall i in cal(M), t in cal(T)
 We can now state our new optimization problem.
 
 $
-    "minimize" & quad bold(x)^T bold(c^p) + sum_(i=1)^(M) c^r_i sum_(t=1)^(T) sum_(k=1)^(abs(S_i)) n_(i,t,k) \
+  "minimize" & quad bold(x)^T bold(c^p) + sum_(i=1)^(M) c^r_i sum_(t=1)^(T) sum_(k=1)^(abs(S_i)) n_(i,t,k) \
   //=bold(x)^T bold(c^p) + sum_(t=1)^(T) bold(z)_t^T bold(c^r) \
   "subject to" & quad S_i = {bold(y) in ZZnonneg^J | bold(R y) <= bold(m)_i}, quad forall i in cal(M) \
-               & quad bold(Y)_i = mat(bold(y)_(i,1), ..., bold(y)_(i,abs(S_i))) \
-               & quad bold(y)_(i,j) in S_i quad forall i in cal(M), j in cal(abs(S_i)) \
-               & quad sum_(i=1)^M bold(Y)_i bold(n)_(i,t) >= bold(l)_t quad forall t in cal(T) \
-               & quad sum_(k=1)^(abs(S_i)) n_(i,t,k) <= x_i quad forall i in cal(M), t in cal(T) \
-               & quad bold(x) in ZZnonneg^M, quad bold(n)_(i,t) in ZZnonneg^(abs(S_i)) quad forall i in cal(M), t in cal(T)
+  & quad bold(Y)_i = mat(bold(y)_(i,1), ..., bold(y)_(i,abs(S_i))) \
+  & quad bold(y)_(i,j) in S_i quad forall i in cal(M), j in cal(abs(S_i)) \
+  & quad sum_(i=1)^M bold(Y)_i bold(n)_(i,t) >= bold(l)_t quad forall t in cal(T) \
+  & quad sum_(k=1)^(abs(S_i)) n_(i,t,k) <= x_i quad forall i in cal(M), t in cal(T) \
+  & quad bold(x) in ZZnonneg^M, quad bold(n)_(i,t) in ZZnonneg^(abs(S_i)) quad forall i in cal(M), t in cal(T)
 $
 
 == Symbol reference table
