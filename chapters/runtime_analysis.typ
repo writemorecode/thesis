@@ -67,7 +67,7 @@ Because the chart shows that all mean runtimes remain below $100$ milliseconds p
         ..runtime_ttest_balanced.flatten(),
       ),
       caption: [Paired runtime-ratio $t$-tests for the balanced dataset (_BFD_ / other algorithms).],
-    )
+    ) <table_runtime_ttest_balanced>
   ])
 ]
 
@@ -90,7 +90,7 @@ Because the chart shows that all mean runtimes remain below $100$ milliseconds p
         ..runtime_ttest_job_heavy.flatten(),
       ),
       caption: [Paired runtime-ratio $t$-tests for the job-heavy dataset (_BFD_ / other algorithms).],
-    )
+    ) <table_runtime_ttest_job_heavy>
   ])
 ]
 
@@ -113,6 +113,6 @@ Because the chart shows that all mean runtimes remain below $100$ milliseconds p
         ..runtime_ttest_machine_heavy.flatten(),
       ),
       caption: [Paired runtime-ratio $t$-tests for the machine-heavy dataset (_BFD_ / other algorithms).],
-    )
+    ) <table_runtime_ttest_machine_heavy>
   ])
 ]
