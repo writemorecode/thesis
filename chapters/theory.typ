@@ -16,6 +16,12 @@ The book _Computers and Intractability_ @book_computers_intractability gives the
 We are given a finite set $U={u_1,dots.h,u_n}$ of items where item $u in U$ has item size $s_u$, where $0 < s_u <= c$.
 The problem is to find a partition of $U$ into $k$ disjoint subsets $U_1,dots.h,U_k$ such that the sum of the size of the items in each subset $U_i$ is no more than $c$ and such that $k$ is as small as possible.
 Each subset $U_i$ is as a _bin_, and the elements of $U_i$ are the items in the bin.
+
+The bin-packing problem is NP-hard @karp_1972_reducibility @book_computers_intractability.
+Informally, this means that there is no known algorithm that always finds an optimal solution efficiently for every possible input.
+If an efficient general algorithm for an NP-hard optimization problem were found, then it would imply efficient solutions for a large class of other difficult combinatorial problems.
+For this reason, practical work on bin-packing often uses approximation algorithms and heuristics, which aim to find good solutions quickly rather than guaranteeing an optimal solution for every instance.
+
 The problem can be formulated as an integer LP problem:
 
 $
@@ -162,4 +168,3 @@ In 2014, Dósa and Sgall @dosa_sgall_2014_bounds_bf showed that the same absolut
 $
   "BF"(L) <= floor(1.7 "OPT"(L)).
 $
-
