@@ -4,7 +4,7 @@
 // -----------------------------
 // Thesis metadata (edit these)
 // -----------------------------
-#let thesis-degree = "Civilingenjör i datorsäkerhet"
+#let thesis-degree = "Master of Science in Engineering: Computer Security"
 #let thesis-month = "May"
 #let thesis-year = "2026"
 #let faculty = "Computing"
@@ -139,8 +139,12 @@
   columns: (1fr, auto),
   row-gutter: 0.2cm,
   column-gutter: 1cm,
-  [#thesis-degree], [#image(bth-logo, width: 3cm)],
-  [#(thesis-month + " " + thesis-year)], [],
+  [#thesis-degree \
+    #(thesis-month + " " + thesis-year)
+  ],
+  [#image(bth-logo, width: 3cm)],
+
+  [],
 )
 
 #v(7.5cm)
