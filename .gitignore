@@ -9,6 +9,5 @@ images/*
 *.svg
 *.png
 dataset
-*.md
 .DS_Store
 simulator_symlink
