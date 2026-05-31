@@ -11,12 +11,13 @@ On the _Job-heavy_ dataset, the difference to the best remaining algorithm was s
 We concluded that these two algorithms used a larger number of machines than the others.
 We also observed that _BFD_ had lower average solution cost on the _Machine-heavy_ dataset than on the _Balanced_ dataset, but the corresponding cross-dataset test was inconclusive.
 For our first research question (RQ1), we have found that we can construct efficient scheduling algorithms by adapting traditional packing heuristics such as _FFD_ and _BFD_.
-Regarding our second research question (RQ2), we concluded after evaluation that the _BFD_ and _FFDNew_ algorithms had execution times longer than all other algorithms.
-For the _Balanced_ dataset, _BFD_ was slightly slower than _FFDNew_.
-For the _Job-heavy_ dataset, _FFDNew_ was slightly slower than _BFD_.
-For the _Machine-heavy_ dataset, _FFDNew_ was also slightly slower than _BFD_, and the runtime-ratio test rejected the null hypothesis.
+Regarding our second research question (RQ2), we observed that the evaluated _BFD_ and _FFDNew_ implementations had higher measured runtimes than the other evaluated implementations.
+For the _Balanced_ dataset, the _BFD_ implementation was slightly slower than _FFDNew_.
+For the _Job-heavy_ dataset, the _FFDNew_ implementation was slightly slower than _BFD_.
+For the _Machine-heavy_ dataset, the _FFDNew_ implementation was also slightly slower than _BFD_, and the runtime-ratio test rejected the null hypothesis.
 The differences in execution time were only on the order of milliseconds to tens of milliseconds, and all average execution times remained below $100$ milliseconds per problem instance.
-Within the evaluated datasets and implementation, this suggests that selecting the strongest cost-oriented algorithms does not require a practically large execution-time penalty.
+Within the evaluated datasets and current implementation, this suggests that selecting the strongest cost-oriented implementations did not require a practically large measured execution-time penalty.
+However, these runtime results should be interpreted as observations about the current Python implementation, not as a general benchmark of optimized implementations of the underlying algorithms.
 
 == Future Work
 In this report, we have studied an offline job scheduling problem where the given load profile data $bold(L)$ is deterministic.
@@ -55,5 +56,4 @@ This primitive cost-model could be expanded to support e.g. time-dependent energ
 
 Finally, a future study could take a more theoretical approach and attempt to find provable bounds for the _BFD_ and _FFDNew_ algorithms, and compare these to the bounds on the existing _BFD_ and _FFD_ algorithms.
 Such a study could also work on finding worst-case problem instances for these algorithms.
-
 
