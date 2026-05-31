@@ -657,6 +657,11 @@ Execution times were measured using the Python standard library method `time.mon
 All algorithm evaluations were run on a 2020 MacBook Pro M1 running macOS Sequoia 15.6.1.
 Each dataset was generated using the NumPy deterministic pseudorandom number generator @numpy_default_rng, using the fixed seed value $5000$.
 Each dataset contains 100 randomly generated problem instances.
+Each problem instance has between 100-200 time slots.
+All time slots are independent.
+This means that each problem instance has between 10 000-20 000 time slots.
+Each of these time slots is its own small subproblem.
+This gives each of the three datasets a wide variation of workloads to schedule.
 Except for the dimension intervals $I_J$, $I_M$, and $I_T$, all other problem-instance generation parameters were kept at the default values from @dataset_parameter_table.
 In particular, the resource-weight vector $bold(alpha)$ was sampled independently for each generated instance, and the running-cost factor was fixed to $gamma=0.10$.
 
