@@ -59,6 +59,7 @@ where $bold(alpha)$ is a vector where the element $alpha_k$ represents the weigh
 The vector $bold(c^r)$ of machine type per-slot running costs is a fixed percentage $gamma$ of the vector $bold(c^p)$ of machine type purchase costs.
 That is, the running cost of each machine type is a fixed percentage $gamma$ of its up-front purchase cost.
 We will not allow a single job to be split across multiple machines.
+Supporting fragmented jobs would likely greatly increase the complexity of the problem.
 Machines incur no running cost while powered off.
 Let the $M$-dimensional vector $bold(x) in ZZnonneg^M$ be the decision variable representing our selection of machine types.
 The vector element $x_i$ equals the number of machines of type $i$ we choose to buy.
