@@ -9,6 +9,29 @@ This chapter describes how problem instances are generated, and how datasets are
 We also describe our method for evaluating these algorithms on the generated datasets.
 We evaluate both the solution costs and execution times for each algorithm.
 
+Before we begin describing how problem instances are generated, we will first justify why we are using synthetic problem instances instead of real-world problem instances.
+There does exist public datasets of problem instances for hardware procurement and job scheduling.
+
+In 2019, Google Research released a large dataset of traces from a number of their production clusters @clusterdata_Wilkes2020 @clusterdata_Wilkes2020a.
+These clusters were managed by Borg @borg_google, Google's internal version of Kubernetes.
+This dataset contains information about machine types, machine capacities, workload resource requests, etc.
+
+Alibaba has released a number of different production cluster datasets @alibaba_clusterdata_github.
+In 2018, Alibaba released a dataset of traces sampled from one of their production clusters @alibaba_cluster_trace_v2018.
+These clusters were used to run both long-running applications and batch workloads.
+Like the Google dataset, this Alibaba trace dataset contained data on machine capacities and machine resource utilization over time, as well as resource usage data of containers running on machines.
+
+We believe it would be possible to derive a suitable dataset for this work from these public real-world datasets.
+However, this would require large parts of the work reworked.
+Further, these datasets would be better suited for studying online scheduling in particular.
+For online job scheduling, job requests can arrive spontaneously over some period of time.
+This is different from offline job scheduling, in which all job requests are known from the beginning.
+It should also be noted that both of these datasets were created from major public hyperscaler cloud environments.
+This work focuses specifically on smaller private cloud environments.
+Therefore, these datasets may be less well suited to this specific work.
+We were not able to find any public datasets created from private cloud environments.
+Therefore, we decided to instead design a method of generating datasets of random synthetic realistic problem instances.
+
 === Problem instance generation <problem_instance_generation>
 
 The number of resources $K$, machine types $M$, job types $J$, and time slots $T$ the problem instance shall have are given.
