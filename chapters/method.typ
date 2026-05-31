@@ -30,6 +30,9 @@ All of the algorithms described in this section always select the cheapest feasi
 The algorithms do differ in how they sort the item types before they are packed.
 
 The _FFDLex_ (also referred to in this report as just _FFD_) algorithm orders all item types at once using a single lexicographical sort.
+Lexicographic sorting is a deterministic multi-key sorting rule, where the first key is compared first and later keys are used to break ties @knuth_sorting_searching_1998.
+In _FFDLex_, the keys are the elements of the job type resource-demand vector, so job types are ordered by non-increasing lexicographic order of their resource demands.
+In the simulator implementation, this ordering is implemented with NumPy's $"lexsort"$ function, using negated resource-demand values to obtain decreasing order @numpy_lexsort.
 The _FFDSum_ algorithm orders item types in decreasing order of the sum of their resource demand vector $sum_k r_(j,k)$.
 The _FFDProd_ algorithm orders item types in decreasing order of the product of their resource demand vector $product_k r_(j,k)$.
 This algorithm works best when all resource demand values are positive.
