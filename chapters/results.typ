@@ -38,6 +38,7 @@ The reason for this is that multiple algorithms can be tied for certain problem 
     #figure(
       table(
         columns: 6,
+        align: center,
         [*Scheduler*],
         [*Average cost*],
         [*Min cost*],
@@ -62,6 +63,7 @@ Using the paired ratio $t$-test on raw total cost ratios, we fail to reject the 
     #figure(
       table(
         columns: 6,
+        align: center,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],
@@ -89,6 +91,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
     #figure(
       table(
         columns: 6,
+        align: center,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],
@@ -122,6 +125,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
     #figure(
       table(
         columns: 4,
+        align: center,
         [*Scheduler*], [*Wins*], [*Ties*], [*Total*],
         ..perf_profiles_balanced.flatten(),
       ),
@@ -138,6 +142,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
     #figure(
       table(
         columns: 6,
+        align: center,
         [*Scheduler*],
         [*Average cost*],
         [*Min cost*],
@@ -163,6 +168,7 @@ The effect is very small since the mean ratio is approximately $1.00071$, meanin
     #figure(
       table(
         columns: 6,
+        align: center,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],
@@ -190,6 +196,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
     #figure(
       table(
         columns: 6,
+        align: center,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],
@@ -223,6 +230,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
     #figure(
       table(
         columns: 4,
+        align: center,
         [*Scheduler*], [*Wins*], [*Ties*], [*Total*],
         ..perf_profiles_job_heavy.flatten(),
       ),
@@ -239,6 +247,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
     #figure(
       table(
         columns: 6,
+        align: center,
         [*Scheduler*],
         [*Average cost*],
         [*Min cost*],
@@ -265,6 +274,7 @@ Using the paired ratio $t$-test on raw total cost ratios, we fail to reject the 
     #figure(
       table(
         columns: 6,
+        align: center,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],
@@ -292,6 +302,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
     #figure(
       table(
         columns: 6,
+        align: center,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],
@@ -327,6 +338,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
     #figure(
       table(
         columns: 4,
+        align: center,
         [*Scheduler*], [*Wins*], [*Ties*], [*Total*],
         ..perf_profiles_machine_heavy.flatten(),
       ),

@@ -61,6 +61,7 @@ They are useful for comparing the evaluated implementations, but should not be o
     #figure(
       table(
         columns: 6,
+        align: center,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],
@@ -84,6 +85,7 @@ They are useful for comparing the evaluated implementations, but should not be o
     #figure(
       table(
         columns: 6,
+        align: center,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],
@@ -107,6 +109,7 @@ They are useful for comparing the evaluated implementations, but should not be o
     #figure(
       table(
         columns: 6,
+        align: center,
         [*Comparison*],
         [*$n$*],
         [*Mean ratio*],

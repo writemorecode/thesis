@@ -53,6 +53,7 @@ Below, we present a table of symbols used by this algorithm.
   #figure(
     table(
       columns: 4,
+      align: center,
       [*Symbol*], [*Type*], [*Shape*], [*Description*],
       [$B$], [Set], [-], [Set of open bins for the current time slot],
       [$X_(i,t)$], [Scalar], [-], [Number of bins of type $i$ open for time slot $t$],
