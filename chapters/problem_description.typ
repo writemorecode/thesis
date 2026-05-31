@@ -77,6 +77,11 @@ $
   bold(C) bold(z)_t >= bold(R) bold(l)_t , forall t in cal(T)
 $
 
+This constraint compares total available capacity with total workload demand for each time slot.
+The vector $bold(C) bold(z)_t$ gives the aggregate amount of each resource provided by the machines powered on during time slot $t$.
+The vector $bold(R) bold(l)_t$ gives the aggregate amount of each resource required by all jobs that must run during the same time slot.
+Thus, the constraint states that, for every resource dimension, the powered-on machines must provide at least as much total capacity as the jobs require.
+
 Finally, we can state an optimization problem.
 
 $
@@ -85,6 +90,13 @@ $
                & quad bold(z)_t <= bold(x) ,forall t in cal(T) \
                & quad bold(x) in ZZnonneg^M quad bold(z)_t in ZZnonneg^M ,forall t in cal(T)
 $
+
+The objective function minimizes the total cost of the selected machine fleet.
+The first term, $bold(x)^(T)bold(c^p)$, is the one-time purchase cost of the machines.
+The second term is the total running cost over all time slots, obtained by multiplying the number of powered-on machines of each type by their per-slot running costs.
+The first constraint enforces aggregate resource sufficiency in every time slot.
+The second constraint states that we cannot power on more machines of a type than we have purchased.
+The final constraint states that both the purchase decisions and the powered-on machine counts must be non-negative integers.
 
 However, this is not an accurate model of the problem.
 The solutions given by the simplified optimization problem above are not guaranteed to be valid allocations of jobs to machines.
@@ -96,6 +108,9 @@ The problem is _multi-dimensional_ since the jobs have multiple dimensions in th
 The problem is _heterogeneous_ since the bins have different resource capacities.
 
 Because the stated problem does not have these packing constraints, it can only yield _lower bound_ solutions.
+It may select a fleet whose total capacity is large enough when all machines are viewed as one combined resource pool, even though the individual jobs cannot be divided into a valid set of per-machine assignments.
+Any solution that is feasible for the real scheduling problem must also satisfy the aggregate capacity constraints above, but the reverse is not necessarily true.
+Therefore, the simplified model can underestimate the true minimum cost.
 
 Let us now describe the variables and constraints required to state an optimization problem which will guarantee valid allocations of jobs to machines.
 We introduce the vectors $bold(y)_t^((i)) in ZZnonneg^J$ to denote the number of each job type allocated per powered-on instance of machine type $i$ to time slot $t$.
@@ -105,6 +120,9 @@ $
   sum_(i=1)^M z_(t,i) bold(y)_t^((i)) = bold(l)_t , forall t in cal(T)
 $
 ensures that exactly the jobs scheduled for each time slot will be run.
+For a fixed time slot $t$, the term $z_(t,i) bold(y)_t^((i))$ is the number of jobs assigned to all powered-on machines of type $i$.
+Summing over all machine types therefore gives the total number of scheduled jobs of each type.
+The equality to $bold(l)_t$ means that every required job is assigned, and that no extra jobs are introduced.
 Second, the constraint
 
 $
@@ -112,6 +130,9 @@ $
 $
 
 ensures that the sum of the resource requirements for all jobs allocated to the machine type must not exceed its resource capacities at any time slot.
+This is a per-machine packing constraint.
+For one powered-on machine instance of type $i$, the vector $bold(y)_t^((i))$ describes the jobs placed on that machine during time slot $t$.
+Multiplying by $bold(R)$ converts those job counts into resource demand, and the inequality requires that this demand fits within the capacity vector $bold(m)_i$.
 To understand this constraint, note that element $r_(k,j)$ of $bold(R)$ is the requirement for resource $k$ for job type $j$.
 Therefore, the row vector for row $k$ of $bold(R)$, call it $bold(q^((k)))$, gives the resource requirement of resource $k$ of each job type.
 The scalar product of $bold(q^((k)))$ and $bold(y)_t^((i))$ is then the sum of the resource requirement of resource $k$ of each job type, scaled by the number of jobs of type $j$ allocated to machine type $i$ in time slot $t$.
@@ -129,6 +150,11 @@ $
   & quad bold(x) in ZZnonneg^M, quad bold(z)_t in ZZnonneg^M forall t in cal(T), quad bold(y)_t^((i)) in ZZnonneg^J, quad forall i in cal(M), t in cal(T)
 $
 
+The objective has the same interpretation as before: purchase cost plus running cost.
+The first constraint assigns all required jobs in each time slot to powered-on machines.
+The second constraint requires the per-machine job assignment to fit inside the capacity of one machine of the corresponding type.
+The final constraint restricts all decision variables to non-negative integer values, since the model chooses counts of machines and jobs.
+
 However, this formulation only allows for a single job packing configuration per machine type.
 In reality, there will exist a large set of valid job packing configurations per machine type.
 In order to express this, we require new notation.
@@ -137,6 +163,9 @@ Let $S_i$ be the set of all valid job packings for machine type $i$.
 $
   S_i = {bold(y) in ZZnonneg^J | bold(R y) <= bold(m)_i}
 $
+
+The set $S_i$ contains every possible combination of job counts that can fit on one machine instance of type $i$.
+Each vector $bold(y) in S_i$ is therefore one feasible way to pack jobs onto a single machine of that type.
 
 Let $bold(n)_(i,t) in ZZnonneg^(abs(S_i))$ be a vector where element $n_(i,t,k)$ is the number of machine instances of type $i$ that are running job packing configuration $k$ during time slot $t$.
 For each machine type $i$, let $bold(Y)_i in ZZnonneg^(J crossmark abs(S_i))$ be a matrix with column vectors from the set $S_i$.
@@ -159,6 +188,8 @@ For each vector $bold(y) in S_i$, we have $bold(R)bold(y)<=bold(m)_i$.
 Each column vector of $bold(Y)_i$ represents a possible valid job packing configuration of jobs for a machine instance of type $i$.
 The vector $bold(n)_(i,t)$ gives the number of machine instances of type $i$ running each job packing configuration during time slot $t$.
 Therefore, row $j$ of $bold(Y)_i bold(n)_(i,t)$ gives the total number of jobs of type $j$ running on machine instances of type $i$ during time slot $t$.
+Equivalently, $bold(Y)_i bold(n)_(i,t)$ is the vector of jobs served by all active machines of type $i$ during time slot $t$.
+After summing this vector over all machine types, the resulting vector must cover the workload vector $bold(l)_t$.
 Note that:
 $ sum_(k=1)^(abs(S_i)) n_(i,t,k) = z_(t,i), quad forall i in cal(M), t in cal(T). $
 We can now state our new optimization problem.
@@ -173,6 +204,14 @@ $
   & quad sum_(k=1)^(abs(S_i)) n_(i,t,k) <= x_i quad forall i in cal(M), t in cal(T) \
   & quad bold(x) in ZZnonneg^M, quad bold(n)_(i,t) in ZZnonneg^(abs(S_i)) quad forall i in cal(M), t in cal(T)
 $
+
+In this final formulation, the objective again minimizes purchase cost plus running cost.
+The first term, $bold(x)^T bold(c^p)$, is the cost of buying the selected machines.
+The second term counts how many machine instances of each type are active across all time slots and packing configurations, and multiplies those counts by the corresponding per-slot running cost.
+The first three constraints define the feasible packing configurations for each machine type and collect them in the matrices $bold(Y)_i$.
+The fourth constraint requires the selected packing configurations to cover all jobs in every time slot.
+The fifth constraint states that the number of active machine instances of type $i$ in any time slot cannot exceed the number $x_i$ purchased.
+The final constraint enforces non-negative integer counts for purchased machines and active packing configurations.
 
 == Symbol reference table
 
@@ -252,7 +291,8 @@ In time slot $1$, one machine of type $1$ runs one job of each type.
 In time slot $2$, two machines of type $1$ each run one job of type $1$.
 In time slot $3$, one machine of type $1$ runs one job of type $2$.
 
-We first verify that the used packing configurations are feasible:
+We verify the solution by checking the same feasibility conditions used in the final optimization problem.
+First, we verify that the used packing configurations belong to the corresponding sets $S_i$:
 
 $
   bold(R) vec(0, 0) = vec(0, 0, 0) <= vec(3, 2, 1) \
@@ -262,7 +302,7 @@ $
   bold(R) vec(0, 0) = vec(0, 0, 0) <= vec(1, 3, 0)
 $
 
-We then verify that the scheduled jobs match the workload exactly:
+We then verify the workload coverage constraint, meaning that the selected packing configurations serve exactly the jobs required in each time slot:
 
 $
   t=1: bold(Y)_1 vec(0, 0, 0, 1) + bold(Y)_2 vec(0) = vec(1, 1) = bold(l)_1 \
@@ -270,14 +310,16 @@ $
   t=3: bold(Y)_1 vec(0, 0, 1, 0) + bold(Y)_2 vec(0) = vec(0, 1) = bold(l)_3
 $
 
-The number of powered-on machines does not exceed the number of purchased machines:
+#block(breakable: false, [
+  Finally, we verify the purchased-machine constraint, meaning that the number of powered-on machines does not exceed the number of purchased machines:
 
-$
-  t=1: sum_(k=1)^(abs(S_1)) n_(1,1,k) = 1 <= x_1 \
-  t=2: sum_(k=1)^(abs(S_1)) n_(1,2,k) = 2 <= x_1 \
-  t=3: sum_(k=1)^(abs(S_1)) n_(1,3,k) = 1 <= x_1 \
-  sum_(k=1)^(abs(S_2)) n_(2,t,k) = 0 <= x_2 quad forall t in cal(T)
-$
+  $
+    t=1: sum_(k=1)^(abs(S_1)) n_(1,1,k) = 1 <= x_1 \
+    t=2: sum_(k=1)^(abs(S_1)) n_(1,2,k) = 2 <= x_1 \
+    t=3: sum_(k=1)^(abs(S_1)) n_(1,3,k) = 1 <= x_1 \
+    sum_(k=1)^(abs(S_2)) n_(2,t,k) = 0 <= x_2 quad forall t in cal(T)
+  $
+])
 
 The purchase cost is:
 
