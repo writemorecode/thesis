@@ -125,6 +125,9 @@ This gives the algorithm the time complexity $Omicron (n^2)$.
 
 == Offline bin-packing algorithms
 
+In offline scheduling, the relevant job data are assumed to be known before the schedule is constructed.
+For online scheduling requires decisions under incomplete knowledge of future jobs or releases @pinedo_single_machine_2016 @lee_leung_pinedo_2013_online_scheduling.
+
 For the offline case, we can improve the previous online algorithms by sorting the items in decreasing order.
 This gives us the First-Fit-Decreasing algorithm @garey_graham_ullman_1972.
 
