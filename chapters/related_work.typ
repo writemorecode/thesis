@@ -63,7 +63,7 @@ For further work on the machine reassignment problem, see @mrp_multineighborhood
 
 == Bin-packing
 
-In 1972, Garey, Graham, and Ullman analyzed the worst-case performance of heuristics-based methods for bin-packing @garey_worst_mem_alloc.
+In 1972, Garey, Graham, and Ullman analyzed the worst-case performance of heuristics-based methods for bin-packing @garey_graham_ullman_1972.
 The authors viewed these algorithms from a more practical point of view, as algorithms for memory allocation.
 
 David Johnson was first to study approximation algorithms for the bin-packing problem, in his 1973 Ph.D. thesis @johnson_1973_phd.
@@ -80,7 +80,7 @@ Existing VBP algorithms are combined, and new algorithms are proposed.
 
 In 2021, Stakić et al. @stakic2021reduced presented a solution to the two-dimensional heterogeneous vector bin-packing problem (2DHet-VBPP).
 This solution to this NP-hard problem used a metaheuristic approach based on Reduced variable neighborhood search (RVNS).
-RVNS is based on the variable neighborhood search method, which was proposed by in 2010 by Hansen et al. @Hansen_vns_2010.
+RVNS is based on the variable neighborhood search method, which was proposed by in 2010 by Hansen et al. @hansen_variable_2010.
 In general, these kinds of solutions work in three phases.
 First, we generate an initial solution $S_0$, and let the current solution $S$ and best solution $S^*$ be $S_0$.
 Next, we apply a shaking operator to $S$ to attempt to move $S$ to a different neighborhood of the solution space.
