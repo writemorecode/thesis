@@ -456,6 +456,7 @@ In this way, larger or more capable machine types also become more expensive to 
 The generator also stores the resource-weight vector $bold(alpha)$ used in this computation.
 In the Python implementation used for this thesis, each element $alpha_k$ is sampled independently from $U([0,1))$ unless a fixed vector is supplied externally.
 The running-cost factor is fixed to $gamma = 0.10$ unless overridden; all datasets in this thesis use this default.
+This is a modeling assumption: in the generated instances, the per-slot running cost of each machine type is assumed to be $10%$ of its up-front purchase cost.
 
 #block(breakable: false, [
   #show: style-algorithm
@@ -664,7 +665,7 @@ This means that each problem instance has between 10 000-20 000 time slots.
 Each of these time slots is its own small subproblem.
 This gives each of the three datasets a wide variation of workloads to schedule.
 Except for the dimension intervals $I_J$, $I_M$, and $I_T$, all other problem-instance generation parameters were kept at the default values from @dataset_parameter_table.
-In particular, the resource-weight vector $bold(alpha)$ was sampled independently for each generated instance, and the running-cost factor was fixed to $gamma=0.10$.
+In particular, the resource-weight vector $bold(alpha)$ was sampled independently for each generated instance, and the running-cost factor was fixed to $gamma=0.10$, meaning that per-slot running costs were assumed to be $10%$ of up-front purchase costs.
 
 The first dataset ("balanced") was generated with a balanced number of job types and machine types.
 The second dataset ("job heavy") was generated with a greater number of job types than machine types.
