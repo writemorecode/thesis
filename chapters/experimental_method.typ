@@ -699,6 +699,35 @@ For each algorithm and problem instance, we record the total solution cost, exec
 The total solution cost is the value of the objective function defined in @problem_description_section, using the generated purchase and running cost vectors for the instance.
 The total machine count is the number of machine instances used by the produced schedule.
 
+==== Statistical test design and interpretation <statistical_test_design>
+The statistical unit in the cost comparisons is the generated problem instance.
+Each problem instance contains many time slots, and these time slots make the generated workloads richer and more varied.
+However, the statistical tests below are performed on per-instance aggregate outcomes, such as total solution cost.
+The sample size for each per-dataset cost comparison is therefore the $100$ generated problem instances, not the total number of time slots contained inside those instances.
+
+The comparisons are paired because every algorithm is evaluated on the same set of generated problem instances.
+This means that a comparison between two algorithms uses matched observations: the result of algorithm $A$ and the result of algorithm $B$ on the same instance.
+Pairing is useful because some problem instances are naturally more expensive than others, regardless of which algorithm is used.
+By comparing algorithms within the same instance, the test focuses on the relative difference between the algorithms rather than on differences in instance difficulty.
+
+We use ratios because total solution costs can vary substantially between problem instances.
+A ratio of $1$ means that the two algorithms have equal total cost on that instance, a ratio below $1$ means that the numerator algorithm is cheaper, and a ratio above $1$ means that it is more expensive.
+The paired ratio $t$-tests estimate whether the mean per-instance ratio differs from $1$.
+Thus, the tests support claims about average relative cost on the generated datasets.
+They do not prove that one algorithm is better on every individual instance, and they should not be interpreted as universal guarantees for all possible workloads.
+
+The use of $t$-tests is supported by the fact that each per-dataset comparison contains $n = 100$ paired observations.
+This gives some support for the normal approximation of the sample mean through the Central Limit Theorem, even when the observed ratio values are not perfectly normally distributed.
+Nevertheless, the test results should be interpreted together with the reported confidence intervals and effect sizes.
+
+The cost-test design has two parts.
+First, we compare _BFD_ and _FFDNew_ directly because these are the two strongest cost-aware algorithms in the evaluation, and because their average solution costs are very close.
+This test answers whether either of these two leading algorithms has a meaningful cost advantage over the other.
+Second, we compare _BFD_ with the remaining baseline algorithms, excluding _FFDNew_.
+This uses _BFD_ as a representative strong cost-aware algorithm when comparing against the simpler _FFD_ variants and _PeakDemand_.
+These tests support conclusions about _BFD_ relative to those baselines.
+Together with the summary statistics and performance profiles, they also help evaluate the broader difference between the cost-aware algorithms and the simpler baselines, but the _BFD_-versus-baseline tests alone do not prove that _FFDNew_ separately dominates every baseline.
+
 ==== Paired comparison via cost ratios <cost_ratios>
 Let $c_(A,i)$ and $c_(B,i)$ be the total costs of algorithms $A$ and $B$ on instance $i$.
 Define the per-instance cost ratio
@@ -712,7 +741,7 @@ We test whether the algorithms differ using a paired two-tailed $t$-test on the 
 From this test, we report the mean ratio, the $95%$ confidence interval for the mean ratio, the two-sided $p$-value, and the test decision.
 Here, $mu_r < 1$ indicates that $A$ has lower cost than $B$ on average, and $mu_r > 1$ indicates the opposite.
 
-In addition to the comparison of the two best algorithms, we also run paired ratio $t$-tests between _BFD_ and each remaining algorithm (excluding _FFDNew_).
+As described in @statistical_test_design, we use this method both for the direct comparison between _BFD_ and _FFDNew_, and for the comparisons between _BFD_ and each remaining algorithm excluding _FFDNew_.
 We use the same ratio-based approach when comparing total machine counts.
 For this comparison we use _BFD_ and _FFDMax_.
 The purpose of this test is to compare one of the best cost-oriented algorithms against an algorithm which tends to use fewer machines, in order to study whether lower solution cost also implies a lower total machine count.
