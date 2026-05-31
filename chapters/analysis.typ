@@ -12,29 +12,28 @@ The performance difference between _BFD_ and _FFDNew_ is practically very small.
 These conclusions hold for all three datasets.
 
 Next, we consider the execution times of the algorithms.
-The execution time analysis in @figure_alg_execution_time_chart and @table_runtime_ttest_balanced, @table_runtime_ttest_job_heavy, and @table_runtime_ttest_machine_heavy shows that _BFD_ and _FFDNew_ are the two slowest algorithms across all three datasets.
-This is expected, since these two algorithms use more detailed placement rules than the simpler _FFD_ variants.
-The paired runtime-ratio $t$-tests show that _BFD_ is significantly slower than the simpler _FFD_ variants on every dataset.
+The execution time analysis in @figure_alg_execution_time_chart and @table_runtime_ttest_balanced, @table_runtime_ttest_job_heavy, and @table_runtime_ttest_machine_heavy shows that the _BFD_ and _FFDNew_ implementations are the two slowest evaluated implementations across all three datasets.
+This is consistent with the fact that these two implementations use more detailed placement rules than the simpler _FFD_ variants.
+The paired runtime-ratio $t$-tests show that the _BFD_ implementation is significantly slower than the simpler _FFD_ variant implementations on every dataset.
 The comparison between _BFD_ and _FFDNew_ is much closer.
-On the _Balanced_ dataset, _BFD_ is slightly slower than _FFDNew_.
-On the _Job-heavy_ dataset, _FFDNew_ is instead slightly slower than _BFD_.
-On the _Machine-heavy_ dataset, _FFDNew_ is also slightly slower than _BFD_, and the runtime-ratio test rejects the null hypothesis.
+On the _Balanced_ dataset, the _BFD_ implementation is slightly slower than the _FFDNew_ implementation.
+On the _Job-heavy_ dataset, the _FFDNew_ implementation is instead slightly slower than the _BFD_ implementation.
+On the _Machine-heavy_ dataset, the _FFDNew_ implementation is also slightly slower than the _BFD_ implementation, and the runtime-ratio test rejects the null hypothesis.
 The absolute difference is still small.
 
-These results are reasonable given how the algorithms work, but the following explanations should be interpreted as hypotheses rather than tested mechanisms.
-Both _BFD_ and _FFDNew_ perform more work when selecting placements than the simpler first-fit variants.
+These results are reasonable given how the evaluated implementations work, but the following explanations should be interpreted as hypotheses rather than tested mechanisms.
+Both the _BFD_ and _FFDNew_ implementations perform more work when selecting placements than the simpler first-fit variants.
 This overhead becomes especially visible when there are more available machine types, because more machine types must be considered when selecting a new machine type for a job.
-This may explain why _BFD_ and _FFDNew_ have similar execution times on the _Machine-heavy_ dataset.
-For the _Job-heavy_ dataset, the slightly higher execution time of _FFDNew_ may be explained by the larger number of job types.
+This may explain why the _BFD_ and _FFDNew_ implementations have similar execution times on the _Machine-heavy_ dataset.
+For the _Job-heavy_ dataset, the slightly higher measured execution time of _FFDNew_ may be explained by the larger number of job types.
 Although _FFDNew_ stops once it finds a suitable open machine, it still uses weighted ordering and slack-based machine-type selection.
 In contrast, _BFD_ may sometimes choose open machines that can store a larger number of jobs of the current job type, thereby reducing the number of placement iterations.
 This could offset the cost of searching over open machines.
 
-For RQ2, these results suggest that, for the evaluated datasets and implementation, optimizing for both scheduling quality and execution time does not require choosing the absolutely fastest heuristic.
-The earlier cost analysis identified _BFD_ and _FFDNew_ as the strongest quality-oriented choices, and the present runtime results in @figure_alg_execution_time_chart show that their overhead is still small in absolute terms.
+For RQ2, these results suggest that, for the evaluated datasets and current implementation, the strongest cost-oriented implementations did not impose a practically large measured runtime penalty.
+The earlier cost analysis identified _BFD_ and _FFDNew_ as the strongest quality-oriented choices, and the present runtime results in @figure_alg_execution_time_chart show that their measured overhead is still small in absolute terms.
 All average runtimes remain below 110 milliseconds per instance.
-It shall be noted that the algorithms were not implemented with performance in mind.
-It is likely that more efficient implementations would have yielded different results.
+However, this should be interpreted as a statement about the evaluated prototype implementations rather than as a general claim about optimized implementations of the algorithms.
 
 Let us now consider the evaluation results of the _BFD_ and _FFDNew_ algorithms.
 The summary tables @table_summary_balanced, @table_summary_job_heavy, and @table_summary_machine_heavy show that the two algorithms have nearly identical average costs on each of the datasets.
@@ -116,12 +115,16 @@ This average cost difference is consistent with increased packing flexibility, b
 Together, these patterns provide support for, but not proof of, the validity of our results.
 
 Finally, we mention a few things regarding algorithm execution time analysis.
-Since the execution time for algorithm for each problem instance was measured only once, the measurements may have been affected by noise from the machine on which they were collected.
-We used a laptop to run all algorithm evaluation and execution time collection.
+There is an important distinction between the theoretical time complexity of an algorithm and the measured wall-clock runtime of one implementation of that algorithm.
+The implementations used in this thesis were primarily developed to produce correct schedules and comparable cost results, not to optimize wall-clock performance.
+The execution-time evaluation was added later in the project, and the execution time for each algorithm on each problem instance was measured only once.
+The measurements may therefore have been affected by implementation choices, Python and NumPy overhead, and noise from the laptop on which they were collected.
 At this time, the laptop was running a minimal number of tasks required to carry out the evaluation and measurement tasks.
+Consequently, the execution-time results should be interpreted as measurements of the current Python implementation rather than as definitive evidence of the inherent runtime performance of the underlying algorithms.
 A more rigorous algorithm benchmarking study would repeat each run multiple times, randomize execution order, and collect all measurements on a dedicated server machine.
-Further, such a study could also collect operation counts, such as the number of open-machine checks, new-machine-type checks, and placement iterations.
-This would make it possible to test the proposed explanations for the observed runtime differences between _BFD_ and _FFDNew_.
+It could also compare optimized implementations, alternative data structures, or compiled implementations.
+Further, such a study could collect operation counts, such as the number of open-machine checks, new-machine-type checks, and placement iterations.
+This would make it possible to test the proposed explanations for the observed runtime differences between the _BFD_ and _FFDNew_ implementations.
 
 === Threats to external validity
 
