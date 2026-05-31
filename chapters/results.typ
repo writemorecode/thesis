@@ -47,7 +47,7 @@ The reason for this is that multiple algorithms can be tied for certain problem 
         ..summary_data_balanced_dataset.flatten(),
       ),
       caption: [Summary of evaluation results for balanced dataset.],
-    )
+    ) <table_summary_balanced>
   ])
 ]
 
@@ -71,7 +71,7 @@ Using the paired ratio $t$-test on raw total cost ratios, we fail to reject the 
         ..ratio_ttest_balanced.flatten(),
       ),
       caption: [Paired ratio $t$-test summary for balanced dataset (_BFD_ / _FFDNew_).],
-    )
+    ) <table_cost_ttest_bfd_ffdnew_balanced>
   ])
 ]
 
@@ -98,7 +98,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
         ..ratio_ttest_pairwise_balanced.flatten(),
       ),
       caption: [Paired ratio $t$-tests for balanced dataset (_BFD_ / other algorithms except _FFDNew_).],
-    )
+    ) <table_cost_ttest_pairwise_balanced>
   ])
 ]
 
@@ -112,7 +112,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
         fit: "contain",
       ),
       caption: [Performance profiles for the balanced dataset.],
-    )
+    ) <figure_perf_profile_balanced>
   ])
 ]
 
@@ -126,7 +126,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
         ..perf_profiles_balanced.flatten(),
       ),
       caption: [Performance profile wins for the balanced dataset.],
-    )
+    ) <table_perf_wins_balanced>
   ])
 ]
 
@@ -147,7 +147,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
         ..summary_data_job_heavy.flatten(),
       ),
       caption: [Summary of evaluation results for job-heavy dataset.],
-    )
+    ) <table_summary_job_heavy>
   ])
 ]
 
@@ -172,7 +172,7 @@ The effect is very small since the mean ratio is approximately $1.00071$, meanin
         ..ratio_ttest_job_heavy.flatten(),
       ),
       caption: [Paired ratio $t$-test summary for job-heavy dataset (_BFD_ / _FFDNew_).],
-    )
+    ) <table_cost_ttest_bfd_ffdnew_job_heavy>
   ])
 ]
 
@@ -199,7 +199,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
         ..ratio_ttest_pairwise_job_heavy.flatten(),
       ),
       caption: [Paired ratio $t$-tests for job-heavy dataset (_BFD_ / other algorithms except _FFDNew_).],
-    )
+    ) <table_cost_ttest_pairwise_job_heavy>
   ])
 ]
 
@@ -213,7 +213,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
         fit: "contain",
       ),
       caption: [Performance profiles for the job-heavy dataset.],
-    )
+    ) <figure_perf_profile_job_heavy>
   ])
 ]
 
@@ -227,7 +227,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
         ..perf_profiles_job_heavy.flatten(),
       ),
       caption: [Performance profile wins for the job-heavy dataset.],
-    )
+    ) <table_perf_wins_job_heavy>
   ])
 ]
 
@@ -248,7 +248,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
         ..summary_data_machine_heavy.flatten(),
       ),
       caption: [Summary of evaluation results for machine-heavy dataset.],
-    )
+    ) <table_summary_machine_heavy>
   ])
 ]
 
@@ -274,7 +274,7 @@ Using the paired ratio $t$-test on raw total cost ratios, we fail to reject the 
         ..ratio_ttest_machine_heavy.flatten(),
       ),
       caption: [Paired ratio $t$-test summary for machine-heavy dataset (_BFD_ / _FFDNew_).],
-    )
+    ) <table_cost_ttest_bfd_ffdnew_machine_heavy>
   ])
 ]
 
@@ -301,7 +301,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
         ..ratio_ttest_pairwise_machine_heavy.flatten(),
       ),
       caption: [Paired ratio $t$-tests for machine-heavy dataset (_BFD_ / other algorithms except _FFDNew_).],
-    )
+    ) <table_cost_ttest_pairwise_machine_heavy>
   ])
 ]
 
@@ -315,7 +315,7 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
         fit: "contain",
       ),
       caption: [Performance profiles for the machine-heavy dataset.],
-    )
+    ) <figure_perf_profile_machine_heavy>
   ])
 ]
 
@@ -331,6 +331,6 @@ The table below summarizes the pairwise ratio $t$-tests between _BFD_ and the re
         ..perf_profiles_machine_heavy.flatten(),
       ),
       caption: [Performance profile wins for the machine-heavy dataset.],
-    )
+    ) <table_perf_wins_machine_heavy>
   ])
 ]

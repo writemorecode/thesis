@@ -5,14 +5,14 @@
 This chapter interprets the evaluation results and discusses their implications for offline scheduling in private clouds.
 
 The results of the evaluation are clear.
-We can divide the packing algorithms into two groups: the simpler _FFDLex_, _FFDSum_, _FFDProd_, _FFDMax_, and _FFDL2_ variants, and the cost-aware _BFD_ and _FFDNew_ algorithms.
+As shown in @table_summary_balanced, @table_summary_job_heavy, and @table_summary_machine_heavy, and supported by the pairwise cost-ratio tests in @table_cost_ttest_pairwise_balanced, @table_cost_ttest_pairwise_job_heavy, and @table_cost_ttest_pairwise_machine_heavy, we can divide the packing algorithms into two groups: the simpler _FFDLex_, _FFDSum_, _FFDProd_, _FFDMax_, and _FFDL2_ variants, and the cost-aware _BFD_ and _FFDNew_ algorithms.
 We can make two initial conclusions.
 The performance of the simpler _FFD_ variants is broadly comparable, although the relative gaps differ between datasets.
 The performance difference between _BFD_ and _FFDNew_ is practically very small.
 These conclusions hold for all three datasets.
 
 Next, we consider the execution times of the algorithms.
-The execution time analysis shows that _BFD_ and _FFDNew_ are the two slowest algorithms across all three datasets.
+The execution time analysis in @figure_alg_execution_time_chart and @table_runtime_ttest_balanced, @table_runtime_ttest_job_heavy, and @table_runtime_ttest_machine_heavy shows that _BFD_ and _FFDNew_ are the two slowest algorithms across all three datasets.
 This is expected, since these two algorithms use more detailed placement rules than the simpler _FFD_ variants.
 The paired runtime-ratio $t$-tests show that _BFD_ is significantly slower than the simpler _FFD_ variants on every dataset.
 The comparison between _BFD_ and _FFDNew_ is much closer.
@@ -31,24 +31,24 @@ In contrast, _BFD_ may sometimes choose open machines that can store a larger nu
 This could offset the cost of searching over open machines.
 
 For RQ2, these results suggest that, for the evaluated datasets and implementation, optimizing for both scheduling quality and execution time does not require choosing the absolutely fastest heuristic.
-The earlier cost analysis identified _BFD_ and _FFDNew_ as the strongest quality-oriented choices, and the present runtime results show that their overhead is still small in absolute terms.
+The earlier cost analysis identified _BFD_ and _FFDNew_ as the strongest quality-oriented choices, and the present runtime results in @figure_alg_execution_time_chart show that their overhead is still small in absolute terms.
 All average runtimes remain below 110 milliseconds per instance.
 It shall be noted that the algorithms were not implemented with performance in mind.
 It is likely that more efficient implementations would have yielded different results.
 
 Let us now consider the evaluation results of the _BFD_ and _FFDNew_ algorithms.
-The two algorithms have nearly identical average costs on each of the datasets.
+The summary tables @table_summary_balanced, @table_summary_job_heavy, and @table_summary_machine_heavy show that the two algorithms have nearly identical average costs on each of the datasets.
 For the _Balanced_ and _Machine-heavy_ datasets, the paired ratio $t$-tests on raw total cost ratios fail to reject the null hypothesis at $alpha=0.05$.
-For the _Job-heavy_ dataset, the paired ratio $t$-test rejects the null hypothesis ($p approx 1.07 dot 10^(-5)$), but the effect size is very small.
+For the _Job-heavy_ dataset, the paired ratio $t$-test rejects the null hypothesis ($p approx 1.07 dot 10^(-5)$), but the effect size is very small, as shown in @table_cost_ttest_bfd_ffdnew_job_heavy.
 The mean _BFD_ / _FFDNew_ cost ratio is approximately $1.00071$.
-This means that _FFDNew_ is slightly cheaper on average in the job-heavy dataset, while the two algorithms remain practically almost identical.
+Together with @table_cost_ttest_bfd_ffdnew_balanced and @table_cost_ttest_bfd_ffdnew_machine_heavy, this means that _FFDNew_ is slightly cheaper on average in the job-heavy dataset, while the two algorithms remain practically almost identical.
 
 The pairwise ratio $t$-tests comparing _BFD_ to the remaining algorithms (excluding _FFDNew_) are all decisive.
-Across all three datasets, the mean cost ratios are below $1$, the $p$-values are far below $0.05$, and the results are consistent with _BFD_ yielding lower solution cost than the other evaluated baselines.
+Across all three datasets, @table_cost_ttest_pairwise_balanced, @table_cost_ttest_pairwise_job_heavy, and @table_cost_ttest_pairwise_machine_heavy show that the mean cost ratios are below $1$, the $p$-values are far below $0.05$, and the results are consistent with _BFD_ yielding lower solution cost than the other evaluated baselines.
 
 There are notable relationships between the total machine count and the solution cost for different algorithms.
-We find that the two algorithms with the lowest solution costs, _BFD_ and _FFDNew_, have the highest total machine count.
-We have run paired ratio $t$-tests ($alpha=0.05$) between the total machine counts for the _BFD_ and _FFDMax_ algorithms.
+The average machine counts in @table_summary_balanced, @table_summary_job_heavy, and @table_summary_machine_heavy show that the two algorithms with the lowest solution costs, _BFD_ and _FFDNew_, have the highest total machine count.
+We have run paired ratio $t$-tests ($alpha=0.05$) between the total machine counts for the _BFD_ and _FFDMax_ algorithms, using the ratio-based approach described in @cost_ratios.
 This comparison was chosen because _BFD_ is one of the best cost-oriented algorithms, while _FFDMax_ tends to use fewer machines.
 The null hypothesis was rejected for all three datasets.
 For the _Balanced_ dataset, the mean machine-count ratio is $1.3325$ (_BFD_ / _FFDMax_), with $p=1.79102 dot 10^(-19)$.
@@ -59,19 +59,19 @@ This supports the interpretation that lower cost in our setting does not imply f
 It is also consistent with _BFD_ finding a more cost-efficient choice of machine types over time, although the aggregate machine-count data does not by itself prove the detailed allocation mechanism.
 
 We also observe a dataset-level shift in absolute cost scale.
-This is consistent with the dataset definitions.
+This is visible in the average costs reported in @table_summary_balanced and @table_summary_machine_heavy, and is consistent with the dataset definitions.
 The _Machine-heavy_ dataset has twice as many machine types as the other two datasets.
 A greater number of available machine types can, but is not guaranteed to, increase packing flexibility and reduce unused capacity.
-We ran a paired one-tailed cross-dataset $t$-test for the _BFD_ algorithm on per-instance raw total costs.
+We ran a paired one-tailed cross-dataset $t$-test for the _BFD_ algorithm on per-instance raw total costs, using the method described in @cost_ratios.
 For the test for _Machine-heavy_ $<$ _Balanced_, the test does not reject the null hypothesis at $alpha=0.05$ ($p=0.0527$), with mean costs of $93,311.47$ (machine-heavy) vs $104,938.47$ (balanced) and mean paired cost difference $-11,627$.
 The large difference in mean cost difference does suggest that the machine-heavy dataset has, on average, lower solution costs than the balanced.
 But since the $t$-test was not conclusive, we can not draw any stronger conclusions.
 
-We note that the Dolan-Moré performance profiles are generally consistent across all datasets.
+We note that the Dolan-Moré performance profiles in @figure_perf_profile_balanced, @figure_perf_profile_job_heavy, and @figure_perf_profile_machine_heavy are generally consistent across all datasets.
 The _BFD_ and _FFDNew_ algorithms are dominant over all other algorithms.
-These two algorithms are tied on $64\%$ and $72\%$ of problem instances, for the _Balanced_ and _Machine-heavy_ datasets respectively.
+These two algorithms are tied on $64\%$ and $72\%$ of problem instances, for the _Balanced_ and _Machine-heavy_ datasets respectively, as shown in @table_perf_wins_balanced and @table_perf_wins_machine_heavy.
 For the _Job-heavy_ dataset, there are some notable differences.
-Here, the two algorithms are tied on only $11\%$ of problem instances.
+Here, @table_perf_wins_job_heavy shows that the two algorithms are tied on only $11\%$ of problem instances.
 
 == Discussion <discussion_section>
 
