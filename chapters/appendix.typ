@@ -89,6 +89,7 @@ The results of these tests for the _BFD_ / _FFDNew_ cost ratios on all three dat
     #figure(
       table(
         columns: 4,
+        align: center,
         table.header([*Comparison*], [*W statistic*], [*$p$-value*], [*Reject H0*]),
         ..shapiro_ratio_balanced.flatten(),
       ),
@@ -103,6 +104,7 @@ The results of these tests for the _BFD_ / _FFDNew_ cost ratios on all three dat
     #figure(
       table(
         columns: 4,
+        align: center,
         table.header([*Comparison*], [*W statistic*], [*$p$-value*], [*Reject H0*]),
         ..shapiro_ratio_job_heavy.flatten(),
       ),
@@ -117,6 +119,7 @@ The results of these tests for the _BFD_ / _FFDNew_ cost ratios on all three dat
     #figure(
       table(
         columns: 4,
+        align: center,
         table.header([*Comparison*], [*W statistic*], [*$p$-value*], [*Reject H0*]),
         ..shapiro_ratio_machine_heavy.flatten(),
       ),

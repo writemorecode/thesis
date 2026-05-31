@@ -42,6 +42,7 @@ The table below describes each of these parameters.
   #figure(
     table(
       columns: 3,
+      align: center,
       [*Parameter*], [*Purpose*], [*Default value*],
       [$c_0^"cpu"$], [Base CPU capacity value], [$16$ vCPU],
       [$c_0^"memory"$], [Base memory capacity value], [$64$ GiB],
@@ -677,6 +678,7 @@ The table below presents the parameters used to generate each dataset.
     #figure(
       table(
         columns: 9,
+        align: center,
         [*$"Name"$*],
         [*$K_min$*],
         [*$K_max$*],

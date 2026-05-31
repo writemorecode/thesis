@@ -219,7 +219,7 @@ The final constraint enforces non-negative integer counts for purchased machines
 #figure(
   table(
     columns: 4,
-    align: horizon,
+    align: center,
     table.header([*Symbol*], [*Type*], [*Shape*], [*Description*]),
     [K], [Scalar], [-], [Number of resource types],
     [J], [Scalar], [-], [Number of job types],
