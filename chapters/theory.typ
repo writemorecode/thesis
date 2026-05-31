@@ -135,7 +135,7 @@ In offline scheduling, the relevant job data are assumed to be known before the 
 For online scheduling requires decisions under incomplete knowledge of future jobs or releases @pinedo_single_machine_2016 @lee_leung_pinedo_2013_online_scheduling.
 
 For the offline case, we can improve the previous online algorithms by sorting the items in decreasing order.
-This gives us the First-Fit-Decreasing algorithm @garey_graham_ullman_1972.
+This gives us the First-Fit-Decreasing (FFD) algorithm @garey_graham_ullman_1972.
 
 We can extend the first-fit decreasing algorithm for multidimensional heterogeneous bin-packing.
 In order to do this, we must first define how items and bins shall be sorted.

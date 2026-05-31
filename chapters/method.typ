@@ -23,7 +23,7 @@ The same goes for the terms bin and machine.
 
 === Heuristics for FFD
 
-Here, we shall describe a number of different variations of the first-fit decreasing algorithm, each using a different heuristic.
+Here, we shall describe a number of different variations of the first-fit decreasing (FFD) algorithm, each using a different heuristic.
 Many of these heuristics were first presented by in 2017 by Panigrahy et al. @Panigrahy2011HeuristicsFV.
 
 All of the algorithms described in this section always select the cheapest feasible bin when opening a new bin.
@@ -39,9 +39,8 @@ The _FFDL2_ algorithm orders item types in decreasing order of the Euclidean (L2
 === Resource-weighted cost-aware best-fit algorithm <bfd_algo>
 
 Next, we will describe a new packing algorithm based on the best-fit heuristic.
-As we shall later see in the coming Results section (@results_section), this algorithm yields excellent solutions, dominating all other packing algorithms previously described in this report.
 The strength of this algorithm comes from how it selects the type of bin to open for a new item.
-Previous algorithm have used naïve methods for this, such as simply selecting the cheapest feasible bin type.
+Previous algorithms have used naïve methods for this, such as simply selecting the cheapest feasible bin type.
 This algorithm takes a more intelligent approach to the problem, instead attempting to place multiple items of the same type into a new open bin, and selecting the bin type which can accomplish this with minimum remaining slack.
 The algorithm was inspired by previous work such as @Panigrahy2011HeuristicsFV, @MOMMESSIN2025106860, @gabay_vector_2016 and others.
 Because of this, the algorithm could also be viewed as a best-fit-next-fit hybrid algorithm.
@@ -341,10 +340,11 @@ $
 
 === Resource-weighted cost-aware first-fit algorithm
 
-We can now construct a new FFD-based packing algorithm by modifying the open-bin selection rule of the previous algorithm.
+We can now construct a new FFD-based packing algorithm by modifying the open-bin selection rule of the _BFD_ algorithm described in @bfd_algo.
 We will call this algorithm _"FFDNew"_.
+The _FFDNew_ algorithm is developed in this work as a variation of _FFD_, based on previous FFD-style variations and the cost-aware components introduced for _BFD_ above.
 This algorithm uses exactly the same resource-weighted job ordering and the same cost-aware $"SelectNewBinType"$ helper as _BFD_.
-The algorithm has the same worst-case time complexity as the previous _BFD_ algorithm.
+The algorithm has the same worst-case time complexity as the _BFD_ algorithm.
 Thus, both algorithms open new bins according to the same normalized weighted slack score.
 The only difference lies in how already open bins are selected.
 
