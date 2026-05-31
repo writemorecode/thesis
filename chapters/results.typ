@@ -9,6 +9,7 @@ We then compare the two best algorithms for the dataset, defined as the two sche
 This comparison uses a paired two-tailed $t$-test on per-instance total-cost ratios and reports the mean ratio, the $95%$ confidence interval for the mean ratio, the $p$-value, and whether the null hypothesis is rejected.
 // The ratio-distribution diagnostics are discussed in the appendix @appendix_data_normality.
 Next, we present a plot of the performance profiles for each of the algorithms.
+These are the Dolan-Moré performance profiles introduced in @exp_method_section.
 Here, $tau$ is on the $x$-axis, and $rho_s (tau)$ is on the $y$-axis, for each solver $s$.
 Finally, we present a table of the performance ratio _"win rate"_ for each algorithm.
 This value is, for each algorithm $s$, given by the performance profile function $rho_s (tau)$ at $tau = 1$.
