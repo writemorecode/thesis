@@ -672,11 +672,26 @@ The third dataset ("machine heavy") was generated with a greater number of machi
 The table below presents the parameters used to generate each dataset.
 
 #let all_datasets_csv_file = csv("../data/all_datasets.csv")
-#table(
-  columns: 9,
-  [*$"Name"$*], [*$K_min$*], [*$K_max$*], [*$J_min$*], [*$J_max$*], [*$M_min$*], [*$M_max$*], [*$T_min$*], [*$T_max$*],
-  ..all_datasets_csv_file.flatten(),
-)
+#align(center)[
+  #block(breakable: false, [
+    #figure(
+      table(
+        columns: 9,
+        [*$"Name"$*],
+        [*$K_min$*],
+        [*$K_max$*],
+        [*$J_min$*],
+        [*$J_max$*],
+        [*$M_min$*],
+        [*$M_max$*],
+        [*$T_min$*],
+        [*$T_max$*],
+        ..all_datasets_csv_file.flatten(),
+      ),
+      caption: [Generation parameters for each dataset.],
+    )
+  ])
+]
 
 === Evaluation method
 
